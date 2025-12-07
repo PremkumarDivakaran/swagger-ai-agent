@@ -5,6 +5,9 @@
 
 import { Router, Request, Response } from 'express';
 import { ApiResponse } from '../../core/types';
+import specRoutes from './spec.routes';
+import environmentRoutes, { createSpecEnvironmentRoutes } from './environment.routes';
+import executionRoutes from './execution.routes';
 
 const router = Router();
 
@@ -51,8 +54,11 @@ router.get('/docs', (_req: Request, res: Response) => {
         { method: 'GET', path: '/api/spec/:specId', description: 'Get spec metadata' },
         { method: 'GET', path: '/api/spec/:specId/operations', description: 'List operations in a spec' },
         { method: 'GET', path: '/api/spec/:specId/tags', description: 'List tags in a spec' },
-        { method: 'POST', path: '/api/environment', description: 'Create an environment' },
         { method: 'GET', path: '/api/spec/:specId/environments', description: 'List environments for a spec' },
+        { method: 'POST', path: '/api/environment', description: 'Create an environment' },
+        { method: 'GET', path: '/api/environment/:envId', description: 'Get environment by ID' },
+        { method: 'PUT', path: '/api/environment/:envId', description: 'Update an environment' },
+        { method: 'DELETE', path: '/api/environment/:envId', description: 'Delete an environment' },
         { method: 'POST', path: '/api/execution/plan', description: 'Create a run plan' },
         { method: 'POST', path: '/api/execution/run', description: 'Execute a run' },
         { method: 'GET', path: '/api/execution/status/:runId', description: 'Get run status' },
@@ -70,10 +76,17 @@ router.get('/docs', (_req: Request, res: Response) => {
   res.status(200).json(response);
 });
 
+// Route modules
+router.use('/spec', specRoutes);
+router.use('/environment', environmentRoutes);
+
+// Mount spec-specific environment routes
+router.use('/spec/:specId/environments', createSpecEnvironmentRoutes());
+
+// Execution routes
+router.use('/execution', executionRoutes);
+
 // Future routes will be added here:
-// router.use('/spec', specRoutes);
-// router.use('/environment', environmentRoutes);
-// router.use('/execution', executionRoutes);
 // router.use('/testgen', testgenRoutes);
 // router.use('/llm', llmRoutes);
 // router.use('/mcp', mcpRoutes);

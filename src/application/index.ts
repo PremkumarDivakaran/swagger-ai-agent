@@ -3,3 +3,5 @@
  */
 
 export * from './spec';
+export * from './environment';
+export * from './execution';

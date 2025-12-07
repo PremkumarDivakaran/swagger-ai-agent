@@ -8,3 +8,4 @@ export { ValidationError, ValidationErrorField } from './ValidationError';
 export { NotFoundError } from './NotFoundError';
 export { ExternalServiceError } from './ExternalServiceError';
 export { UnauthorizedError } from './UnauthorizedError';
+export { ConflictError } from './ConflictError';
