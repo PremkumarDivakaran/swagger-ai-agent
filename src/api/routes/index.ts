@@ -8,6 +8,7 @@ import { ApiResponse } from '../../core/types';
 import specRoutes from './spec.routes';
 import environmentRoutes, { createSpecEnvironmentRoutes } from './environment.routes';
 import executionRoutes from './execution.routes';
+import testgenRoutes from './testgen.routes';
 
 const router = Router();
 
@@ -86,8 +87,10 @@ router.use('/spec/:specId/environments', createSpecEnvironmentRoutes());
 // Execution routes
 router.use('/execution', executionRoutes);
 
+// Test generation routes
+router.use('/testgen', testgenRoutes);
+
 // Future routes will be added here:
-// router.use('/testgen', testgenRoutes);
 // router.use('/llm', llmRoutes);
 // router.use('/mcp', mcpRoutes);
 
