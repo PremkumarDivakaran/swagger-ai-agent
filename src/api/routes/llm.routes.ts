@@ -11,7 +11,7 @@ import {
   validateBuildPayload,
   validateBuildPayloadVariants,
   validateSuggestScenarios,
-  validateSpecIdParam,
+  validateLlmSpecIdParam,
 } from '../validators/llm.validator';
 import { specRepository } from './shared-repositories';
 
@@ -159,7 +159,7 @@ router.post(
  */
 router.get(
   '/spec/:specId/operations',
-  validateSpecIdParam,
+  validateLlmSpecIdParam,
   (req, res, next) => controller.listOperations(req as any, res, next)
 );
 

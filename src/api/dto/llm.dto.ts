@@ -163,9 +163,9 @@ export interface OperationSummaryDto {
 }
 
 /**
- * List operations response DTO
+ * List operations response DTO for LLM endpoints
  */
-export interface ListOperationsResponseDto {
+export interface LlmListOperationsResponseDto {
   /** Spec ID */
   specId: string;
   /** Spec title */

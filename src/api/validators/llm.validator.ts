@@ -137,6 +137,6 @@ export const validateBuildPayloadVariants = createValidator(buildPayloadVariants
 export const validateSuggestScenarios = createValidator(suggestScenariosSchema, 'body');
 
 /**
- * Validate spec ID param
+ * Validate spec ID param for LLM routes
  */
-export const validateSpecIdParam = createValidator(specIdParamSchema, 'params');
+export const validateLlmSpecIdParam = createValidator(specIdParamSchema, 'params');

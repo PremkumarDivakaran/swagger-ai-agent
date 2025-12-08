@@ -16,7 +16,7 @@ import {
   BuildPayloadVariantsResponseDto,
   SuggestScenariosRequestDto,
   SuggestScenariosResponseDto,
-  ListOperationsResponseDto,
+  LlmListOperationsResponseDto,
   LlmProviderStatusDto,
 } from '../dto/llm.dto';
 
@@ -165,7 +165,7 @@ export class LlmController {
    */
   async listOperations(
     req: Request<{ specId: string }>,
-    res: Response<ApiResponse<ListOperationsResponseDto>>,
+    res: Response<ApiResponse<LlmListOperationsResponseDto>>,
     next: NextFunction
   ): Promise<void> {
     try {
@@ -173,7 +173,7 @@ export class LlmController {
 
       const result = await this.buildPayloadUseCase.listOperations(specId);
 
-      const response: ApiResponse<ListOperationsResponseDto> = {
+      const response: ApiResponse<LlmListOperationsResponseDto> = {
         success: true,
         data: {
           specId: result.specId,

@@ -7,3 +7,4 @@ export * from './environment.dto';
 export * from './execution.dto';
 export * from './testgen.dto';
 export * from './llm.dto';
+export * from './mcp.dto';
