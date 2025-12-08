@@ -2,10 +2,10 @@
   "name": "swagger-ai-agent",
   "version": "1.0.0",
   "description": "Enterprise-grade Swagger AI Agent - API-first using Node.js + TypeScript + Express",
-  "main": "dist/core/server.js",
+  "main": "dist/src/core/server.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/core/server.js",
+    "start": "node dist/src/core/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/core/server.ts",
     "lint": "eslint src/**/*.ts",
     "test": "jest",

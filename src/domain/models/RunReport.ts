@@ -149,6 +149,22 @@ export interface MethodStats {
 }
 
 /**
+ * Statistics by path
+ */
+export interface PathStats {
+  /** API path */
+  path: string;
+  /** Total tests for this path */
+  total: number;
+  /** Passed tests */
+  passed: number;
+  /** Failed tests */
+  failed: number;
+  /** Pass rate */
+  passRate: number;
+}
+
+/**
  * RunReport domain model
  * Represents complete results of an execution
  */
@@ -173,6 +189,9 @@ export interface RunReport {
   
   /** Statistics by HTTP method */
   methodStats: MethodStats[];
+  
+  /** Statistics by path */
+  pathStats: PathStats[];
   
   /** When the run started */
   startedAt: Date;
@@ -218,6 +237,7 @@ export function createRunReport(
     testResults: partial.testResults,
     tagStats: partial.tagStats ?? [],
     methodStats: partial.methodStats ?? [],
+    pathStats: partial.pathStats ?? [],
     startedAt: partial.startedAt,
     completedAt: partial.completedAt,
     duration: partial.completedAt.getTime() - partial.startedAt.getTime(),
@@ -376,5 +396,145 @@ export function createErrorResult(
     retryAttempt: 0,
     startedAt: now,
     completedAt: now,
+  };
+}
+
+/**
+ * Result with operation metadata for aggregation
+ */
+export interface TestResultWithMetadata extends TestCaseResult {
+  /** HTTP method from operation */
+  method?: HttpMethod;
+  /** Path from operation */
+  path?: string;
+  /** Tags from operation */
+  tags?: string[];
+}
+
+/**
+ * Calculates statistics by tag from test results
+ * @param results - Test results with metadata
+ * @returns Array of tag statistics
+ */
+export function calculateTagStats(results: TestResultWithMetadata[]): TagStats[] {
+  const tagMap = new Map<string, { total: number; passed: number; failed: number }>();
+
+  for (const result of results) {
+    const tags = result.tags ?? [];
+    for (const tag of tags) {
+      const existing = tagMap.get(tag) ?? { total: 0, passed: 0, failed: 0 };
+      existing.total++;
+      if (result.status === 'passed') existing.passed++;
+      if (result.status === 'failed' || result.status === 'error') existing.failed++;
+      tagMap.set(tag, existing);
+    }
+  }
+
+  return Array.from(tagMap.entries()).map(([tag, stats]) => ({
+    tag,
+    total: stats.total,
+    passed: stats.passed,
+    failed: stats.failed,
+    passRate: stats.total > 0 ? (stats.passed / stats.total) * 100 : 0,
+  }));
+}
+
+/**
+ * Calculates statistics by HTTP method from test results
+ * @param results - Test results with metadata
+ * @returns Array of method statistics
+ */
+export function calculateMethodStats(results: TestResultWithMetadata[]): MethodStats[] {
+  const methodMap = new Map<HttpMethod, { total: number; passed: number; failed: number }>();
+
+  for (const result of results) {
+    const method = result.method;
+    if (!method) continue;
+    
+    const existing = methodMap.get(method) ?? { total: 0, passed: 0, failed: 0 };
+    existing.total++;
+    if (result.status === 'passed') existing.passed++;
+    if (result.status === 'failed' || result.status === 'error') existing.failed++;
+    methodMap.set(method, existing);
+  }
+
+  return Array.from(methodMap.entries()).map(([method, stats]) => ({
+    method,
+    total: stats.total,
+    passed: stats.passed,
+    failed: stats.failed,
+    passRate: stats.total > 0 ? (stats.passed / stats.total) * 100 : 0,
+  }));
+}
+
+/**
+ * Calculates statistics by path from test results
+ * @param results - Test results with metadata
+ * @returns Array of path statistics
+ */
+export function calculatePathStats(results: TestResultWithMetadata[]): PathStats[] {
+  const pathMap = new Map<string, { total: number; passed: number; failed: number }>();
+
+  for (const result of results) {
+    const path = result.path;
+    if (!path) continue;
+    
+    const existing = pathMap.get(path) ?? { total: 0, passed: 0, failed: 0 };
+    existing.total++;
+    if (result.status === 'passed') existing.passed++;
+    if (result.status === 'failed' || result.status === 'error') existing.failed++;
+    pathMap.set(path, existing);
+  }
+
+  return Array.from(pathMap.entries()).map(([path, stats]) => ({
+    path,
+    total: stats.total,
+    passed: stats.passed,
+    failed: stats.failed,
+    passRate: stats.total > 0 ? (stats.passed / stats.total) * 100 : 0,
+  }));
+}
+
+/**
+ * Creates a RunReport with calculated aggregations
+ * @param partial - Partial report data
+ * @param resultsWithMetadata - Test results with operation metadata
+ * @returns Complete RunReport with aggregations
+ */
+export function createRunReportWithAggregations(
+  partial: Partial<RunReport> & { 
+    runId: string; 
+    specId: string; 
+    envName: string;
+    startedAt: Date;
+    completedAt: Date;
+  },
+  resultsWithMetadata: TestResultWithMetadata[]
+): RunReport {
+  const testResults = resultsWithMetadata.map(r => {
+    // Strip metadata fields to get base TestCaseResult
+    const { method, path, tags, ...baseResult } = r;
+    return baseResult as TestCaseResult;
+  });
+
+  const summary = calculateSummary(testResults);
+  const tagStats = calculateTagStats(resultsWithMetadata);
+  const methodStats = calculateMethodStats(resultsWithMetadata);
+  const pathStats = calculatePathStats(resultsWithMetadata);
+  
+  return {
+    runId: partial.runId,
+    specId: partial.specId,
+    envName: partial.envName,
+    summary,
+    testResults,
+    tagStats,
+    methodStats,
+    pathStats,
+    startedAt: partial.startedAt,
+    completedAt: partial.completedAt,
+    duration: partial.completedAt.getTime() - partial.startedAt.getTime(),
+    environmentDetails: partial.environmentDetails,
+    runErrors: partial.runErrors,
   };
 }

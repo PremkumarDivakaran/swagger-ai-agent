@@ -18,7 +18,8 @@ import {
   Operation,
   EnvironmentConfig,
   TestCaseDefinition,
-  createRunReport,
+  TestResultWithMetadata,
+  createRunReportWithAggregations,
   startRun,
   completeRun,
   buildUrl,
@@ -193,13 +194,20 @@ export class ExecuteRunUseCase {
     await this.deps.runPlanRepository.update(runPlan);
 
     const startedAt = new Date();
-    const testResults: TestCaseResult[] = [];
+    const testResults: TestResultWithMetadata[] = [];
 
     // Execute each test case
     for (const item of runPlan.executionItems) {
       for (const testCase of item.testCases) {
         const result = await this.executeTestCase(testCase, item.operation, environment);
-        testResults.push(result);
+        // Add operation metadata to result for aggregations
+        const resultWithMetadata: TestResultWithMetadata = {
+          ...result,
+          method: item.operation.method,
+          path: item.operation.path,
+          tags: item.operation.tags,
+        };
+        testResults.push(resultWithMetadata);
 
         // Check stop on failure
         if (runPlan.config?.stopOnFailure && result.status === 'failed') {
@@ -210,19 +218,21 @@ export class ExecuteRunUseCase {
 
     const completedAt = new Date();
 
-    // Create run report
-    const runReport = createRunReport({
-      runId: runPlan.runId,
-      specId: runPlan.specId,
-      envName: runPlan.envName,
-      testResults,
-      startedAt,
-      completedAt,
-      environmentDetails: {
-        baseUrl: environment.baseUrl,
-        headers: environment.defaultHeaders,
+    // Create run report with aggregations
+    const runReport = createRunReportWithAggregations(
+      {
+        runId: runPlan.runId,
+        specId: runPlan.specId,
+        envName: runPlan.envName,
+        startedAt,
+        completedAt,
+        environmentDetails: {
+          baseUrl: environment.baseUrl,
+          headers: environment.defaultHeaders,
+        },
       },
-    });
+      testResults
+    );
 
     // Save report
     await this.deps.runReportRepository.create(runReport);

@@ -110,16 +110,18 @@ export class ExecutionController {
    * Gets the status of a run
    */
   getRunStatus = async (
-    req: Request<{ runId: string }, {}, {}, { includeDetails?: string }>,
+    req: Request<{ runId: string }, {}, {}, { includeDetails?: string; includeAggregations?: string }>,
     res: Response<ApiResponse<GetRunStatusResponseDTO>>,
     next: NextFunction
   ): Promise<void> => {
     try {
       const includeDetails = req.query.includeDetails === 'true';
+      const includeAggregations = req.query.includeAggregations === 'true';
 
       const result = await this.deps.getRunStatusUseCase.execute({
         runId: req.params.runId,
         includeDetails,
+        includeAggregations,
       });
 
       const response: ApiResponse<GetRunStatusResponseDTO> = {

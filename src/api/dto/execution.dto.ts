@@ -156,6 +156,41 @@ export interface FullRunSummaryDTO {
 }
 
 /**
+ * Tag statistics DTO
+ */
+export interface TagStatsDTO {
+  tag: string;
+  total: number;
+  passed: number;
+  failed: number;
+  passRate: number;
+}
+
+/**
+ * Method statistics DTO
+ */
+export interface MethodStatsDTO {
+  method: string;
+  total: number;
+  passed: number;
+  failed: number;
+  passRate: number;
+}
+
+/**
+ * Path statistics DTO
+ */
+export interface PathStatsDTO {
+  path: string;
+  method: string;
+  total: number;
+  passed: number;
+  failed: number;
+  avgDuration: number;
+  passRate: number;
+}
+
+/**
  * Get run status response DTO
  */
 export interface GetRunStatusResponseDTO {
@@ -171,6 +206,9 @@ export interface GetRunStatusResponseDTO {
   duration?: number;
   summary?: FullRunSummaryDTO;
   testResults?: TestCaseResultDTO[];
+  tagStats?: TagStatsDTO[];
+  methodStats?: MethodStatsDTO[];
+  pathStats?: PathStatsDTO[];
 }
 
 /**
@@ -292,6 +330,9 @@ export function toGetRunStatusResponseDTO(output: {
   duration?: number;
   summary?: any;
   testResults?: any[];
+  tagStats?: any[];
+  methodStats?: any[];
+  pathStats?: any[];
 }): GetRunStatusResponseDTO {
   return {
     runId: output.runId,
@@ -306,6 +347,9 @@ export function toGetRunStatusResponseDTO(output: {
     duration: output.duration,
     summary: output.summary,
     testResults: output.testResults?.map(toTestCaseResultDTO),
+    tagStats: output.tagStats,
+    methodStats: output.methodStats,
+    pathStats: output.pathStats,
   };
 }
 

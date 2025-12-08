@@ -57,6 +57,16 @@ const createMockRunReport = (): RunReport => {
     ],
     startedAt,
     completedAt,
+    tagStats: [
+      { tag: 'pets', total: 2, passed: 1, failed: 1, passRate: 50 },
+    ],
+    methodStats: [
+      { method: 'GET', total: 1, passed: 1, failed: 0, passRate: 100 },
+      { method: 'POST', total: 1, passed: 0, failed: 1, passRate: 0 },
+    ],
+    pathStats: [
+      { path: '/pets', total: 2, passed: 1, failed: 1, passRate: 50 },
+    ],
   });
 };
 
@@ -213,5 +223,79 @@ describe('GetRunStatusUseCase', () => {
     };
 
     await expect(useCase.execute(input)).rejects.toThrow('Run not found');
+  });
+
+  it('should include aggregations when includeAggregations is true', async () => {
+    const mockPlan = createMockRunPlan('completed');
+    mockPlan.startedAt = new Date('2024-01-01T10:00:00Z');
+    mockPlan.completedAt = new Date('2024-01-01T10:01:00Z');
+    mockRunPlanRepo.findById.mockResolvedValue(mockPlan);
+
+    const mockReport = createMockRunReport();
+    mockRunReportRepo.findById.mockResolvedValue(mockReport);
+
+    const input: GetRunStatusInput = {
+      runId: 'run-123',
+      includeAggregations: true,
+    };
+
+    const result = await useCase.execute(input);
+
+    expect(result.tagStats).toBeDefined();
+    expect(result.tagStats).toHaveLength(1);
+    expect(result.tagStats![0].tag).toBe('pets');
+
+    expect(result.methodStats).toBeDefined();
+    expect(result.methodStats).toHaveLength(2);
+
+    expect(result.pathStats).toBeDefined();
+    expect(result.pathStats).toHaveLength(1);
+    expect(result.pathStats![0].path).toBe('/pets');
+  });
+
+  it('should not include aggregations when includeAggregations is false', async () => {
+    const mockPlan = createMockRunPlan('completed');
+    mockRunPlanRepo.findById.mockResolvedValue(mockPlan);
+
+    const mockReport = createMockRunReport();
+    mockRunReportRepo.findById.mockResolvedValue(mockReport);
+
+    const input: GetRunStatusInput = {
+      runId: 'run-123',
+      includeAggregations: false,
+    };
+
+    const result = await useCase.execute(input);
+
+    expect(result.tagStats).toBeUndefined();
+    expect(result.methodStats).toBeUndefined();
+    expect(result.pathStats).toBeUndefined();
+  });
+
+  it('should include both details and aggregations when both requested', async () => {
+    const mockPlan = createMockRunPlan('completed');
+    mockPlan.startedAt = new Date('2024-01-01T10:00:00Z');
+    mockPlan.completedAt = new Date('2024-01-01T10:01:00Z');
+    mockRunPlanRepo.findById.mockResolvedValue(mockPlan);
+
+    const mockReport = createMockRunReport();
+    mockRunReportRepo.findById.mockResolvedValue(mockReport);
+
+    const input: GetRunStatusInput = {
+      runId: 'run-123',
+      includeDetails: true,
+      includeAggregations: true,
+    };
+
+    const result = await useCase.execute(input);
+
+    // Check details
+    expect(result.testResults).toBeDefined();
+    expect(result.testResults).toHaveLength(2);
+
+    // Check aggregations
+    expect(result.tagStats).toBeDefined();
+    expect(result.methodStats).toBeDefined();
+    expect(result.pathStats).toBeDefined();
   });
 });

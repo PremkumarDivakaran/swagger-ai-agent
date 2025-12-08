@@ -4,7 +4,7 @@
  */
 
 import { IRunPlanRepository, IRunReportRepository } from '../../domain/repositories';
-import { RunPlan, RunReport, TestCaseResult } from '../../domain/models';
+import { RunPlan, RunReport, TestCaseResult, TagStats, MethodStats, PathStats } from '../../domain/models';
 import { NotFoundError } from '../../core/errors';
 
 /**
@@ -13,6 +13,7 @@ import { NotFoundError } from '../../core/errors';
 export interface GetRunStatusInput {
   runId: string;
   includeDetails?: boolean;
+  includeAggregations?: boolean;
 }
 
 /**
@@ -40,6 +41,9 @@ export interface GetRunStatusOutput {
     avgDuration: number;
   };
   testResults?: TestCaseResult[];
+  tagStats?: TagStats[];
+  methodStats?: MethodStats[];
+  pathStats?: PathStats[];
 }
 
 /**
@@ -105,6 +109,13 @@ export class GetRunStatusUseCase {
         // Include test results if requested
         if (input.includeDetails) {
           output.testResults = report.testResults;
+        }
+
+        // Include aggregated stats if requested
+        if (input.includeAggregations) {
+          output.tagStats = report.tagStats;
+          output.methodStats = report.methodStats;
+          output.pathStats = report.pathStats;
         }
       }
     }

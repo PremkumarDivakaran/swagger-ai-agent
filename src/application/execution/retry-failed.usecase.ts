@@ -12,11 +12,12 @@ import {
   RunPlan,
   RunReport,
   TestCaseResult,
+  TestResultWithMetadata,
   RequestDetails,
   ResponseDetails,
   AssertionResult,
   createRunPlan,
-  createRunReport,
+  createRunReportWithAggregations,
   getFailedTests,
   buildUrl,
 } from '../../domain/models';
@@ -143,7 +144,7 @@ export class RetryFailedUseCase {
 
     // Execute retry tests
     const startedAt = new Date();
-    const testResults: TestCaseResult[] = [];
+    const testResults: TestResultWithMetadata[] = [];
 
     for (const failedResult of failedTests) {
       // Find the original test case
@@ -152,25 +153,34 @@ export class RetryFailedUseCase {
 
       if (testCase && operation) {
         const result = await this.executeTestCase(testCase, operation, environment, failedResult.retryAttempt + 1);
-        testResults.push(result);
+        // Add operation metadata to result for aggregations
+        const resultWithMetadata: TestResultWithMetadata = {
+          ...result,
+          method: operation.method,
+          path: operation.path,
+          tags: operation.tags,
+        };
+        testResults.push(resultWithMetadata);
       }
     }
 
     const completedAt = new Date();
 
-    // Create new run report
-    const runReport = createRunReport({
-      runId: newRunId,
-      specId: originalReport.specId,
-      envName: originalReport.envName,
-      testResults,
-      startedAt,
-      completedAt,
-      environmentDetails: {
-        baseUrl: environment.baseUrl,
-        headers: environment.defaultHeaders,
+    // Create new run report with aggregations
+    const runReport = createRunReportWithAggregations(
+      {
+        runId: newRunId,
+        specId: originalReport.specId,
+        envName: originalReport.envName,
+        startedAt,
+        completedAt,
+        environmentDetails: {
+          baseUrl: environment.baseUrl,
+          headers: environment.defaultHeaders,
+        },
       },
-    });
+      testResults
+    );
 
     // Save report
     await this.deps.runReportRepository.create(runReport);
