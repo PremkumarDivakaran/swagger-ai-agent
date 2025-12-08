@@ -9,6 +9,7 @@ import specRoutes from './spec.routes';
 import environmentRoutes, { createSpecEnvironmentRoutes } from './environment.routes';
 import executionRoutes from './execution.routes';
 import testgenRoutes from './testgen.routes';
+import llmRoutes from './llm.routes';
 
 const router = Router();
 
@@ -90,8 +91,10 @@ router.use('/execution', executionRoutes);
 // Test generation routes
 router.use('/testgen', testgenRoutes);
 
+// LLM routes
+router.use('/llm', llmRoutes);
+
 // Future routes will be added here:
-// router.use('/llm', llmRoutes);
 // router.use('/mcp', mcpRoutes);
 
 export default router;
