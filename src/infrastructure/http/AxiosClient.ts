@@ -1,11 +1,44 @@
 /**
  * AxiosClient
- * Wrapper around Axios for making HTTP requests
+ * Wrapper around Axios for making HTTP requests with retry and timeout support
  */
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { ExternalServiceError } from '../../core/errors';
 import { HttpMethod } from '../../domain/models';
+
+/**
+ * Retry configuration
+ */
+export interface RetryConfig {
+  /** Maximum number of retry attempts */
+  maxRetries: number;
+  /** Base delay between retries in milliseconds */
+  retryDelay: number;
+  /** Multiplier for exponential backoff */
+  backoffMultiplier: number;
+  /** Maximum delay between retries in milliseconds */
+  maxRetryDelay: number;
+  /** HTTP status codes that should trigger a retry */
+  retryableStatuses: number[];
+  /** Whether to retry on network errors */
+  retryOnNetworkError: boolean;
+  /** Whether to retry on timeout */
+  retryOnTimeout: boolean;
+}
+
+/**
+ * Default retry configuration
+ */
+export const DEFAULT_RETRY_CONFIG: RetryConfig = {
+  maxRetries: 3,
+  retryDelay: 1000,
+  backoffMultiplier: 2,
+  maxRetryDelay: 10000,
+  retryableStatuses: [408, 429, 500, 502, 503, 504],
+  retryOnNetworkError: true,
+  retryOnTimeout: true,
+};
 
 /**
  * Request configuration
@@ -25,6 +58,10 @@ export interface HttpRequestConfig {
   timeout?: number;
   /** Whether to validate SSL certificates */
   validateStatus?: (status: number) => boolean;
+  /** Retry configuration override */
+  retry?: Partial<RetryConfig>;
+  /** Disable retry for this request */
+  disableRetry?: boolean;
 }
 
 /**
@@ -41,6 +78,8 @@ export interface HttpResponse<T = unknown> {
   data: T;
   /** Response time in milliseconds */
   responseTime: number;
+  /** Number of retry attempts made */
+  retryAttempts?: number;
 }
 
 /**
@@ -59,65 +98,167 @@ export interface HttpError {
   isCancelled: boolean;
   /** Whether it's a network error */
   isNetworkError: boolean;
+  /** Error code (e.g., ECONNREFUSED, ETIMEDOUT) */
+  code?: string;
+  /** Number of retry attempts made */
+  retryAttempts?: number;
+}
+
+/**
+ * Client configuration
+ */
+export interface AxiosClientConfig {
+  baseURL?: string;
+  timeout?: number;
+  headers?: Record<string, string>;
+  retry?: Partial<RetryConfig>;
 }
 
 /**
  * AxiosClient class
- * Provides HTTP client functionality with timing and error handling
+ * Provides HTTP client functionality with timing, retry, and error handling
  */
 export class AxiosClient {
   private instance: AxiosInstance;
+  private retryConfig: RetryConfig;
 
-  constructor(config?: {
-    baseURL?: string;
-    timeout?: number;
-    headers?: Record<string, string>;
-  }) {
+  constructor(config?: AxiosClientConfig) {
     this.instance = axios.create({
       baseURL: config?.baseURL,
       timeout: config?.timeout ?? 30000,
       headers: config?.headers,
       validateStatus: () => true, // Don't throw on any status
     });
+    
+    this.retryConfig = {
+      ...DEFAULT_RETRY_CONFIG,
+      ...config?.retry,
+    };
   }
 
   /**
-   * Make an HTTP request
+   * Calculate delay for retry with exponential backoff
+   */
+  private calculateRetryDelay(attempt: number, config: RetryConfig): number {
+    const delay = config.retryDelay * Math.pow(config.backoffMultiplier, attempt);
+    return Math.min(delay, config.maxRetryDelay);
+  }
+
+  /**
+   * Check if the error/response is retryable
+   */
+  private isRetryable(error: HttpError | null, status: number | undefined, config: RetryConfig): boolean {
+    // Check if status code is retryable
+    if (status && config.retryableStatuses.includes(status)) {
+      return true;
+    }
+    
+    // Check network error
+    if (error?.isNetworkError && config.retryOnNetworkError) {
+      return true;
+    }
+    
+    // Check timeout
+    if (error?.isTimeout && config.retryOnTimeout) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  /**
+   * Sleep for specified milliseconds
+   */
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Make an HTTP request with retry support
    * @param config - Request configuration
    * @returns Response with timing data
    */
   async request<T = unknown>(config: HttpRequestConfig): Promise<HttpResponse<T>> {
     const startTime = Date.now();
+    const effectiveRetryConfig: RetryConfig = {
+      ...this.retryConfig,
+      ...config.retry,
+    };
+    
+    const maxAttempts = config.disableRetry ? 1 : effectiveRetryConfig.maxRetries + 1;
+    let lastError: HttpError | null = null;
+    let attempt = 0;
 
-    try {
-      const axiosConfig: AxiosRequestConfig = {
-        url: config.url,
-        method: config.method,
-        headers: config.headers,
-        params: config.params,
-        data: config.data,
-        timeout: config.timeout ?? 30000,
-        validateStatus: config.validateStatus ?? (() => true),
-      };
+    while (attempt < maxAttempts) {
+      try {
+        const axiosConfig: AxiosRequestConfig = {
+          url: config.url,
+          method: config.method,
+          headers: config.headers,
+          params: config.params,
+          data: config.data,
+          timeout: config.timeout ?? 30000,
+          validateStatus: config.validateStatus ?? (() => true),
+        };
 
-      const response: AxiosResponse<T> = await this.instance.request(axiosConfig);
-      const responseTime = Date.now() - startTime;
+        const response: AxiosResponse<T> = await this.instance.request(axiosConfig);
+        const responseTime = Date.now() - startTime;
 
-      return {
-        status: response.status,
-        statusText: response.statusText,
-        headers: this.normalizeHeaders(response.headers),
-        data: response.data,
-        responseTime,
-      };
-    } catch (error) {
-      const httpError = this.parseError(error);
-      throw new ExternalServiceError(
-        'AxiosClient',
-        `HTTP request failed: ${httpError.message}`,
-        error instanceof Error ? error : new Error(String(error))
-      );
+        // Check if response status is retryable
+        if (attempt < maxAttempts - 1 && this.isRetryable(null, response.status, effectiveRetryConfig)) {
+          const delay = this.calculateRetryDelay(attempt, effectiveRetryConfig);
+          await this.sleep(delay);
+          attempt++;
+          continue;
+        }
+
+        return {
+          status: response.status,
+          statusText: response.statusText,
+          headers: this.normalizeHeaders(response.headers),
+          data: response.data,
+          responseTime,
+          retryAttempts: attempt,
+        };
+      } catch (error) {
+        lastError = this.parseError(error);
+        lastError.retryAttempts = attempt;
+        
+        // Check if we should retry
+        if (attempt < maxAttempts - 1 && this.isRetryable(lastError, lastError.status, effectiveRetryConfig)) {
+          const delay = this.calculateRetryDelay(attempt, effectiveRetryConfig);
+          await this.sleep(delay);
+          attempt++;
+          continue;
+        }
+        
+        // No more retries, throw the error
+        const errorDetails = {
+          url: config.url,
+          method: config.method,
+          status: lastError.status,
+          isTimeout: lastError.isTimeout,
+          isNetworkError: lastError.isNetworkError,
+          retryAttempts: attempt,
+          code: lastError.code,
+        };
+        const detailedError = error instanceof Error ? error : new Error(String(error));
+        (detailedError as any).details = errorDetails;
+        
+        throw new ExternalServiceError(
+          'AxiosClient',
+          `HTTP request failed after ${attempt + 1} attempt(s): ${lastError.message}`,
+          detailedError
+        );
+      }
     }
+
+    // Should not reach here, but just in case
+    throw new ExternalServiceError(
+      'AxiosClient',
+      `HTTP request failed after ${attempt} attempt(s): ${lastError?.message ?? 'Unknown error'}`,
+      new Error(lastError?.message ?? 'Unknown error')
+    );
   }
 
   /**
@@ -211,6 +352,7 @@ export class AxiosClient {
         isTimeout: axiosError.code === 'ECONNABORTED' || axiosError.code === 'ETIMEDOUT',
         isCancelled: axios.isCancel(error),
         isNetworkError: !axiosError.response,
+        code: axiosError.code,
       };
     }
 
@@ -222,6 +364,23 @@ export class AxiosClient {
       isNetworkError: false,
     };
   }
+
+  /**
+   * Get retry configuration
+   */
+  getRetryConfig(): RetryConfig {
+    return { ...this.retryConfig };
+  }
+
+  /**
+   * Update retry configuration
+   */
+  setRetryConfig(config: Partial<RetryConfig>): void {
+    this.retryConfig = {
+      ...this.retryConfig,
+      ...config,
+    };
+  }
 }
 
 /**
@@ -229,10 +388,6 @@ export class AxiosClient {
  * @param config - Optional configuration
  * @returns AxiosClient instance
  */
-export function createAxiosClient(config?: {
-  baseURL?: string;
-  timeout?: number;
-  headers?: Record<string, string>;
-}): AxiosClient {
+export function createAxiosClient(config?: AxiosClientConfig): AxiosClient {
   return new AxiosClient(config);
 }

@@ -7,3 +7,14 @@ export { errorHandler } from './errorHandler';
 export { requestLogger } from './requestLogger';
 export { validateRequest, validateBody, validateQuery, validateParams, ValidationConfig } from './validateRequest';
 export { auth, optionalAuth, AuthConfig } from './auth';
+export {
+  rateLimiter,
+  createRouteRateLimiter,
+  apiRateLimiter,
+  uploadRateLimiter,
+  llmRateLimiter,
+  executionRateLimiter,
+  getRateLimitStore,
+  RateLimiterConfig,
+  DEFAULT_RATE_LIMIT_CONFIG,
+} from './rateLimiter';

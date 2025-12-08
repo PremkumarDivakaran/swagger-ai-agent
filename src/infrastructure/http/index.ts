@@ -8,6 +8,9 @@ export {
   HttpRequestConfig,
   HttpResponse,
   HttpError,
+  RetryConfig,
+  AxiosClientConfig,
+  DEFAULT_RETRY_CONFIG,
 } from './AxiosClient';
 
 export {
