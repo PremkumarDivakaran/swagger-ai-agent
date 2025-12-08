@@ -244,4 +244,254 @@ describe('CreateRunPlanUseCase', () => {
       })
     );
   });
+
+  describe('expected status code detection', () => {
+    it('should use status from swagger spec responses', async () => {
+      const specWithResponses: NormalizedSpec = {
+        ...mockSpec,
+        operations: [
+          createOperation({
+            operationId: 'createPet',
+            method: 'POST',
+            path: '/pet',
+            tags: ['pet'],
+            responses: [
+              { statusCode: '200', description: 'Successful operation' },
+              { statusCode: '405', description: 'Invalid input' },
+            ],
+          }),
+        ],
+      };
+      mockSpecRepo.findById.mockResolvedValue(specWithResponses);
+
+      const input: CreateRunPlanInput = {
+        specId: 'spec-123',
+        envName: 'qa',
+        selection: { mode: 'full' },
+      };
+
+      await useCase.execute(input);
+
+      // Should use 200 from spec, not default 201 for POST
+      expect(mockRunPlanRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          executionItems: expect.arrayContaining([
+            expect.objectContaining({
+              testCases: expect.arrayContaining([
+                expect.objectContaining({
+                  expectedStatus: 200,
+                }),
+              ]),
+            }),
+          ]),
+        })
+      );
+    });
+
+    it('should fallback to default status when no responses defined', async () => {
+      const specNoResponses: NormalizedSpec = {
+        ...mockSpec,
+        operations: [
+          createOperation({
+            operationId: 'createUser',
+            method: 'POST',
+            path: '/users',
+            tags: ['Users'],
+            responses: [], // No responses defined
+          }),
+        ],
+      };
+      mockSpecRepo.findById.mockResolvedValue(specNoResponses);
+
+      const input: CreateRunPlanInput = {
+        specId: 'spec-123',
+        envName: 'qa',
+        selection: { mode: 'full' },
+      };
+
+      await useCase.execute(input);
+
+      // Should fallback to 201 for POST
+      expect(mockRunPlanRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          executionItems: expect.arrayContaining([
+            expect.objectContaining({
+              testCases: expect.arrayContaining([
+                expect.objectContaining({
+                  expectedStatus: 201,
+                }),
+              ]),
+            }),
+          ]),
+        })
+      );
+    });
+  });
+
+  describe('request body generation', () => {
+    it('should generate request body from schema', async () => {
+      const specWithBody: NormalizedSpec = {
+        ...mockSpec,
+        operations: [
+          createOperation({
+            operationId: 'createPet',
+            method: 'POST',
+            path: '/pet',
+            tags: ['pet'],
+            requestBody: {
+              required: true,
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      name: { type: 'string' },
+                      status: { type: 'string', enum: ['available', 'pending', 'sold'] },
+                    },
+                    required: ['name'],
+                  },
+                },
+              },
+            },
+            responses: [{ statusCode: '200', description: 'OK' }],
+          }),
+        ],
+      };
+      mockSpecRepo.findById.mockResolvedValue(specWithBody);
+
+      const input: CreateRunPlanInput = {
+        specId: 'spec-123',
+        envName: 'qa',
+        selection: { mode: 'full' },
+      };
+
+      await useCase.execute(input);
+
+      expect(mockRunPlanRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          executionItems: expect.arrayContaining([
+            expect.objectContaining({
+              testCases: expect.arrayContaining([
+                expect.objectContaining({
+                  overrides: expect.objectContaining({
+                    body: expect.objectContaining({
+                      name: expect.any(String),
+                      status: 'available',
+                    }),
+                  }),
+                }),
+              ]),
+            }),
+          ]),
+        })
+      );
+    });
+
+    it('should use example from schema when available', async () => {
+      const specWithExample: NormalizedSpec = {
+        ...mockSpec,
+        operations: [
+          createOperation({
+            operationId: 'createPet',
+            method: 'POST',
+            path: '/pet',
+            tags: ['pet'],
+            requestBody: {
+              required: true,
+              content: {
+                'application/json': {
+                  example: { name: 'Fluffy', status: 'available' },
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      name: { type: 'string' },
+                      status: { type: 'string' },
+                    },
+                  },
+                },
+              },
+            },
+            responses: [{ statusCode: '200', description: 'OK' }],
+          }),
+        ],
+      };
+      mockSpecRepo.findById.mockResolvedValue(specWithExample);
+
+      const input: CreateRunPlanInput = {
+        specId: 'spec-123',
+        envName: 'qa',
+        selection: { mode: 'full' },
+      };
+
+      await useCase.execute(input);
+
+      expect(mockRunPlanRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          executionItems: expect.arrayContaining([
+            expect.objectContaining({
+              testCases: expect.arrayContaining([
+                expect.objectContaining({
+                  overrides: expect.objectContaining({
+                    body: { name: 'Fluffy', status: 'available' },
+                  }),
+                }),
+              ]),
+            }),
+          ]),
+        })
+      );
+    });
+
+    it('should skip file upload operations', async () => {
+      const specWithFileUpload: NormalizedSpec = {
+        ...mockSpec,
+        operations: [
+          createOperation({
+            operationId: 'uploadFile',
+            method: 'POST',
+            path: '/pet/{petId}/uploadImage',
+            tags: ['pet'],
+            requestBody: {
+              required: true,
+              content: {
+                'multipart/form-data': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      file: { type: 'string', format: 'binary' },
+                    },
+                  },
+                },
+              },
+            },
+            responses: [{ statusCode: '200', description: 'OK' }],
+          }),
+        ],
+      };
+      mockSpecRepo.findById.mockResolvedValue(specWithFileUpload);
+
+      const input: CreateRunPlanInput = {
+        specId: 'spec-123',
+        envName: 'qa',
+        selection: { mode: 'full' },
+      };
+
+      await useCase.execute(input);
+
+      expect(mockRunPlanRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          executionItems: expect.arrayContaining([
+            expect.objectContaining({
+              testCases: expect.arrayContaining([
+                expect.objectContaining({
+                  skip: true,
+                  skipReason: 'File upload operations require manual setup',
+                }),
+              ]),
+            }),
+          ]),
+        })
+      );
+    });
+  });
 });

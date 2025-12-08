@@ -173,13 +173,24 @@ export function createTestCaseDefinition(
  * @param operationId - Operation ID
  * @param method - HTTP method
  * @param path - API path
+ * @param options - Optional configuration
  * @returns Happy path test case definition
  */
 export function createHappyPathTestCase(
   operationId: string,
   method: HttpMethod,
-  path: string
+  path: string,
+  options?: {
+    expectedStatus?: number;
+    overrides?: TestCaseDefinition['overrides'];
+    skip?: boolean;
+    skipReason?: string;
+  }
 ): TestCaseDefinition {
+  // Default expected status: POST=201, others=200 (unless overridden)
+  const defaultStatus = method === 'POST' ? 201 : 200;
+  const expectedStatus = options?.expectedStatus ?? defaultStatus;
+
   return createTestCaseDefinition({
     id: `${operationId}_happy_path`,
     name: `${method} ${path} - Happy Path`,
@@ -188,10 +199,13 @@ export function createHappyPathTestCase(
     operationId,
     method,
     path,
-    expectedStatus: method === 'POST' ? 201 : 200,
+    expectedStatus,
     payloadStrategy: 'schema-default',
     priority: 1,
     tags: ['smoke', 'happy-path'],
+    overrides: options?.overrides,
+    skip: options?.skip,
+    skipReason: options?.skipReason,
   });
 }
 

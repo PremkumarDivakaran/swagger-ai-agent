@@ -198,11 +198,15 @@ export class GenerateAxiosTestsUseCase {
   ): TestCaseDefinition[] {
     const testCases: TestCaseDefinition[] = [];
 
+    // Determine expected status from responses
+    const expectedStatus = this.determineExpectedStatus(operation);
+
     // Always include happy path
     testCases.push(createHappyPathTestCase(
       operation.operationId,
       operation.method,
-      operation.path
+      operation.path,
+      { expectedStatus }
     ));
 
     // Include validation error tests if requested
@@ -318,6 +322,27 @@ export class GenerateAxiosTestsUseCase {
     }
 
     return tests;
+  }
+
+  /**
+   * Determine the expected success status code from operation responses
+   */
+  private determineExpectedStatus(operation: Operation): number {
+    // Look for successful responses (2xx) in the operation
+    const successResponses = operation.responses.filter(r => {
+      const code = parseInt(r.statusCode, 10);
+      return code >= 200 && code < 300;
+    });
+
+    // Sort to get the most specific (200, 201, 204) first
+    successResponses.sort((a, b) => parseInt(a.statusCode) - parseInt(b.statusCode));
+
+    if (successResponses.length > 0) {
+      return parseInt(successResponses[0].statusCode, 10);
+    }
+
+    // Fallback: POST = 201, others = 200
+    return operation.method === 'POST' ? 201 : 200;
   }
 
   /**

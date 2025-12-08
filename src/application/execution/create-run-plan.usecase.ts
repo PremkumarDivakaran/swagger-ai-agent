@@ -179,22 +179,199 @@ export class CreateRunPlanUseCase {
 
   /**
    * Generate default test cases for an operation
-   * For now, generates a happy path test for each operation
+   * Generates smart test cases with proper expected status and request bodies
    */
   private generateDefaultTestCases(operation: Operation): TestCaseDefinition[] {
     const testCases: TestCaseDefinition[] = [];
+
+    // Determine expected status from Swagger spec responses
+    const expectedStatus = this.determineExpectedStatus(operation);
+
+    // Check if this is a file upload operation
+    const isFileUpload = this.isFileUploadOperation(operation);
+
+    // Generate request body if needed
+    const requestBody = this.generateRequestBody(operation);
 
     // Happy path test
     testCases.push(createHappyPathTestCase(
       operation.operationId,
       operation.method,
-      operation.path
+      operation.path,
+      {
+        expectedStatus,
+        overrides: requestBody ? { body: requestBody } : undefined,
+        skip: isFileUpload,
+        skipReason: isFileUpload ? 'File upload operations require manual setup' : undefined,
+      }
     ));
 
     // Add more test types based on operation characteristics
     // This can be expanded to include validation tests, auth tests, etc.
 
     return testCases;
+  }
+
+  /**
+   * Determine the expected success status code from operation responses
+   */
+  private determineExpectedStatus(operation: Operation): number {
+    // Look for successful responses (2xx) in the operation
+    const successResponses = operation.responses.filter(r => {
+      const code = parseInt(r.statusCode, 10);
+      return code >= 200 && code < 300;
+    });
+
+    // Sort to get the most specific (200, 201, 204) first
+    successResponses.sort((a, b) => parseInt(a.statusCode) - parseInt(b.statusCode));
+
+    if (successResponses.length > 0) {
+      return parseInt(successResponses[0].statusCode, 10);
+    }
+
+    // Fallback: Use 200 as default (most common actual API behavior)
+    // Many APIs don't properly document success responses but return 200
+    return 200;
+  }
+
+  /**
+   * Check if the operation is a file upload operation
+   * Handles both OpenAPI 3.x (requestBody.content) and Swagger 2.0 (formData parameters with type: file)
+   */
+  private isFileUploadOperation(operation: Operation): boolean {
+    // Check OpenAPI 3.x style - requestBody with multipart content
+    if (operation.requestBody?.content) {
+      const contentTypes = Object.keys(operation.requestBody.content);
+      if (contentTypes.some(ct => 
+        ct.includes('multipart/form-data') || ct.includes('application/octet-stream')
+      )) {
+        return true;
+      }
+    }
+
+    // Check Swagger 2.0 style - formData parameters with type: file
+    // These may be normalized differently, so check multiple patterns
+    if (operation.parameters.some(p => {
+      const schema = p.schema as Record<string, unknown> | undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const paramAny = p as any;
+      const inValue = String(p.in || paramAny.in || '');
+      const typeValue = String(schema?.type || paramAny.type || '');
+      return inValue === 'formData' && typeValue === 'file';
+    })) {
+      return true;
+    }
+
+    // Check if path suggests file upload (common patterns)
+    if (operation.path.includes('upload') && operation.method === 'POST') {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Generate request body from operation schema
+   */
+  private generateRequestBody(operation: Operation): unknown | undefined {
+    if (!operation.requestBody?.content) return undefined;
+
+    // Try application/json first
+    const jsonContent = operation.requestBody.content['application/json'];
+    if (jsonContent) {
+      // Use example if available
+      if (jsonContent.example) {
+        return jsonContent.example;
+      }
+
+      // Use first example from examples if available
+      if (jsonContent.examples) {
+        const firstExample = Object.values(jsonContent.examples)[0];
+        if (firstExample?.value) {
+          return firstExample.value;
+        }
+      }
+
+      // Generate from schema
+      if (jsonContent.schema) {
+        return this.generateFromSchema(jsonContent.schema);
+      }
+    }
+
+    // Try form-urlencoded
+    const formContent = operation.requestBody.content['application/x-www-form-urlencoded'];
+    if (formContent?.schema) {
+      return this.generateFromSchema(formContent.schema);
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Generate sample data from JSON schema
+   */
+  private generateFromSchema(schema: Record<string, unknown>): unknown {
+    const type = schema.type as string;
+
+    // Use example if available
+    if (schema.example !== undefined) {
+      return schema.example;
+    }
+
+    // Use default if available
+    if (schema.default !== undefined) {
+      return schema.default;
+    }
+
+    switch (type) {
+      case 'object': {
+        const obj: Record<string, unknown> = {};
+        const properties = schema.properties as Record<string, Record<string, unknown>> | undefined;
+        const required = schema.required as string[] | undefined;
+        
+        if (properties) {
+          for (const [propName, propSchema] of Object.entries(properties)) {
+            // Include required properties and some optional ones
+            if (required?.includes(propName) || Object.keys(obj).length < 5) {
+              obj[propName] = this.generateFromSchema(propSchema);
+            }
+          }
+        }
+        return obj;
+      }
+      
+      case 'array': {
+        const items = schema.items as Record<string, unknown> | undefined;
+        if (items) {
+          return [this.generateFromSchema(items)];
+        }
+        return [];
+      }
+      
+      case 'string':
+        if (schema.format === 'date') return '2025-01-01';
+        if (schema.format === 'date-time') return '2025-01-01T00:00:00Z';
+        if (schema.format === 'email') return 'test@example.com';
+        if (schema.format === 'uri' || schema.format === 'url') return 'https://example.com';
+        if (schema.format === 'uuid') return '550e8400-e29b-41d4-a716-446655440000';
+        if (schema.enum && Array.isArray(schema.enum)) return schema.enum[0];
+        // Use property name hint for better values
+        return 'test-value';
+      
+      case 'integer':
+        if (schema.minimum !== undefined) return schema.minimum;
+        return 1;
+      
+      case 'number':
+        if (schema.minimum !== undefined) return schema.minimum;
+        return 1.0;
+      
+      case 'boolean':
+        return true;
+      
+      default:
+        return null;
+    }
   }
 }
 

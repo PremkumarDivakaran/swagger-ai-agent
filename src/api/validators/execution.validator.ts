@@ -67,7 +67,8 @@ export const getRunStatusParamsSchema = Joi.object({
  * Get run status query schema
  */
 export const getRunStatusQuerySchema = Joi.object({
-  includeDetails: Joi.boolean().optional(),
+  includeDetails: Joi.string().valid('true', 'false').optional(),
+  includeAggregations: Joi.string().valid('true', 'false').optional(),
 });
 
 /**

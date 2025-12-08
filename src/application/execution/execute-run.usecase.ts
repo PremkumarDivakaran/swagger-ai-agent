@@ -199,6 +199,33 @@ export class ExecuteRunUseCase {
     // Execute each test case
     for (const item of runPlan.executionItems) {
       for (const testCase of item.testCases) {
+        // Check if test should be skipped
+        if (testCase.skip) {
+          const skippedResult: TestResultWithMetadata = {
+            testCaseId: testCase.id,
+            testCaseName: testCase.name,
+            operationId: item.operation.operationId,
+            status: 'skipped',
+            request: {
+              url: '',
+              method: item.operation.method,
+              headers: {},
+              timestamp: new Date(),
+            },
+            assertions: [],
+            duration: 0,
+            retryAttempt: 0,
+            startedAt: new Date(),
+            completedAt: new Date(),
+            skipReason: testCase.skipReason,
+            method: item.operation.method,
+            path: item.operation.path,
+            tags: item.operation.tags,
+          };
+          testResults.push(skippedResult);
+          continue;
+        }
+
         const result = await this.executeTestCase(testCase, item.operation, environment);
         // Add operation metadata to result for aggregations
         const resultWithMetadata: TestResultWithMetadata = {

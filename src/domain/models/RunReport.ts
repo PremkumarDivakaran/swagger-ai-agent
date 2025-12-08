@@ -84,6 +84,8 @@ export interface TestCaseResult {
   error?: string;
   /** Error stack trace */
   errorStack?: string;
+  /** Skip reason (for 'skipped' status) */
+  skipReason?: string;
   /** Execution duration in milliseconds */
   duration: number;
   /** Retry attempt number (0 = first attempt) */

@@ -135,6 +135,7 @@ export interface TestCaseResultDTO {
   response?: ResponseDetailsDTO;
   assertions: AssertionResultDTO[];
   error?: string;
+  skipReason?: string;
   duration: number;
   retryAttempt: number;
   startedAt: string;
@@ -307,6 +308,7 @@ export function toTestCaseResultDTO(result: any): TestCaseResultDTO {
     } : undefined,
     assertions: result.assertions,
     error: result.error,
+    skipReason: result.skipReason,
     duration: result.duration,
     retryAttempt: result.retryAttempt,
     startedAt: result.startedAt.toISOString(),
