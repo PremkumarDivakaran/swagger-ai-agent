@@ -10,6 +10,7 @@ export {
   UrlSource,
   FileSource,
   GitSource,
+  InlineSource,
   LoadResult,
 } from './SwaggerLoader';
 

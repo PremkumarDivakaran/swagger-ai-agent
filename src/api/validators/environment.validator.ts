@@ -64,9 +64,8 @@ const createEnvironmentSchema = Joi.object({
     'string.pattern.base': 'name can only contain letters, numbers, underscores, and hyphens',
     'any.required': 'name is required',
   }),
-  baseUrl: Joi.string().uri({ scheme: ['http', 'https'] }).required().messages({
+  baseUrl: Joi.string().uri({ scheme: ['http', 'https'] }).optional().messages({
     'string.uri': 'baseUrl must be a valid HTTP or HTTPS URL',
-    'any.required': 'baseUrl is required',
   }),
   defaultHeaders: Joi.object().pattern(Joi.string(), Joi.string()).optional(),
   authConfig: authConfigSchema.optional(),

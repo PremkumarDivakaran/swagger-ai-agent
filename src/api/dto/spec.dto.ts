@@ -93,7 +93,7 @@ export interface SpecMetadataResponseDto {
   operationCount: number;
   /** Source information */
   source: {
-    type: 'url' | 'file' | 'git';
+    type: 'url' | 'file' | 'git' | 'inline';
     location: string;
     importedAt: string;
   };

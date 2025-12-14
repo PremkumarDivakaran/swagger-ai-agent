@@ -111,8 +111,8 @@ export interface SecurityScheme {
  * Spec metadata
  */
 export interface SpecMetadata {
-  /** Source type (url, file, git) */
-  sourceType: 'url' | 'file' | 'git';
+  /** Source type (url, file, git, inline) */
+  sourceType: 'url' | 'file' | 'git' | 'inline';
   /** Original source location */
   sourceLocation: string;
   /** When the spec was imported */

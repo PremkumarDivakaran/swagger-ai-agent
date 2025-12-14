@@ -10,7 +10,7 @@ import { ExternalServiceError } from '../../core/errors';
 /**
  * Source types for Swagger specs
  */
-export type SpecSourceType = 'url' | 'file' | 'git';
+export type SpecSourceType = 'url' | 'file' | 'git' | 'inline';
 
 /**
  * URL source configuration
@@ -27,6 +27,15 @@ export interface UrlSource {
 export interface FileSource {
   type: 'file';
   path: string;
+}
+
+/**
+ * Inline source configuration (raw content)
+ */
+export interface InlineSource {
+  type: 'inline';
+  content: string;
+  filename?: string;
 }
 
 /**
@@ -47,7 +56,7 @@ export interface GitSource {
 /**
  * Union type for all source configurations
  */
-export type SpecSource = UrlSource | FileSource | GitSource;
+export type SpecSource = UrlSource | FileSource | GitSource | InlineSource;
 
 /**
  * Result of loading a spec
@@ -65,7 +74,7 @@ export interface LoadResult {
 
 /**
  * SwaggerLoader class
- * Handles loading Swagger/OpenAPI specs from URL, file, or git
+ * Handles loading Swagger/OpenAPI specs from URL, file, git, or inline content
  */
 export class SwaggerLoader {
   /**
@@ -81,12 +90,29 @@ export class SwaggerLoader {
         return this.loadFromFile(source);
       case 'git':
         return this.loadFromGit(source);
+      case 'inline':
+        return this.loadFromInline(source);
       default:
         throw new ExternalServiceError(
           `Unsupported source type: ${(source as SpecSource).type}`,
           'SwaggerLoader'
         );
     }
+  }
+
+  /**
+   * Load spec from inline content
+   * @param source - Inline source configuration
+   * @returns LoadResult with raw content
+   */
+  loadFromInline(source: InlineSource): LoadResult {
+    const contentType = this.detectContentType(source.content, source.filename || 'inline');
+    return {
+      content: source.content,
+      contentType,
+      sourceLocation: source.filename || 'inline',
+      sourceType: 'inline',
+    };
   }
 
   /**

@@ -11,7 +11,16 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "stop:backend": "lsof -ti :3001 | xargs kill -9 2>/dev/null || true",
+    "stop:frontend": "lsof -ti :5174 | xargs kill -9 2>/dev/null || true",
+    "stop:app": "npm run stop:backend && npm run stop:frontend",
+    "start:backend": "npm run dev &",
+    "start:frontend": "cd web-app && npm run dev &",
+    "start:app": "npm run stop:app && sleep 1 && npm run start:backend && sleep 2 && npm run start:frontend",
+    "restart:app": "npm run stop:app && sleep 1 && npm run start:backend && sleep 2 && npm run start:frontend",
+    "build:frontend": "cd web-app && npm run build",
+    "build:all": "npm run build && npm run build:frontend"
   },
   "keywords": [
     "swagger",

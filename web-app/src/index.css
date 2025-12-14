@@ -1,0 +1,186 @@
+@import "tailwindcss";
+
+/* Custom CSS Variables - Light Blue Theme inspired by modern e-commerce */
+:root {
+  /* Backgrounds */
+  --background: 210 50% 98%;
+  --foreground: 213 27% 14%;
+  
+  /* Cards - crisp white */
+  --card: 0 0% 100%;
+  --card-foreground: 213 27% 14%;
+  
+  /* Popover */
+  --popover: 0 0% 100%;
+  --popover-foreground: 213 27% 14%;
+  
+  /* Primary - Amazon-like orange accent for CTAs */
+  --primary: 36 100% 50%;
+  --primary-foreground: 0 0% 100%;
+  
+  /* Secondary - Light blue tint */
+  --secondary: 199 89% 96%;
+  --secondary-foreground: 199 69% 28%;
+  
+  /* Muted - Soft gray-blue */
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+  
+  /* Accent - Light blue hover states */
+  --accent: 199 89% 94%;
+  --accent-foreground: 199 69% 28%;
+  
+  /* Destructive */
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  
+  /* Status colors */
+  --success: 142 71% 45%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 26 83% 14%;
+  
+  /* Borders - subtle blue-gray */
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 36 100% 50%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* Dark mode - Deep blue-gray */
+  --background: 222 47% 11%;
+  --foreground: 210 40% 98%;
+  
+  --card: 223 47% 13%;
+  --card-foreground: 210 40% 98%;
+  
+  --popover: 223 47% 13%;
+  --popover-foreground: 210 40% 98%;
+  
+  /* Primary stays orange for consistency */
+  --primary: 36 100% 50%;
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 217 33% 20%;
+  --secondary-foreground: 210 40% 98%;
+  
+  --muted: 217 33% 18%;
+  --muted-foreground: 215 20% 65%;
+  
+  --accent: 217 33% 22%;
+  --accent-foreground: 210 40% 98%;
+  
+  --destructive: 0 63% 40%;
+  --destructive-foreground: 210 40% 98%;
+  
+  --success: 142 71% 45%;
+  --success-foreground: 210 40% 98%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 210 40% 98%;
+  
+  --border: 217 33% 22%;
+  --input: 217 33% 22%;
+  --ring: 36 100% 50%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Enhanced Form Elements */
+input[type="text"],
+input[type="url"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+  transition: all 0.2s ease;
+  border: 1.5px solid #cbd5e1;
+  background-color: white;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+  outline: none;
+}
+
+input:hover:not(:focus):not(:disabled),
+select:hover:not(:focus):not(:disabled),
+textarea:hover:not(:focus):not(:disabled) {
+  border-color: #7dd3fc;
+}
+
+/* Better Select Styling */
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Checkbox Styling */
+input[type="checkbox"] {
+  accent-color: hsl(var(--primary));
+  cursor: pointer;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Method Color Classes */
+.method-get { color: #22c55e; }
+.method-post { color: #3b82f6; }
+.method-put { color: #f59e0b; }
+.method-patch { color: #8b5cf6; }
+.method-delete { color: #ef4444; }
+
+.method-badge-get { background-color: #dcfce7; color: #166534; }
+.method-badge-post { background-color: #dbeafe; color: #1e40af; }
+.method-badge-put { background-color: #fef3c7; color: #92400e; }
+.method-badge-patch { background-color: #ede9fe; color: #5b21b6; }
+.method-badge-delete { background-color: #fee2e2; color: #991b1b; }
+
+.dark .method-badge-get { background-color: #166534; color: #dcfce7; }
+.dark .method-badge-post { background-color: #1e40af; color: #dbeafe; }
+.dark .method-badge-put { background-color: #92400e; color: #fef3c7; }
+.dark .method-badge-patch { background-color: #5b21b6; color: #ede9fe; }
+.dark .method-badge-delete { background-color: #991b1b; color: #fee2e2; }

@@ -3,7 +3,7 @@
  * Creates a new environment configuration for a spec
  */
 
-import { EnvironmentConfig, AuthConfig, createEnvironmentConfig } from '../../domain/models';
+import { EnvironmentConfig, AuthConfig, createEnvironmentConfig, getDefaultServerUrl } from '../../domain/models';
 import { IEnvironmentRepository, ISpecRepository } from '../../domain/repositories';
 import { NotFoundError, ValidationError, ConflictError } from '../../core/errors';
 import { generateId } from '../../utils';
@@ -16,8 +16,8 @@ export interface CreateEnvironmentInput {
   specId: string;
   /** Environment name (e.g., 'dev', 'qa', 'staging', 'prod') */
   name: string;
-  /** Base URL for API calls */
-  baseUrl: string;
+  /** Base URL for API calls - if not provided, uses spec's default server URL */
+  baseUrl?: string;
   /** Default headers to include in all requests */
   defaultHeaders?: Record<string, string>;
   /** Authentication configuration */
@@ -80,10 +80,13 @@ export class CreateEnvironmentUseCase {
       throw new ConflictError(`Environment with name '${input.name}' already exists for this spec`);
     }
 
+    // Use provided baseUrl or fallback to spec's default server URL
+    const baseUrl = input.baseUrl || getDefaultServerUrl(spec);
+
     // Validate base URL
-    if (!this.isValidUrl(input.baseUrl)) {
+    if (!baseUrl || !this.isValidUrl(baseUrl)) {
       throw new ValidationError('Invalid base URL', [
-        { field: 'baseUrl', message: 'Must be a valid HTTP or HTTPS URL' }
+        { field: 'baseUrl', message: 'Must be a valid HTTP or HTTPS URL. Provide a baseUrl or ensure the spec has server definitions.' }
       ]);
     }
 
@@ -95,7 +98,7 @@ export class CreateEnvironmentUseCase {
       id: envId,
       specId: input.specId,
       name: input.name,
-      baseUrl: input.baseUrl,
+      baseUrl: baseUrl,
       defaultHeaders: input.defaultHeaders,
       authConfig: input.authConfig,
       timeout: input.timeout,
