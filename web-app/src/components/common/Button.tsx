@@ -15,9 +15,9 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const variantClasses = {
   primary: 'bg-gradient-to-b from-amber-400 to-amber-500 text-white hover:from-amber-500 hover:to-amber-600 shadow-md hover:shadow-lg border border-amber-600/20',
-  secondary: 'bg-gradient-to-b from-sky-50 to-sky-100 text-sky-700 hover:from-sky-100 hover:to-sky-200 border border-sky-200',
-  outline: 'border-2 border-sky-300 bg-white text-sky-700 hover:bg-sky-50 hover:border-sky-400',
-  ghost: 'text-sky-700 hover:bg-sky-50 hover:text-sky-800',
+  secondary: 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600',
+  outline: 'border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-amber-500/50',
+  ghost: 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white',
   destructive: 'bg-gradient-to-b from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-md border border-red-700/20',
 };
 

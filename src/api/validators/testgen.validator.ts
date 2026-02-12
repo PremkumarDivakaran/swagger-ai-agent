@@ -7,21 +7,30 @@ import Joi from 'joi';
 import { Request, Response, NextFunction } from 'express';
 
 /**
- * Selection schema (reused across validators)
+ * Selection schema (reused across validators).
+ * For mode 'single': either operationId (string) or operationIds (array) is required.
  */
 const selectionSchema = Joi.object({
   mode: Joi.string().valid('single', 'tag', 'full').required(),
-  operationId: Joi.string().when('mode', {
-    is: 'single',
-    then: Joi.required(),
-    otherwise: Joi.optional(),
-  }),
+  operationId: Joi.string().optional(),
+  operationIds: Joi.array().items(Joi.string()).min(1).optional(),
   tags: Joi.array().items(Joi.string()).min(1).when('mode', {
     is: 'tag',
     then: Joi.required(),
     otherwise: Joi.optional(),
   }),
   exclude: Joi.array().items(Joi.string()).optional(),
+}).custom((value, helpers) => {
+  if (value.mode === 'single') {
+    const hasOperationId = value.operationId != null && String(value.operationId).trim() !== '';
+    const hasOperationIds = Array.isArray(value.operationIds) && value.operationIds.length > 0;
+    if (!hasOperationId && !hasOperationIds) {
+      return helpers.error('selection.singleRequiresOperation');
+    }
+  }
+  return value;
+}).messages({
+  'selection.singleRequiresOperation': '"selection" must include either "operationId" or "operationIds" when mode is "single"',
 });
 
 /**
@@ -38,18 +47,6 @@ const testOptionsSchema = Joi.object({
 });
 
 /**
- * Generate Axios tests request schema
- */
-export const generateAxiosTestsSchema = Joi.object({
-  specId: Joi.string().required().messages({
-    'any.required': 'specId is required',
-    'string.empty': 'specId cannot be empty',
-  }),
-  selection: selectionSchema.optional(),
-  options: testOptionsSchema.optional(),
-});
-
-/**
  * Test preview request schema
  */
 export const testPreviewSchema = Joi.object({
@@ -58,29 +55,6 @@ export const testPreviewSchema = Joi.object({
     'string.empty': 'specId cannot be empty',
   }),
   maxOperations: Joi.number().integer().min(1).max(50).default(5),
-});
-
-/**
- * Export options schema
- */
-const exportOptionsSchema = Joi.object({
-  format: Joi.string().valid('single-file', 'multi-file', 'zip').default('single-file'),
-  includePackageJson: Joi.boolean().default(true),
-  includeJestConfig: Joi.boolean().default(true),
-  includeReadme: Joi.boolean().default(true),
-});
-
-/**
- * Export test suite request schema
- */
-export const exportTestSuiteSchema = Joi.object({
-  specId: Joi.string().required().messages({
-    'any.required': 'specId is required',
-    'string.empty': 'specId cannot be empty',
-  }),
-  selection: selectionSchema.optional(),
-  exportOptions: exportOptionsSchema.optional(),
-  testOptions: testOptionsSchema.optional(),
 });
 
 /**
@@ -116,16 +90,43 @@ function createValidator(schema: Joi.Schema) {
 }
 
 /**
- * Validate generate axios tests request
- */
-export const validateGenerateAxiosTests = createValidator(generateAxiosTestsSchema);
-
-/**
  * Validate test preview request
  */
 export const validateTestPreview = createValidator(testPreviewSchema);
 
 /**
- * Validate export test suite request
+ * Execute tests request schema
  */
-export const validateExportTestSuite = createValidator(exportTestSuiteSchema);
+export const executeTestsSchema = Joi.object({
+  testSuitePath: Joi.string().required().messages({
+    'any.required': 'testSuitePath is required',
+    'string.empty': 'testSuitePath cannot be empty',
+  }),
+  framework: Joi.string().valid('cucumber', 'jest', 'maven').required(),
+  args: Joi.array().items(Joi.string()).optional(),
+  env: Joi.object().pattern(Joi.string(), Joi.string()).optional(),
+});
+
+/**
+ * Validate execute tests request
+ */
+export const validateExecuteTests = createValidator(executeTestsSchema);
+
+/**
+ * AI Agent run request schema
+ */
+export const agentRunSchema = Joi.object({
+  specId: Joi.string().required().messages({
+    'any.required': 'specId is required',
+    'string.empty': 'specId cannot be empty',
+  }),
+  maxIterations: Joi.number().integer().min(1).max(10).optional().default(5),
+  baseDirectory: Joi.string().optional().default('./swagger-tests'),
+  basePackage: Joi.string().optional().default('com.api.tests'),
+  autoExecute: Joi.boolean().optional().default(true),
+});
+
+/**
+ * Validate AI Agent run request
+ */
+export const validateAgentRun = createValidator(agentRunSchema);

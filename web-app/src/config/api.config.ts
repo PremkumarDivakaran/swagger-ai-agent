@@ -36,4 +36,13 @@ export const endpoints = {
     status: (runId: string) => `/api/execution/status/${runId}`,
     retryFailed: '/api/execution/retry-failed',
   },
+  
+  // Test Generation endpoints
+  testgen: {
+    executeTests: '/api/testgen/execute-tests',
+    executionStatus: (executionId: string) => `/api/testgen/execution/${executionId}`,
+    // AI REST Assured endpoints
+    agentRun: '/api/testgen/agent/run',
+    agentStatus: (runId: string) => `/api/testgen/agent/run/${runId}`,
+  },
 };

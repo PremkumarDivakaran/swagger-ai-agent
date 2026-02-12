@@ -18,6 +18,7 @@ import {
   OpenApiNormalizer,
 } from '../../infrastructure/swagger';
 import { createAxiosHttpClient } from '../../infrastructure/http';
+import { LlmRouter } from '../../infrastructure/llm';
 
 // Create shared repository instances (singletons)
 export const specRepository = new InMemorySpecRepository();
@@ -34,3 +35,10 @@ export const openApiNormalizer = new OpenApiNormalizer();
 export const httpClient = createAxiosHttpClient({
   timeout: 30000,
 });
+
+// LLM Router (will be set by server initialization)
+export let llmRouter: LlmRouter | null = null;
+
+export function setLlmRouter(router: LlmRouter | null): void {
+  llmRouter = router;
+}

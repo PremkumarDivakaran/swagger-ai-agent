@@ -79,7 +79,7 @@ export const useSpecStore = create<SpecStore>()((set, get) => ({
   addSpec: (spec) => set({ specs: [...get().specs, spec] }),
 
   removeSpec: (specId) => set({
-    specs: get().specs.filter((s) => s.specId !== specId),
+    specs: get().specs.filter((s) => s.id !== specId),
     selectedSpec: get().selectedSpec?.specId === specId ? null : get().selectedSpec,
     operations: get().selectedSpec?.specId === specId ? [] : get().operations,
   }),

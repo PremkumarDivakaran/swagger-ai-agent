@@ -26,7 +26,7 @@ export function Logo({ size = 'md', showText = true, className }: LogoProps) {
         <Zap className={cn(config.icon, 'text-white')} />
       </div>
       {showText && (
-        <span className={cn(config.text, 'font-bold text-slate-800')}>
+        <span className={cn(config.text, 'font-bold text-foreground')}>
           Swagger AI
         </span>
       )}

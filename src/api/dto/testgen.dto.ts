@@ -27,28 +27,7 @@ export interface TestGenerationOptionsDto {
 }
 
 /**
- * Generate Axios tests request DTO
- */
-export interface GenerateAxiosTestsRequestDto {
-  /** Spec ID to generate tests for */
-  specId: string;
-  /** Operation selection criteria */
-  selection?: {
-    /** Selection mode */
-    mode: 'single' | 'tag' | 'full';
-    /** Single operation ID (for 'single' mode) */
-    operationId?: string;
-    /** Tag names (for 'tag' mode) */
-    tags?: string[];
-    /** Operation IDs to exclude */
-    exclude?: string[];
-  };
-  /** Test generation options */
-  options?: TestGenerationOptionsDto;
-}
-
-/**
- * Generated test case DTO
+ * Generated test case DTO (for preview response)
  */
 export interface GeneratedTestCaseDto {
   /** Test case ID */
@@ -67,30 +46,6 @@ export interface GeneratedTestCaseDto {
   expectedStatus: number;
   /** Test case description */
   description?: string;
-}
-
-/**
- * Generate Axios tests response DTO
- */
-export interface GenerateAxiosTestsResponseDto {
-  /** Generated test code */
-  code: string;
-  /** Generated test file name */
-  fileName: string;
-  /** Spec ID */
-  specId: string;
-  /** Spec title */
-  specTitle: string;
-  /** Number of test cases generated */
-  testCount: number;
-  /** Number of operations covered */
-  operationCount: number;
-  /** Test cases metadata */
-  testCases: GeneratedTestCaseDto[];
-  /** Generation timestamp */
-  generatedAt: string;
-  /** Options used */
-  options: TestGenerationOptionsDto;
 }
 
 /**
@@ -129,6 +84,7 @@ export interface ExportTestSuiteRequestDto {
   selection?: {
     mode: 'single' | 'tag' | 'full';
     operationId?: string;
+    operationIds?: string[];
     tags?: string[];
     exclude?: string[];
   };
@@ -171,4 +127,106 @@ export interface ExportTestSuiteResponseDto {
   totalSize: number;
   /** Export timestamp */
   exportedAt: string;
+}
+
+/**
+ * Execute tests request DTO
+ */
+export interface ExecuteTestsRequestDto {
+  testSuitePath: string;
+  framework: 'cucumber' | 'jest' | 'maven';
+  args?: string[];
+  env?: Record<string, string>;
+}
+
+/**
+ * Execute tests response DTO
+ */
+export interface ExecuteTestsResponseDto {
+  executionId: string;
+  status: 'pending' | 'installing' | 'running' | 'completed' | 'failed';
+  startedAt: string;
+  message?: string;
+}
+
+/**
+ * Test execution status response DTO
+ */
+export interface TestExecutionStatusDto {
+  executionId: string;
+  status: 'pending' | 'installing' | 'running' | 'completed' | 'failed';
+  startedAt: string;
+  completedAt?: string;
+  duration: number;
+  exitCode: number;
+  stdout: string;
+  stderr: string;
+  results?: {
+    total: number;
+    passed: number;
+    failed: number;
+    skipped: number;
+  };
+  /** URL path to Allure report (when Maven + report generated). Frontend: baseUrl + reportUrl */
+  reportUrl?: string;
+}
+
+// ──────────────────────────────────────────────
+//  AI REST Assured DTOs
+// ──────────────────────────────────────────────
+
+/**
+ * Start an AI Agent run request
+ */
+export interface AgentRunRequestDto {
+  specId: string;
+  maxIterations?: number;
+  baseDirectory?: string;
+  basePackage?: string;
+  autoExecute?: boolean;
+}
+
+/**
+ * Agent run response (returned immediately when run starts)
+ */
+export interface AgentRunResponseDto {
+  runId: string;
+  status: string;
+  message: string;
+}
+
+/**
+ * Agent run status response (returned when polling)
+ */
+export interface AgentRunStatusDto {
+  runId: string;
+  phase: string;
+  currentIteration: number;
+  maxIterations: number;
+  testSuitePath?: string;
+  log: { timestamp: string; phase: string; message: string }[];
+  iterations: {
+    iteration: number;
+    passed: number;
+    failed: number;
+    total: number;
+    fixesApplied: number;
+  }[];
+  finalResult?: {
+    success: boolean;
+    total: number;
+    passed: number;
+    failed: number;
+    skipped: number;
+    durationMs: number;
+  };
+  testPlan?: {
+    title: string;
+    reasoning: string;
+    itemCount: number;
+    dependencyCount: number;
+  };
+  error?: string;
+  startedAt: string;
+  completedAt?: string;
 }

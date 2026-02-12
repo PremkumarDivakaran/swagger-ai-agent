@@ -8,21 +8,29 @@ import { Request, Response, NextFunction } from 'express';
 import { ValidationError } from '../../core/errors';
 
 /**
- * Selection schema
+ * Selection schema. For mode 'single': either operationId or operationIds required.
  */
 const selectionSchema = Joi.object({
   mode: Joi.string().valid('single', 'tag', 'full').required(),
-  operationId: Joi.string().when('mode', {
-    is: 'single',
-    then: Joi.string().required(),
-    otherwise: Joi.string().optional(),
-  }),
+  operationId: Joi.string().optional(),
+  operationIds: Joi.array().items(Joi.string()).min(1).optional(),
   tags: Joi.array().items(Joi.string()).when('mode', {
     is: 'tag',
     then: Joi.array().items(Joi.string()).min(1).required(),
     otherwise: Joi.array().items(Joi.string()).optional(),
   }),
   exclude: Joi.array().items(Joi.string()).optional(),
+}).custom((value, helpers) => {
+  if (value.mode === 'single') {
+    const hasOperationId = value.operationId != null && String(value.operationId).trim() !== '';
+    const hasOperationIds = Array.isArray(value.operationIds) && value.operationIds.length > 0;
+    if (!hasOperationId && !hasOperationIds) {
+      return helpers.error('selection.singleRequiresOperation');
+    }
+  }
+  return value;
+}).messages({
+  'selection.singleRequiresOperation': '"selection" must include either "operationId" or "operationIds" when mode is "single"',
 });
 
 /**

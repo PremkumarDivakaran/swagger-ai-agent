@@ -13,8 +13,6 @@ import {
   McpPlanRunResponseDto,
   McpExecuteOperationRequestDto,
   McpExecuteOperationResponseDto,
-  McpGenerateTestsRequestDto,
-  McpGenerateTestsResponseDto,
 } from '../../dto/mcp.dto';
 
 /**
@@ -25,18 +23,15 @@ export class SwaggerMcpController {
   private listOperationsTool: McpToolDefinition;
   private planRunTool: McpToolDefinition;
   private executeOperationTool: McpToolDefinition;
-  private generateTestsTool: McpToolDefinition;
 
   constructor(
     listOperationsTool: McpToolDefinition,
     planRunTool: McpToolDefinition,
-    executeOperationTool: McpToolDefinition,
-    generateTestsTool: McpToolDefinition
+    executeOperationTool: McpToolDefinition
   ) {
     this.listOperationsTool = listOperationsTool;
     this.planRunTool = planRunTool;
     this.executeOperationTool = executeOperationTool;
-    this.generateTestsTool = generateTestsTool;
   }
 
   /**
@@ -118,32 +113,6 @@ export class SwaggerMcpController {
   }
 
   /**
-   * POST /mcp/swagger/generate-axios-tests
-   * Generate Axios + Jest tests (MCP-oriented)
-   */
-  async generateTests(
-    req: Request<unknown, unknown, McpGenerateTestsRequestDto>,
-    res: Response<ApiResponse<McpGenerateTestsResponseDto>>,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const result = await this.generateTestsTool.handler(req.body);
-
-      const response: ApiResponse<McpGenerateTestsResponseDto> = {
-        success: true,
-        data: result as McpGenerateTestsResponseDto,
-        meta: {
-          timestamp: new Date().toISOString(),
-        },
-      };
-
-      res.status(200).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /**
    * GET /mcp/swagger/tools
    * List available MCP tools
    */
@@ -162,7 +131,6 @@ export class SwaggerMcpController {
       this.listOperationsTool,
       this.planRunTool,
       this.executeOperationTool,
-      this.generateTestsTool,
     ];
 
     const response: ApiResponse<{
@@ -195,13 +163,11 @@ export class SwaggerMcpController {
 export function createSwaggerMcpController(
   listOperationsTool: McpToolDefinition,
   planRunTool: McpToolDefinition,
-  executeOperationTool: McpToolDefinition,
-  generateTestsTool: McpToolDefinition
+  executeOperationTool: McpToolDefinition
 ): SwaggerMcpController {
   return new SwaggerMcpController(
     listOperationsTool,
     planRunTool,
-    executeOperationTool,
-    generateTestsTool
+    executeOperationTool
   );
 }

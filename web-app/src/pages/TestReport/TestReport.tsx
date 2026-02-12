@@ -159,11 +159,11 @@ export function TestReport() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-3">
-                <CheckCircle className="h-6 w-6 text-green-600" />
+                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Pass Rate</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {report.summary ? formatPercentage(report.summary.passRate) : 'N/A'}
                 </p>
               </div>
@@ -175,7 +175,7 @@ export function TestReport() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="rounded-full bg-purple-100 dark:bg-purple-900/30 p-3">
-                <Clock className="h-6 w-6 text-purple-600" />
+                <Clock className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Duration</p>
@@ -190,8 +190,8 @@ export function TestReport() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="rounded-full bg-gray-100 dark:bg-gray-900/30 p-3">
-                <AlertCircle className="h-6 w-6 text-gray-600" />
+              <div className="rounded-full bg-slate-100 dark:bg-slate-800 p-3">
+                <AlertCircle className="h-6 w-6 text-slate-600 dark:text-slate-400" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Tests</p>
@@ -227,7 +227,7 @@ export function TestReport() {
                   filterStatus === 'passed' ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'hover:bg-accent'
                 )}
               >
-                <p className="text-2xl font-bold text-green-600">{report.summary.passed}</p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">{report.summary.passed}</p>
                 <p className="text-sm text-muted-foreground">Passed</p>
               </button>
               <button
@@ -237,7 +237,7 @@ export function TestReport() {
                   filterStatus === 'failed' ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'hover:bg-accent'
                 )}
               >
-                <p className="text-2xl font-bold text-red-600">{report.summary.failed}</p>
+                <p className="text-2xl font-bold text-red-600 dark:text-red-400">{report.summary.failed}</p>
                 <p className="text-sm text-muted-foreground">Failed</p>
               </button>
               <button
@@ -247,7 +247,7 @@ export function TestReport() {
                   filterStatus === 'skipped' ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' : 'hover:bg-accent'
                 )}
               >
-                <p className="text-2xl font-bold text-yellow-600">{report.summary.skipped}</p>
+                <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{report.summary.skipped}</p>
                 <p className="text-sm text-muted-foreground">Skipped</p>
               </button>
             </div>
@@ -377,7 +377,7 @@ function TestResultCard({ test, isExpanded, onToggle, onCopy }: TestResultCardPr
             <p className="font-medium truncate">{test.testCaseName || test.operationId}</p>
             <p className="text-sm text-muted-foreground truncate">{path}</p>
             {test.skipReason && (
-              <p className="text-xs text-yellow-600 mt-1">{test.skipReason}</p>
+              <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">{test.skipReason}</p>
             )}
           </div>
         </div>
@@ -499,14 +499,14 @@ function TestResultCard({ test, isExpanded, onToggle, onCopy }: TestResultCardPr
                     )}
                   >
                     {assertion.passed ? (
-                      <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
                     ) : (
-                      <XCircle className="h-4 w-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <XCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                     )}
                     <div className="min-w-0 flex-1">
                       <span className="font-medium">{assertion.description}</span>
                       {!assertion.passed && assertion.error && (
-                        <p className="text-red-600 text-xs mt-1">{assertion.error}</p>
+                        <p className="text-red-600 dark:text-red-400 text-xs mt-1">{assertion.error}</p>
                       )}
                       {!assertion.passed && assertion.expected !== undefined && (
                         <p className="text-muted-foreground text-xs mt-1">
@@ -523,13 +523,13 @@ function TestResultCard({ test, isExpanded, onToggle, onCopy }: TestResultCardPr
           {/* Error */}
           {test.error && (
             <div>
-              <h4 className="font-medium text-sm mb-2 text-red-600">Error</h4>
+              <h4 className="font-medium text-sm mb-2 text-red-600 dark:text-red-400">Error</h4>
               <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 border border-red-200 dark:border-red-800">
                 <p className="text-sm text-red-700 dark:text-red-300">{test.error.message}</p>
                 {test.error.stack && (
                   <details className="text-sm mt-2">
-                    <summary className="cursor-pointer text-red-600">Stack Trace</summary>
-                    <pre className="mt-2 text-xs overflow-x-auto text-red-600">{test.error.stack}</pre>
+                    <summary className="cursor-pointer text-red-600 dark:text-red-400">Stack Trace</summary>
+                    <pre className="mt-2 text-xs overflow-x-auto text-red-600 dark:text-red-400">{test.error.stack}</pre>
                   </details>
                 )}
               </div>

@@ -9,6 +9,7 @@ import axios, {
   type InternalAxiosRequestConfig,
   type AxiosResponse,
 } from 'axios';
+// Note: delWithBody is exported for DELETE requests that need a body
 import { apiConfig } from '@/config';
 import type { TransformedError } from '@/types';
 
@@ -166,6 +167,14 @@ export async function put<T>(url: string, data?: unknown): Promise<T> {
  */
 export async function del<T>(url: string): Promise<T> {
   const response = await apiClient.delete(url);
+  return unwrapResponse<T>(response.data);
+}
+
+/**
+ * Generic DELETE request with body
+ */
+export async function delWithBody<T>(url: string, data?: unknown): Promise<T> {
+  const response = await apiClient.delete(url, { data });
   return unwrapResponse<T>(response.data);
 }
 

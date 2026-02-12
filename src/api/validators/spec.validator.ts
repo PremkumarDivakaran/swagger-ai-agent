@@ -40,12 +40,22 @@ const gitSourceSchema = Joi.object({
 });
 
 /**
+ * Inline source schema (raw content)
+ */
+const inlineSourceSchema = Joi.object({
+  type: Joi.string().valid('inline').required(),
+  content: Joi.string().min(1).required(),
+  filename: Joi.string().optional(),
+});
+
+/**
  * Spec source schema (union)
  */
 const specSourceSchema = Joi.alternatives().try(
   urlSourceSchema,
   fileSourceSchema,
-  gitSourceSchema
+  gitSourceSchema,
+  inlineSourceSchema
 );
 
 /**

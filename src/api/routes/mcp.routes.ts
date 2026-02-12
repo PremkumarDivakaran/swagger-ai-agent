@@ -9,16 +9,13 @@ import {
   createListOperationsTool,
   createPlanApiRunTool,
   createExecuteOperationTool,
-  createGenerateAxiosTestsTool,
 } from '../../infrastructure/mcp/swagger/tools';
 import { createCreateRunPlanUseCase } from '../../application/execution/create-run-plan.usecase';
-import { createGenerateAxiosTestsUseCase } from '../../application/testgen/generate-axios-tests.usecase';
 import { AxiosExecutionAdapter } from '../../infrastructure/http/AxiosExecutionAdapter';
 import {
   validateMcpListOperations,
   validateMcpPlanRun,
   validateMcpExecuteOperation,
-  validateMcpGenerateTests,
 } from '../validators/mcp.validator';
 import {
   specRepository,
@@ -46,18 +43,11 @@ const executeOperationTool = createExecuteOperationTool(
   executionAdapter
 );
 
-const generateAxiosTestsUseCase = createGenerateAxiosTestsUseCase(
-  specRepository,
-  environmentRepository
-);
-const generateTestsTool = createGenerateAxiosTestsTool(generateAxiosTestsUseCase);
-
 // Create controller
 const controller = createSwaggerMcpController(
   listOperationsTool,
   planRunTool,
-  executeOperationTool,
-  generateTestsTool
+  executeOperationTool
 );
 
 /**
@@ -165,38 +155,6 @@ router.post(
   '/swagger/execute-operation',
   validateMcpExecuteOperation,
   (req, res, next) => controller.executeOperation(req, res, next)
-);
-
-/**
- * POST /mcp/swagger/generate-axios-tests
- * Generate Axios + Jest tests (MCP-oriented)
- * 
- * Request body:
- * {
- *   "specId": "spec-123",
- *   "selection": {
- *     "mode": "tag",
- *     "tags": ["pet"]
- *   },
- *   "options": {
- *     "includeNegativeTests": true,
- *     "includeAuthTests": true
- *   }
- * }
- * 
- * Response:
- * {
- *   "code": "import axios...",
- *   "fileName": "petstore-api.test.ts",
- *   "testCount": 15,
- *   "operationCount": 5,
- *   "testCases": [...]
- * }
- */
-router.post(
-  '/swagger/generate-axios-tests',
-  validateMcpGenerateTests,
-  (req, res, next) => controller.generateTests(req, res, next)
 );
 
 export default router;

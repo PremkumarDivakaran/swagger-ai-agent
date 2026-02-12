@@ -1,12 +1,24 @@
 /**
  * Export Test Suite Use Case
- * 
+ *
  * Exports generated test suites in various formats (file, zip, etc.)
- * Currently supports returning the generated code as a downloadable format.
+ * Uses a generic test result shape (legacy: was used for Axios/Jest export).
  */
 
 import { ValidationError } from '../../core/errors/ValidationError';
-import { TestGenerationResult } from './generate-axios-tests.usecase';
+
+/** Minimal test result shape for export (single-file style) */
+export interface TestGenerationResult {
+  code: string;
+  fileName: string;
+  specId: string;
+  specTitle: string;
+  testCount: number;
+  operationCount: number;
+  testCases: Array<{ id: string; name: string; type: string; operationId: string; method: string; path: string; expectedStatus: number; description?: string }>;
+  generatedAt: Date;
+  options: Record<string, unknown>;
+}
 
 /**
  * Export format options

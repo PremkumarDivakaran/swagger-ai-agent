@@ -36,6 +36,8 @@ export interface OperationSelection {
   mode: SelectionMode;
   /** Single operation ID (for 'single' mode) */
   operationId?: string;
+  /** Operation IDs (for 'single' mode, alternative to operationId) */
+  operationIds?: string[];
   /** Tag names (for 'tag' mode) */
   tags?: string[];
   /** Operation IDs to exclude */

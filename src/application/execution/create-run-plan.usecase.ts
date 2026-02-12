@@ -17,6 +17,7 @@ import {
 } from '../../domain/models';
 import { NotFoundError } from '../../core/errors';
 import { generateId } from '../../utils';
+import { generateFakerValue } from '../../utils/faker-schema';
 
 /**
  * Input for creating a run plan
@@ -132,14 +133,17 @@ export class CreateRunPlanUseCase {
     let selected: Operation[];
 
     switch (selection.mode) {
-      case 'single':
-        if (selection.operationId) {
-          const op = operations.find(o => o.operationId === selection.operationId);
-          selected = op ? [op] : [];
-        } else {
-          selected = [];
-        }
+      case 'single': {
+        const ids = selection.operationIds?.length
+          ? selection.operationIds
+          : selection.operationId
+            ? [selection.operationId]
+            : [];
+        selected = ids.length > 0
+          ? operations.filter(o => ids.includes(o.operationId))
+          : [];
         break;
+      }
 
       case 'tag':
         if (selection.tags && selection.tags.length > 0) {
@@ -292,25 +296,27 @@ export class CreateRunPlanUseCase {
         }
       }
 
-      // Generate from schema
+      // Generate from schema (with Faker for meaningful data)
       if (jsonContent.schema) {
-        return this.generateFromSchema(jsonContent.schema);
+        return this.generateFromSchema(jsonContent.schema as Record<string, unknown>);
       }
     }
 
     // Try form-urlencoded
     const formContent = operation.requestBody.content['application/x-www-form-urlencoded'];
     if (formContent?.schema) {
-      return this.generateFromSchema(formContent.schema);
+      return this.generateFromSchema(formContent.schema as Record<string, unknown>);
     }
 
     return undefined;
   }
 
   /**
-   * Generate sample data from JSON schema
+   * Generate sample data from JSON schema using Faker for meaningful values.
+   * @param schema - JSON Schema object
+   * @param propName - Optional property name (for object properties) to pick contextual Faker values
    */
-  private generateFromSchema(schema: Record<string, unknown>): unknown {
+  private generateFromSchema(schema: Record<string, unknown>, propName?: string): unknown {
     const type = schema.type as string;
 
     // Use example if available
@@ -323,23 +329,27 @@ export class CreateRunPlanUseCase {
       return schema.default;
     }
 
+    // Use enum first value if available
+    if (schema.enum && Array.isArray(schema.enum)) {
+      return schema.enum[0];
+    }
+
     switch (type) {
       case 'object': {
         const obj: Record<string, unknown> = {};
         const properties = schema.properties as Record<string, Record<string, unknown>> | undefined;
         const required = schema.required as string[] | undefined;
-        
+
         if (properties) {
-          for (const [propName, propSchema] of Object.entries(properties)) {
-            // Include required properties and some optional ones
-            if (required?.includes(propName) || Object.keys(obj).length < 5) {
-              obj[propName] = this.generateFromSchema(propSchema);
+          for (const [name, propSchema] of Object.entries(properties)) {
+            if (required?.includes(name) || Object.keys(obj).length < 5) {
+              obj[name] = this.generateFromSchema(propSchema, name);
             }
           }
         }
         return obj;
       }
-      
+
       case 'array': {
         const items = schema.items as Record<string, unknown> | undefined;
         if (items) {
@@ -347,28 +357,30 @@ export class CreateRunPlanUseCase {
         }
         return [];
       }
-      
+
       case 'string':
-        if (schema.format === 'date') return '2025-01-01';
-        if (schema.format === 'date-time') return '2025-01-01T00:00:00Z';
-        if (schema.format === 'email') return 'test@example.com';
-        if (schema.format === 'uri' || schema.format === 'url') return 'https://example.com';
-        if (schema.format === 'uuid') return '550e8400-e29b-41d4-a716-446655440000';
-        if (schema.enum && Array.isArray(schema.enum)) return schema.enum[0];
-        // Use property name hint for better values
-        return 'test-value';
-      
       case 'integer':
-        if (schema.minimum !== undefined) return schema.minimum;
-        return 1;
-      
       case 'number':
-        if (schema.minimum !== undefined) return schema.minimum;
-        return 1.0;
-      
-      case 'boolean':
-        return true;
-      
+      case 'boolean': {
+        const fakerVal = generateFakerValue(
+          {
+            type,
+            format: schema.format as string | undefined,
+            minimum: schema.minimum as number | undefined,
+            maximum: schema.maximum as number | undefined,
+            enum: schema.enum as unknown[] | undefined,
+          },
+          propName
+        );
+        if (fakerVal !== null) return fakerVal;
+        // Fallbacks when Faker didn't map
+        if (type === 'string') return 'test-value';
+        if (type === 'integer') return (schema.minimum as number) ?? 1;
+        if (type === 'number') return (schema.minimum as number) ?? 1.0;
+        if (type === 'boolean') return true;
+        return null;
+      }
+
       default:
         return null;
     }

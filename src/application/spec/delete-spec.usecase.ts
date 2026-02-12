@@ -4,7 +4,7 @@
  */
 
 import { ISpecRepository, IEnvironmentRepository } from '../../domain/repositories';
-import { NotFoundError } from '../../core/errors';
+import { NotFoundError, ConflictError } from '../../core/errors';
 
 /**
  * Input for spec deletion
@@ -54,9 +54,9 @@ export class DeleteSpecUseCase {
     const environments = await this.environmentRepository.findBySpecId(input.specId);
     
     if (environments.length > 0 && !input.force) {
-      throw new Error(
-        `Cannot delete spec ${input.specId}: ${environments.length} environment(s) still exist. ` +
-        'Use force=true to delete spec and all associated environments.'
+      throw new ConflictError(
+        `Cannot delete spec: ${environments.length} environment(s) still exist. Use force delete to remove spec and all associated environments.`,
+        'ENVIRONMENTS_EXIST'
       );
     }
 

@@ -19,11 +19,89 @@ import { Button, ErrorMessage } from '@/components/common';
 import { specService } from '@/services';
 import { useSpecStore, useToast } from '@/stores';
 import { cn } from '@/utils';
-import type { ImportSpecResponse, SpecSource } from '@/types';
+import type { ImportSpecResponse, SpecSource, TransformedError } from '@/types';
+
+/**
+ * Check if error is a TransformedError (from API client)
+ */
+function isTransformedError(error: unknown): error is TransformedError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    'message' in error
+  );
+}
+
+/**
+ * Get user-friendly error message based on error type
+ */
+function getUserFriendlyErrorMessage(error: unknown): { title: string; message: string } {
+  if (isTransformedError(error)) {
+    // Handle duplicate spec error
+    if (error.code === 'CONFLICT' || error.status === 409) {
+      return {
+        title: 'Duplicate Specification',
+        message: 'This specification has already been imported. You can view it in the Operations page or delete it first to re-import.',
+      };
+    }
+
+    // Handle validation errors
+    if (error.code === 'VALIDATION_ERROR' || error.status === 400) {
+      return {
+        title: 'Invalid Specification',
+        message: error.message || 'The specification format is invalid. Please check your file and try again.',
+      };
+    }
+
+    // Handle not found errors
+    if (error.code === 'NOT_FOUND' || error.status === 404) {
+      return {
+        title: 'Specification Not Found',
+        message: 'Could not fetch the specification from the provided URL. Please check the URL and try again.',
+      };
+    }
+
+    // Handle network errors
+    if (error.code === 'NETWORK_ERROR') {
+      return {
+        title: 'Network Error',
+        message: 'Unable to connect to the server. Please check your connection and try again.',
+      };
+    }
+
+    // Default API error
+    return {
+      title: 'Import Failed',
+      message: error.message || 'An unexpected error occurred during import.',
+    };
+  }
+
+  // Handle standard Error objects
+  if (error instanceof Error) {
+    return {
+      title: 'Import Failed',
+      message: error.message,
+    };
+  }
+
+  // Fallback
+  return {
+    title: 'Import Failed',
+    message: 'An unexpected error occurred. Please try again.',
+  };
+}
 
 type ImportMethod = 'url' | 'file' | 'paste';
 
-export function SwaggerImport() {
+export interface SwaggerImportProps {
+  /**
+   * Callback fired after successful import
+   */
+  onImportSuccess?: () => void;
+}
+
+export function SwaggerImport({ onImportSuccess }: SwaggerImportProps = {}) {
   const navigate = useNavigate();
   const toast = useToast();
   const addSpec = useSpecStore((state) => state.addSpec);
@@ -37,6 +115,12 @@ export function SwaggerImport() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [importResult, setImportResult] = useState<ImportSpecResponse | null>(null);
+
+  // Clear error when switching tabs
+  const handleTabChange = (tab: ImportMethod) => {
+    setActiveTab(tab);
+    setError(null);
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -146,10 +230,15 @@ export function SwaggerImport() {
       });
 
       toast.success('Import Successful', `Imported ${result.operationCount} operations from ${result.title}`);
+      
+      // Call success callback if provided
+      if (onImportSuccess) {
+        onImportSuccess();
+      }
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Import failed';
+      const { title, message } = getUserFriendlyErrorMessage(err);
       setError(message);
-      toast.error('Import Failed', message);
+      toast.error(title, message);
     } finally {
       setIsLoading(false);
     }
@@ -186,7 +275,7 @@ export function SwaggerImport() {
                 View Operations
               </Button>
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={() => {
                   setImportResult(null);
                   setUrl('');
@@ -209,7 +298,7 @@ export function SwaggerImport() {
         {/* Tab Selection */}
         <div className="flex border-b border-border mb-6">
           <button
-            onClick={() => setActiveTab('url')}
+            onClick={() => handleTabChange('url')}
             className={cn(
               'flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 -mb-px transition-colors',
               activeTab === 'url'
@@ -221,7 +310,7 @@ export function SwaggerImport() {
             URL
           </button>
           <button
-            onClick={() => setActiveTab('file')}
+            onClick={() => handleTabChange('file')}
             className={cn(
               'flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 -mb-px transition-colors',
               activeTab === 'file'
@@ -233,7 +322,7 @@ export function SwaggerImport() {
             File
           </button>
           <button
-            onClick={() => setActiveTab('paste')}
+            onClick={() => handleTabChange('paste')}
             className={cn(
               'flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 -mb-px transition-colors',
               activeTab === 'paste'

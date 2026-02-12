@@ -107,6 +107,15 @@ export class InMemorySpecRepository implements ISpecRepository {
     return spec !== null;
   }
 
+  async findByTitleAndVersion(title: string, version: string): Promise<NormalizedSpec | null> {
+    for (const spec of this.specs.values()) {
+      if (spec.info.title === title && spec.info.version === version) {
+        return spec;
+      }
+    }
+    return null;
+  }
+
   /**
    * Clear all specs (useful for testing)
    */

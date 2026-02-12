@@ -1,19 +1,22 @@
 /**
- * Dashboard Page
- * Shows health check status and overview
+ * Dashboard Page - Modern Approach
+ * Shows health status, quick stats, and unified navigation
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Activity,
-  Upload,
   FileCode,
-  Play,
-  RefreshCw,
+  Sparkles,
+  Beaker,
   CheckCircle,
   XCircle,
   Clock,
+  RefreshCw,
+  ArrowRight,
+  TrendingUp,
+  Zap,
 } from 'lucide-react';
 import { PageContainer } from '@/components/layout';
 import {
@@ -29,8 +32,10 @@ import {
 import { healthService, specService, type HealthStatus } from '@/services';
 import { useSpecStore } from '@/stores';
 import { formatDuration } from '@/utils';
+import { cn } from '@/utils/cn';
 
 export function Dashboard() {
+  const navigate = useNavigate();
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,34 +72,44 @@ export function Dashboard() {
     loadSpecs();
   }, []);
 
-  const quickActions = [
+  // Modern workflow cards
+  const workflowSteps = [
     {
-      title: 'Import Swagger',
-      description: 'Import an OpenAPI specification',
-      icon: Upload,
-      href: '/import',
-      color: 'text-blue-600 bg-blue-100',
-    },
-    {
-      title: 'View Operations',
-      description: 'Browse API operations',
+      step: 1,
+      title: 'Import Specs',
+      description: 'Import your OpenAPI/Swagger specifications',
       icon: FileCode,
-      href: '/operations',
-      color: 'text-green-600 bg-green-100',
+      href: '/specs?tab=import',
+      color: 'from-blue-500 to-cyan-500',
+      bgColor: 'bg-gradient-to-br from-blue-500/10 to-cyan-500/10',
+      stats: `${specs.length} imported`,
     },
     {
-      title: 'Run Tests',
-      description: 'Execute API tests',
-      icon: Play,
-      href: '/execution',
-      color: 'text-purple-600 bg-purple-100',
+      step: 2,
+      title: 'Generate Tests',
+      description: 'AI generates REST Assured tests autonomously',
+      icon: Sparkles,
+      href: '/test-lab',
+      color: 'from-purple-500 to-pink-500',
+      bgColor: 'bg-gradient-to-br from-purple-500/10 to-pink-500/10',
+      stats: 'AI REST Assured',
+    },
+    {
+      step: 3,
+      title: 'Execute & Report',
+      description: 'Run tests and view detailed reports',
+      icon: Beaker,
+      href: '/test-lab',
+      color: 'from-green-500 to-emerald-500',
+      bgColor: 'bg-gradient-to-br from-green-500/10 to-emerald-500/10',
+      stats: 'Real-time results',
     },
   ];
 
   return (
     <PageContainer
       title="Dashboard"
-      description="Health check and overview"
+      description="Welcome to Swagger AI Agent - Your automated API testing platform"
       actions={
         <Button
           variant="outline"
@@ -106,146 +121,239 @@ export function Dashboard() {
         </Button>
       }
     >
-      {/* Health Status Card */}
-      <Card className="mb-6">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-primary/10 p-2">
-                <Activity className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <CardTitle>API Health Status</CardTitle>
-                <CardDescription>
-                  Backend service status and uptime
-                </CardDescription>
-              </div>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <LoadingSpinner label="Checking health..." />
-            </div>
-          ) : error ? (
-            <ErrorMessage
-              title="Health Check Failed"
-              message={error}
-              onRetry={checkHealth}
-            />
-          ) : health ? (
-            <div className="grid gap-4 md:grid-cols-3">
-              {/* Status */}
-              <div className="flex items-center gap-3 rounded-lg border p-4">
-                {health.status === 'healthy' ? (
-                  <CheckCircle className="h-8 w-8 text-green-500" />
-                ) : (
-                  <XCircle className="h-8 w-8 text-red-500" />
-                )}
+      <div className="space-y-6">
+        {/* Health Status - Modern Gradient Card */}
+        <Card className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20" />
+          <CardHeader className="relative">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-gradient-to-br from-primary to-primary/80 p-3 shadow-lg">
+                  <Activity className="h-6 w-6 text-white" />
+                </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
-                  <p className="font-semibold capitalize">{health.status}</p>
+                  <CardTitle className="text-xl">System Status</CardTitle>
+                  <CardDescription>
+                    Backend API health and performance
+                  </CardDescription>
                 </div>
               </div>
-
-              {/* Uptime */}
-              <div className="flex items-center gap-3 rounded-lg border p-4">
-                <Clock className="h-8 w-8 text-blue-500" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Uptime</p>
-                  <p className="font-semibold">
-                    {formatDuration(health.uptime * 1000)}
-                  </p>
+              {lastChecked && (
+                <div className="text-right text-sm text-muted-foreground">
+                  <div>Last checked</div>
+                  <div className="font-medium">{lastChecked.toLocaleTimeString()}</div>
                 </div>
-              </div>
-
-              {/* Last Checked */}
-              <div className="flex items-center gap-3 rounded-lg border p-4">
-                <RefreshCw className="h-8 w-8 text-gray-500" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Last Checked</p>
-                  <p className="font-semibold">
-                    {lastChecked?.toLocaleTimeString()}
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
-          ) : null}
-        </CardContent>
-      </Card>
-
-      {/* Quick Actions */}
-      <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-      <div className="grid gap-4 md:grid-cols-3 mb-6">
-        {quickActions.map((action) => {
-          const Icon = action.icon;
-          return (
-            <Link key={action.href} to={action.href}>
-              <Card className="h-full transition-shadow hover:shadow-md cursor-pointer">
-                <CardContent className="pt-6">
-                  <div className="flex items-start gap-4">
-                    <div className={`rounded-lg p-3 ${action.color}`}>
-                      <Icon className="h-6 w-6" />
-                    </div>
+          </CardHeader>
+          <CardContent className="relative">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <LoadingSpinner label="Checking system health..." />
+              </div>
+            ) : error ? (
+              <ErrorMessage
+                title="Health Check Failed"
+                message={error}
+                onRetry={checkHealth}
+              />
+            ) : health ? (
+              <div className="grid gap-4 md:grid-cols-3">
+                {/* Status */}
+                <div className="group relative overflow-hidden rounded-xl border bg-card p-6 transition-all hover:shadow-lg">
+                  <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="font-semibold">{action.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {action.description}
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Status</p>
+                      <p className="text-2xl font-bold capitalize flex items-center gap-2">
+                        {health.status === 'healthy' ? (
+                          <>
+                            <CheckCircle className="h-6 w-6 text-green-500" />
+                            <span className="text-green-500">Healthy</span>
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="h-6 w-6 text-red-500" />
+                            <span className="text-red-500">Unhealthy</span>
+                          </>
+                        )}
                       </p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* Imported Specs Overview */}
-      <h2 className="text-lg font-semibold mb-4">Imported Specifications</h2>
-      <Card>
-        <CardContent className="pt-6">
-          {specs.length === 0 ? (
-            <div className="text-center py-8">
-              <FileCode className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No specifications imported yet</p>
-              <Link to="/import">
-                <Button variant="outline" className="mt-4">
-                  Import your first spec
-                </Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {specs.slice(0, 5).map((spec) => (
-                <Link
-                  key={spec.id}
-                  to={`/operations/${spec.id}`}
-                  className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent transition-colors"
-                >
-                  <div>
-                    <p className="font-medium">{spec.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      v{spec.version} • {spec.operationCount} operations
-                    </p>
+                  <div className="absolute bottom-0 right-0 opacity-10">
+                    <TrendingUp className="h-20 w-20" />
                   </div>
-                  <Button variant="ghost" size="sm">
-                    View
-                  </Button>
-                </Link>
-              ))}
-              {specs.length > 5 && (
-                <Link to="/operations" className="block text-center">
-                  <Button variant="outline" className="w-full">
-                    View all {specs.length} specifications
-                  </Button>
-                </Link>
+                </div>
+
+                {/* Uptime */}
+                <div className="group relative overflow-hidden rounded-xl border bg-card p-6 transition-all hover:shadow-lg">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Uptime</p>
+                      <p className="text-2xl font-bold flex items-center gap-2">
+                        <Clock className="h-6 w-6 text-blue-500" />
+                        <span>{formatDuration(health.uptime * 1000)}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 right-0 opacity-10">
+                    <Clock className="h-20 w-20" />
+                  </div>
+                </div>
+
+                {/* Performance */}
+                <div className="group relative overflow-hidden rounded-xl border bg-card p-6 transition-all hover:shadow-lg">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Performance</p>
+                      <p className="text-2xl font-bold flex items-center gap-2">
+                        <Zap className="h-6 w-6 text-yellow-500" />
+                        <span className="text-green-500">Optimal</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 right-0 opacity-10">
+                    <Zap className="h-20 w-20" />
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+
+        {/* Modern Workflow Steps */}
+        <div>
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold tracking-tight mb-2">Get Started</h2>
+            <p className="text-muted-foreground">
+              Follow these simple steps to test your APIs automatically
+            </p>
+          </div>
+          
+          <div className="grid gap-6 md:grid-cols-3">
+            {workflowSteps.map((step) => {
+              const Icon = step.icon;
+              return (
+                <Card
+                  key={step.step}
+                  className="group relative overflow-hidden border-2 transition-all hover:border-primary hover:shadow-xl cursor-pointer"
+                  onClick={() => navigate(step.href)}
+                >
+                  <div className={cn("absolute inset-0 opacity-50", step.bgColor)} />
+                  
+                  <CardContent className="relative pt-6">
+                    {/* Step Number */}
+                    <div className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-sm font-bold text-primary">
+                      {step.step}
+                    </div>
+
+                    {/* Icon */}
+                    <div className={cn(
+                      "mb-4 inline-flex rounded-2xl p-4 bg-gradient-to-br shadow-lg",
+                      step.color
+                    )}>
+                      <Icon className="h-8 w-8 text-white" />
+                    </div>
+
+                    {/* Content */}
+                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                      {step.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {step.description}
+                    </p>
+
+                    {/* Stats */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-muted-foreground bg-muted px-3 py-1 rounded-full">
+                        {step.stats}
+                      </span>
+                      <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Recent Specs - Modern Card */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl">Recent Specifications</CardTitle>
+                <CardDescription>
+                  {specs.length === 0 
+                    ? 'No specifications imported yet' 
+                    : `${specs.length} specification${specs.length !== 1 ? 's' : ''} available`
+                  }
+                </CardDescription>
+              </div>
+              {specs.length > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/specs?tab=browse')}
+                >
+                  View All
+                </Button>
               )}
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            {specs.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="inline-flex rounded-full bg-muted p-6 mb-4">
+                  <FileCode className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <h3 className="font-semibold mb-2">No Specifications Yet</h3>
+                <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
+                  Import your first OpenAPI/Swagger specification to get started with automated testing
+                </p>
+                <Button onClick={() => navigate('/specs?tab=import')}>
+                  <FileCode className="mr-2 h-4 w-4" />
+                  Import Specification
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {specs.slice(0, 5).map((spec) => (
+                  <div
+                    key={spec.id}
+                    onClick={() => navigate(`/specs?tab=operations`)}
+                    className="group flex items-center justify-between p-4 rounded-lg border hover:border-primary hover:bg-accent/50 transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="rounded-lg bg-primary/10 p-3">
+                        <FileCode className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-semibold group-hover:text-primary transition-colors">
+                          {spec.title}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          v{spec.version} • {spec.operationCount} operations
+                        </p>
+                      </div>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </div>
+                ))}
+                {specs.length > 5 && (
+                  <div className="text-center pt-4">
+                    <Button
+                      variant="ghost"
+                      onClick={() => navigate('/specs?tab=browse')}
+                    >
+                      View all {specs.length} specifications
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </PageContainer>
   );
 }

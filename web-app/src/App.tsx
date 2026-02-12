@@ -1,9 +1,23 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { MainLayout } from '@/components/layout';
 import { ToastContainer } from '@/components/common';
-import { Dashboard, SwaggerImport, Operations, TestExecution, TestReport } from '@/pages';
+import { Dashboard, SwaggerImport, Operations, TestExecution, TestReport, Specs, TestLab } from '@/pages';
+import { useSettingsStore, selectResolvedTheme } from '@/stores';
 
 function App() {
+  const theme = useSettingsStore(selectResolvedTheme);
+
+  // Apply theme class to document root
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [theme]);
+
   return (
     <BrowserRouter>
       {/* Toast Notifications */}
@@ -13,6 +27,12 @@ function App() {
         {/* All routes wrapped in MainLayout */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Dashboard />} />
+          
+          {/* New unified routes */}
+          <Route path="/specs" element={<Specs />} />
+          <Route path="/test-lab" element={<TestLab />} />
+          
+          {/* Legacy routes - kept for backward compatibility */}
           <Route path="/import" element={<SwaggerImport />} />
           <Route path="/operations" element={<Operations />} />
           <Route path="/operations/:specId" element={<Operations />} />

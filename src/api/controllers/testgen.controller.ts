@@ -1,27 +1,26 @@
 /**
  * Test Generation Controller
  * Handles HTTP requests for test generation endpoints
+ * Now focused on AI REST Assured (agentic) test generation
  */
 
+import * as path from 'path';
+import * as fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 import { ApiResponse } from '../../core/types';
-import { 
-  GenerateAxiosTestsUseCase,
-  TestGenerationResult,
-} from '../../application/testgen/generate-axios-tests.usecase';
 import {
-  ExportTestSuiteUseCase,
-  ExportResult,
-} from '../../application/testgen/export-test-suite.usecase';
+  ExecuteTestsUseCase,
+} from '../../application/testgen/execute-tests.usecase';
 import { ISpecRepository } from '../../domain/repositories';
 import {
-  GenerateAxiosTestsRequestDto,
-  GenerateAxiosTestsResponseDto,
-  TestPreviewRequestDto,
-  TestPreviewResponseDto,
-  ExportTestSuiteRequestDto,
-  ExportTestSuiteResponseDto,
+  ExecuteTestsRequestDto,
+  ExecuteTestsResponseDto,
+  TestExecutionStatusDto,
+  AgentRunRequestDto,
+  AgentRunResponseDto,
+  AgentRunStatusDto,
 } from '../dto/testgen.dto';
+import { AgentOrchestrator } from '../../application/agents';
 
 /**
  * TestGenController
@@ -29,32 +28,38 @@ import {
  */
 export class TestGenController {
   constructor(
-    private generateAxiosTestsUseCase: GenerateAxiosTestsUseCase,
-    private exportTestSuiteUseCase: ExportTestSuiteUseCase,
-    private specRepository: ISpecRepository
+    private executeTestsUseCase: ExecuteTestsUseCase,
+    private specRepository: ISpecRepository,
+    private agentOrchestrator?: AgentOrchestrator | null
   ) {}
 
   /**
-   * POST /testgen/generate-axios-tests
-   * Generate Axios + Jest test code from a spec
+   * POST /testgen/execute-tests
+   * Execute generated tests
    */
-  async generateAxiosTests(
-    req: Request<unknown, unknown, GenerateAxiosTestsRequestDto>,
-    res: Response<ApiResponse<GenerateAxiosTestsResponseDto>>,
+  async executeTests(
+    req: Request<unknown, unknown, ExecuteTestsRequestDto>,
+    res: Response<ApiResponse<ExecuteTestsResponseDto>>,
     next: NextFunction
   ): Promise<void> {
     try {
-      const { specId, selection, options } = req.body;
+      const { testSuitePath, framework, args, env } = req.body;
 
-      const result = await this.generateAxiosTestsUseCase.execute({
-        specId,
-        selection,
-        options,
+      const result = await this.executeTestsUseCase.execute({
+        testSuitePath,
+        framework,
+        args,
+        env,
       });
 
-      const response: ApiResponse<GenerateAxiosTestsResponseDto> = {
+      const response: ApiResponse<ExecuteTestsResponseDto> = {
         success: true,
-        data: this.mapTestGenerationResult(result),
+        data: {
+          executionId: result.executionId,
+          status: result.status,
+          startedAt: result.startedAt.toISOString(),
+          message: 'Test execution started',
+        },
         meta: {
           timestamp: new Date().toISOString(),
         },
@@ -67,64 +72,49 @@ export class TestGenController {
   }
 
   /**
-   * GET /testgen/spec/:specId/preview
-   * Get a preview of generated tests for a spec
+   * GET /testgen/execution/:executionId
+   * Get test execution status
    */
-  async getTestPreview(
-    req: Request<{ specId: string }, unknown, unknown, { maxOperations?: string }>,
-    res: Response<ApiResponse<TestPreviewResponseDto>>,
+  async getExecutionStatus(
+    req: Request<{ executionId: string }>,
+    res: Response<ApiResponse<TestExecutionStatusDto>>,
     next: NextFunction
   ): Promise<void> {
     try {
-      const { specId } = req.params;
-      const maxOperations = parseInt(req.query.maxOperations || '5', 10);
+      const { executionId } = req.params;
 
-      // Get spec to determine available tags and operation count
-      const spec = await this.specRepository.findById(specId);
-      if (!spec) {
+      const result = await this.executeTestsUseCase.getStatus(executionId);
+
+      if (!result) {
         res.status(404).json({
           success: false,
           error: {
             code: 'NOT_FOUND',
-            message: `Spec not found: ${specId}`,
+            message: `Execution not found: ${executionId}`,
           },
           meta: { timestamp: new Date().toISOString() },
         });
         return;
       }
 
-      // Generate a preview with limited operations
-      const previewOperations = spec.operations.slice(0, maxOperations);
-      
-      // Generate tests for preview
-      const result = await this.generateAxiosTestsUseCase.execute({
-        specId,
-        selection: {
-          mode: 'full',
-          exclude: spec.operations.slice(maxOperations).map(op => op.operationId),
-        },
-        options: {
-          includeNegativeTests: true,
-          includeAuthTests: true,
-        },
-      });
+      const reportPath = this.executeTestsUseCase.getReportPath(executionId);
+      const reportUrl = reportPath
+        ? `/api/testgen/execution/${executionId}/report`
+        : undefined;
 
-      // Collect all unique tags
-      const allTags = new Set<string>();
-      for (const op of spec.operations) {
-        for (const tag of op.tags) {
-          allTags.add(tag);
-        }
-      }
-
-      const response: ApiResponse<TestPreviewResponseDto> = {
+      const response: ApiResponse<TestExecutionStatusDto> = {
         success: true,
         data: {
-          previewCode: result.code,
-          estimatedTestCount: this.estimateTotalTests(spec.operations.length),
-          estimatedOperationCount: spec.operations.length,
-          availableTags: Array.from(allTags).sort(),
-          sampleTestCases: result.testCases.slice(0, 10),
+          executionId: result.executionId,
+          status: result.status,
+          startedAt: result.startedAt.toISOString(),
+          completedAt: result.completedAt?.toISOString(),
+          duration: result.duration,
+          exitCode: result.exitCode,
+          stdout: result.stdout,
+          stderr: result.stderr,
+          results: result.results,
+          reportUrl,
         },
         meta: {
           timestamp: new Date().toISOString(),
@@ -138,79 +128,190 @@ export class TestGenController {
   }
 
   /**
-   * POST /testgen/export
-   * Export generated tests as downloadable files
+   * GET /testgen/execution/:executionId/report*
+   * Serve Allure report static files
    */
-  async exportTestSuite(
-    req: Request<unknown, unknown, ExportTestSuiteRequestDto>,
-    res: Response<ApiResponse<ExportTestSuiteResponseDto>>,
+  async serveExecutionReport(
+    req: Request<{ executionId: string }>,
+    res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
-      const { specId, selection, exportOptions, testOptions } = req.body;
+      const { executionId } = req.params;
+      const reportDir = this.executeTestsUseCase.getReportPath(executionId);
+      if (!reportDir) {
+        res.status(404).json({
+          success: false,
+          error: {
+            code: 'NOT_FOUND',
+            message: 'Allure report not found. Run Maven tests and ensure allure:report has been generated.',
+          },
+          meta: { timestamp: new Date().toISOString() },
+        });
+        return;
+      }
+      const resolvedDir = path.resolve(reportDir);
+      const pathAfterReport = req.path.replace(new RegExp(`^.*/execution/${executionId}/report/?`), '') || '';
+      const requestedPath = pathAfterReport || 'index.html';
+      if (requestedPath.includes('..')) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'BAD_REQUEST', message: 'Invalid path' },
+          meta: { timestamp: new Date().toISOString() },
+        });
+        return;
+      }
+      const filePath = path.join(resolvedDir, requestedPath);
+      const normalized = path.normalize(filePath);
+      if (!normalized.startsWith(resolvedDir)) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'BAD_REQUEST', message: 'Invalid path' },
+          meta: { timestamp: new Date().toISOString() },
+        });
+        return;
+      }
+      if (!fs.existsSync(normalized)) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'File not found' },
+          meta: { timestamp: new Date().toISOString() },
+        });
+        return;
+      }
+      const stat = fs.statSync(normalized);
+      if (stat.isDirectory()) {
+        const indexFile = path.join(normalized, 'index.html');
+        if (fs.existsSync(indexFile)) {
+          res.sendFile(indexFile);
+          return;
+        }
+        res.status(404).json({
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'index.html not found' },
+          meta: { timestamp: new Date().toISOString() },
+        });
+        return;
+      }
+      res.sendFile(normalized);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-      // First generate the tests
-      const testResult = await this.generateAxiosTestsUseCase.execute({
-        specId,
-        selection,
-        options: testOptions,
-      });
+  // ──────────────────────────────────────────────
+  //  AI REST Assured endpoints
+  // ──────────────────────────────────────────────
 
-      // Then export them
-      const exportResult = await this.exportTestSuiteUseCase.execute({
-        testResult,
-        options: exportOptions,
-      });
+  /**
+   * POST /testgen/agent/run
+   * Start an AI REST Assured run (Plan → Write → Execute → Reflect → Fix loop)
+   */
+  async startAgentRun(
+    req: Request<unknown, unknown, AgentRunRequestDto>,
+    res: Response<ApiResponse<AgentRunResponseDto>>,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      if (!this.agentOrchestrator) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'LLM_REQUIRED', message: 'AI REST Assured requires LLM to be enabled. Set LLM_ENABLED=true in .env' },
+          meta: { timestamp: new Date().toISOString() },
+        });
+        return;
+      }
 
-      const response: ApiResponse<ExportTestSuiteResponseDto> = {
+      const runId = this.agentOrchestrator.startRun(req.body);
+
+      res.status(200).json({
         success: true,
-        data: this.mapExportResult(exportResult),
-        meta: {
-          timestamp: new Date().toISOString(),
+        data: {
+          runId,
+          status: 'planning',
+          message: 'AI REST Assured run started. Poll /api/testgen/agent/run/:runId for status.',
         },
-      };
-
-      res.status(200).json(response);
+        meta: { timestamp: new Date().toISOString() },
+      });
     } catch (error) {
       next(error);
     }
   }
 
   /**
-   * Map TestGenerationResult to DTO
+   * GET /testgen/agent/run/:runId
+   * Poll the status of an AI REST Assured run
    */
-  private mapTestGenerationResult(result: TestGenerationResult): GenerateAxiosTestsResponseDto {
-    return {
-      code: result.code,
-      fileName: result.fileName,
-      specId: result.specId,
-      specTitle: result.specTitle,
-      testCount: result.testCount,
-      operationCount: result.operationCount,
-      testCases: result.testCases,
-      generatedAt: result.generatedAt.toISOString(),
-      options: result.options,
-    };
-  }
+  async getAgentRunStatus(
+    req: Request<{ runId: string }>,
+    res: Response<ApiResponse<AgentRunStatusDto>>,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      if (!this.agentOrchestrator) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'LLM_REQUIRED', message: 'AI REST Assured requires LLM' },
+          meta: { timestamp: new Date().toISOString() },
+        });
+        return;
+      }
 
-  /**
-   * Map ExportResult to DTO
-   */
-  private mapExportResult(result: ExportResult): ExportTestSuiteResponseDto {
-    return {
-      format: result.format,
-      files: result.files,
-      totalSize: result.totalSize,
-      exportedAt: result.exportedAt.toISOString(),
-    };
-  }
+      const status = this.agentOrchestrator.getStatus(req.params.runId);
+      if (!status) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'NOT_FOUND', message: `Agent run ${req.params.runId} not found` },
+          meta: { timestamp: new Date().toISOString() },
+        });
+        return;
+      }
 
-  /**
-   * Estimate total tests based on operation count
-   * (Assumes ~2-3 tests per operation on average)
-   */
-  private estimateTotalTests(operationCount: number): number {
-    return operationCount * 2;
+      const dto: AgentRunStatusDto = {
+        runId: status.runId,
+        phase: status.phase,
+        currentIteration: status.currentIteration,
+        maxIterations: status.maxIterations,
+        testSuitePath: status.testSuitePath,
+        log: status.log.map(l => ({
+          timestamp: l.timestamp.toISOString(),
+          phase: l.phase,
+          message: l.message,
+        })),
+        iterations: status.iterations.map(it => ({
+          iteration: it.iteration,
+          passed: it.executionResult.passed,
+          failed: it.executionResult.failed,
+          total: it.executionResult.total,
+          fixesApplied: it.fixesApplied,
+        })),
+        finalResult: status.finalResult ? {
+          success: status.finalResult.success,
+          total: status.finalResult.total,
+          passed: status.finalResult.passed,
+          failed: status.finalResult.failed,
+          skipped: status.finalResult.skipped,
+          durationMs: status.finalResult.durationMs,
+        } : undefined,
+        testPlan: status.testPlan ? {
+          title: status.testPlan.title,
+          reasoning: status.testPlan.reasoning,
+          itemCount: status.testPlan.items.length,
+          dependencyCount: status.testPlan.dependencies.length,
+        } : undefined,
+        error: status.error,
+        startedAt: status.startedAt.toISOString(),
+        completedAt: status.completedAt?.toISOString(),
+      };
+
+      res.status(200).json({
+        success: true,
+        data: dto,
+        meta: { timestamp: new Date().toISOString() },
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 }
 
@@ -218,13 +319,13 @@ export class TestGenController {
  * Factory function to create the controller
  */
 export function createTestGenController(
-  generateAxiosTestsUseCase: GenerateAxiosTestsUseCase,
-  exportTestSuiteUseCase: ExportTestSuiteUseCase,
-  specRepository: ISpecRepository
+  executeTestsUseCase: ExecuteTestsUseCase,
+  specRepository: ISpecRepository,
+  agentOrchestrator?: AgentOrchestrator | null
 ): TestGenController {
   return new TestGenController(
-    generateAxiosTestsUseCase,
-    exportTestSuiteUseCase,
-    specRepository
+    executeTestsUseCase,
+    specRepository,
+    agentOrchestrator
   );
 }

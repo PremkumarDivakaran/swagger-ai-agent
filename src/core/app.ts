@@ -11,6 +11,7 @@ import { errorHandler } from './middlewares/errorHandler';
 import { requestLogger } from './middlewares/requestLogger';
 import { ApiResponse, HealthCheckResponse } from './types';
 import apiRoutes from '../api/routes';
+import { LlmRouter } from '../infrastructure/llm';
 
 /**
  * Application dependencies interface
@@ -18,6 +19,7 @@ import apiRoutes from '../api/routes';
 export interface AppDependencies {
   config: AppConfig;
   logger: ILogger;
+  llmRouter?: LlmRouter | null;
 }
 
 /**

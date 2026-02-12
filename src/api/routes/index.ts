@@ -9,7 +9,6 @@ import specRoutes from './spec.routes';
 import environmentRoutes, { createSpecEnvironmentRoutes } from './environment.routes';
 import executionRoutes from './execution.routes';
 import testgenRoutes from './testgen.routes';
-import llmRoutes from './llm.routes';
 import mcpRoutes from './mcp.routes';
 
 const router = Router();
@@ -65,8 +64,10 @@ router.get('/docs', (_req: Request, res: Response) => {
         { method: 'POST', path: '/api/execution/plan', description: 'Create a run plan' },
         { method: 'POST', path: '/api/execution/run', description: 'Execute a run' },
         { method: 'GET', path: '/api/execution/status/:runId', description: 'Get run status' },
-        { method: 'POST', path: '/api/testgen/generate-axios-tests', description: 'Generate Axios+Jest tests' },
-        { method: 'POST', path: '/api/llm/build-payload', description: 'Build payload from schema using LLM' },
+        { method: 'POST', path: '/api/testgen/agent/run', description: 'Start AI REST Assured run' },
+        { method: 'GET', path: '/api/testgen/agent/run/:runId', description: 'Poll AI REST Assured status' },
+        { method: 'POST', path: '/api/testgen/execute-tests', description: 'Execute tests' },
+        { method: 'GET', path: '/api/testgen/execution/:executionId', description: 'Get execution status' },
         { method: 'POST', path: '/api/mcp/swagger/list-operations', description: 'MCP: List operations' },
         { method: 'POST', path: '/api/mcp/swagger/plan-run', description: 'MCP: Plan a run' },
         { method: 'POST', path: '/api/mcp/swagger/execute-operation', description: 'MCP: Execute operation' },
@@ -91,9 +92,6 @@ router.use('/execution', executionRoutes);
 
 // Test generation routes
 router.use('/testgen', testgenRoutes);
-
-// LLM routes
-router.use('/llm', llmRoutes);
 
 // MCP routes
 router.use('/mcp', mcpRoutes);

@@ -11,6 +11,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Sparkles,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { Logo } from '@/components/common/Logo';
@@ -27,25 +28,19 @@ const navItems = [
     path: '/',
     label: 'Dashboard',
     icon: LayoutDashboard,
-    description: 'Health check & overview',
+    description: 'System health & overview',
   },
   {
-    path: '/import',
-    label: 'Import Swagger',
-    icon: Upload,
-    description: 'Import OpenAPI specs',
-  },
-  {
-    path: '/operations',
-    label: 'Operations',
+    path: '/specs',
+    label: 'Specs',
     icon: FileCode,
-    description: 'View API operations',
+    description: 'Import & explore APIs',
   },
   {
-    path: '/execution',
-    label: 'Test Execution',
-    icon: Play,
-    description: 'Run API tests',
+    path: '/test-lab',
+    label: 'Test Lab',
+    icon: Sparkles,
+    description: 'Generate & execute tests',
   },
 ] as const;
 
@@ -75,7 +70,7 @@ export function Sidebar({ isOpen = false, onClose, className }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex flex-col border-r border-slate-200 bg-gradient-to-b from-slate-50 to-white transition-all duration-300',
+          'fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-card transition-all duration-300',
           'lg:sticky lg:top-0 lg:z-30 lg:h-screen',
           isCollapsed ? 'lg:w-16' : 'lg:w-64',
           // Mobile: slide in/out
@@ -85,7 +80,7 @@ export function Sidebar({ isOpen = false, onClose, className }: SidebarProps) {
         )}
       >
         {/* Header */}
-        <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4 bg-white">
+        <div className="flex h-16 items-center justify-between border-b border-border px-4 bg-card">
           <Link to="/" className="flex items-center">
             <Logo size="sm" showText={!isCollapsed} />
           </Link>
@@ -127,20 +122,20 @@ export function Sidebar({ isOpen = false, onClose, className }: SidebarProps) {
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200',
                   isActive
-                    ? 'bg-gradient-to-r from-sky-100 to-sky-50 text-sky-800 border-l-4 border-sky-500 shadow-sm'
-                    : 'text-slate-600 hover:bg-sky-50 hover:text-sky-700',
+                    ? 'bg-primary/10 text-primary border-l-4 border-primary shadow-sm'
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground',
                   isCollapsed && 'justify-center'
                 )}
                 title={isCollapsed ? item.label : undefined}
               >
-                <Icon className={cn('h-5 w-5 flex-shrink-0', isActive && 'text-sky-600')} />
+                <Icon className={cn('h-5 w-5 flex-shrink-0', isActive && 'text-primary')} />
                 {!isCollapsed && (
                   <div className="flex flex-col">
                     <span className="font-semibold">{item.label}</span>
                     <span
                       className={cn(
                         'text-xs',
-                        isActive ? 'text-sky-600' : 'text-slate-400'
+                        isActive ? 'text-primary' : 'text-muted-foreground'
                       )}
                     >
                       {item.description}

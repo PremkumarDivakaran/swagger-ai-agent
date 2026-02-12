@@ -22,10 +22,3 @@ export {
   ExecuteOperationToolOutput,
   EXECUTE_OPERATION_TOOL_NAME,
 } from './executeOperation.tool';
-
-export {
-  createGenerateAxiosTestsTool,
-  GenerateAxiosTestsToolInput,
-  GenerateAxiosTestsToolOutput,
-  GENERATE_AXIOS_TESTS_TOOL_NAME,
-} from './generateAxiosTests.tool';

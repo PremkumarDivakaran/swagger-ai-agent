@@ -92,4 +92,12 @@ export interface ISpecRepository {
    * @returns true if exists
    */
   existsBySource(sourceLocation: string): Promise<boolean>;
+
+  /**
+   * Finds a spec by title and version combination
+   * @param title - Spec title
+   * @param version - Spec version
+   * @returns Spec if found, null otherwise
+   */
+  findByTitleAndVersion(title: string, version: string): Promise<NormalizedSpec | null>;
 }

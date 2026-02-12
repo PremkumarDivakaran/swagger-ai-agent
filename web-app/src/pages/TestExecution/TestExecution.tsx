@@ -532,7 +532,7 @@ export function TestExecution() {
                     checked={parallel}
                     onChange={(e) => setParallel(e.target.checked)}
                     disabled={!!currentPlan}
-                    className="h-4 w-4 rounded border-gray-300"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800"
                   />
                   <span>Run tests in parallel</span>
                 </label>
@@ -543,7 +543,7 @@ export function TestExecution() {
                     checked={stopOnFailure}
                     onChange={(e) => setStopOnFailure(e.target.checked)}
                     disabled={!!currentPlan}
-                    className="h-4 w-4 rounded border-gray-300"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800"
                   />
                   <span>Stop on first failure</span>
                 </label>
@@ -656,20 +656,20 @@ export function TestExecution() {
                 {/* Aggregations - use summary instead */}
                 {currentStatus.summary && (
                   <div className="grid grid-cols-3 gap-3">
-                    <div className="text-center p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
-                      <CheckCircle className="h-5 w-5 text-green-600 mx-auto mb-1" />
-                      <p className="text-lg font-bold text-green-600">{currentStatus.summary.passed}</p>
-                      <p className="text-xs text-muted-foreground">Passed</p>
+                    <div className="text-center p-4 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700">
+                      <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 mx-auto mb-1" />
+                      <p className="text-2xl font-bold text-green-600 dark:text-green-400">{currentStatus.summary.passed}</p>
+                      <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Passed</p>
                     </div>
-                    <div className="text-center p-3 rounded-lg bg-red-50 dark:bg-red-900/20">
-                      <XCircle className="h-5 w-5 text-red-600 mx-auto mb-1" />
-                      <p className="text-lg font-bold text-red-600">{currentStatus.summary.failed}</p>
-                      <p className="text-xs text-muted-foreground">Failed</p>
+                    <div className="text-center p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700">
+                      <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 mx-auto mb-1" />
+                      <p className="text-2xl font-bold text-red-600 dark:text-red-400">{currentStatus.summary.failed}</p>
+                      <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Failed</p>
                     </div>
-                    <div className="text-center p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20">
-                      <AlertCircle className="h-5 w-5 text-yellow-600 mx-auto mb-1" />
-                      <p className="text-lg font-bold text-yellow-600">{currentStatus.summary.skipped}</p>
-                      <p className="text-xs text-muted-foreground">Skipped</p>
+                    <div className="text-center p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700">
+                      <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mx-auto mb-1" />
+                      <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{currentStatus.summary.skipped}</p>
+                      <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Skipped</p>
                     </div>
                   </div>
                 )}
@@ -705,17 +705,17 @@ export function TestExecution() {
                     return (
                       <div
                         key={test.testCaseId}
-                        className="flex items-center justify-between p-3 rounded-lg border"
+                        className="flex items-center justify-between p-3 rounded-lg border border-border bg-card"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <StatusBadge status={test.status} iconOnly size="sm" />
                           <div className="min-w-0">
-                            <p className="font-medium truncate">{test.testCaseName || test.operationId}</p>
+                            <p className="font-medium truncate text-foreground">{test.testCaseName || test.operationId}</p>
                             <p className="text-sm text-muted-foreground truncate">
                               {method.toUpperCase()} {test.request?.url || ''}
                             </p>
                             {test.skipReason && (
-                              <p className="text-xs text-yellow-600">{test.skipReason}</p>
+                              <p className="text-xs text-yellow-600 dark:text-yellow-400">{test.skipReason}</p>
                             )}
                           </div>
                         </div>

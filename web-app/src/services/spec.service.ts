@@ -3,7 +3,7 @@
  * API calls for spec management
  */
 
-import { post, get, del } from './api.client';
+import { post, get, delWithBody } from './api.client';
 import { endpoints } from '@/config';
 import type {
   ImportSpecRequest,
@@ -60,9 +60,11 @@ export async function getTagStats(specId: string): Promise<TagStatsResponse> {
 
 /**
  * Delete a spec
+ * @param specId - Spec ID to delete
+ * @param force - Whether to force delete even if environments exist (default: true)
  */
-export async function deleteSpec(specId: string): Promise<void> {
-  return del<void>(endpoints.spec.delete(specId));
+export async function deleteSpec(specId: string, force: boolean = true): Promise<void> {
+  return delWithBody<void>(endpoints.spec.delete(specId), { force });
 }
 
 /**

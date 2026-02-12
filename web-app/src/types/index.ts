@@ -65,3 +65,27 @@ export type {
   ApiSettings,
   AppSettings,
 } from './config.types';
+
+// Test Generation types
+export type {
+  TestType,
+  OperationSelection,
+  AgentRunRequest,
+  AgentRunResponse,
+  AgentRunStatus,
+  AgentLogEntry,
+  AgentIterationSummary,
+} from './testgen.types';
+
+// Test Execution types
+export type {
+  TestExecutionStatus,
+  TestExecutionRequest,
+  TestExecutionResponse,
+  TestExecutionProgress,
+  TestResult,
+  TestStep,
+  TestSuite,
+  TestExecutionReport,
+  GetExecutionStatusResponse,
+} from './test-execution.types';

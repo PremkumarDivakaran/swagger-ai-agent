@@ -14,6 +14,7 @@ import {
   ChevronRight,
   RefreshCw,
   Tag,
+  Trash2,
 } from 'lucide-react';
 import { PageContainer } from '@/components/layout';
 import {
@@ -26,16 +27,25 @@ import {
   StatusBadge,
 } from '@/components/common';
 import { specService } from '@/services';
-import { useSpecStore } from '@/stores';
+import { useSpecStore, useToast } from '@/stores';
 import { cn, getMethodColor, formatMethod } from '@/utils';
 
 
-export function Operations() {
+export interface OperationsProps {
+  /**
+   * If true, only shows the spec list without operations details
+   */
+  showOnlySpecList?: boolean;
+}
+
+export function Operations({ showOnlySpecList = false }: OperationsProps = {}) {
   const { specId } = useParams<{ specId?: string }>();
   const navigate = useNavigate();
+  const toast = useToast();
   
   const specs = useSpecStore((state) => state.specs);
   const setSpecs = useSpecStore((state) => state.setSpecs);
+  const removeSpec = useSpecStore((state) => state.removeSpec);
   const operations = useSpecStore((state) => state.operations);
   const setOperations = useSpecStore((state) => state.setOperations);
   const selectedSpec = useSpecStore((state) => state.selectedSpec);
@@ -44,6 +54,7 @@ export function Operations() {
   const setStoredSelectedOperationIds = useSpecStore((state) => state.setSelectedOperationIds);
   
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -100,6 +111,26 @@ export function Operations() {
 
   const handleSpecSelect = (id: string) => {
     navigate(`/operations/${id}`);
+  };
+
+  const handleDeleteSpec = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the spec select
+    
+    if (!confirm('Are you sure you want to delete this specification? This action cannot be undone.')) {
+      return;
+    }
+    
+    setIsDeleting(id);
+    try {
+      await specService.deleteSpec(id);
+      removeSpec(id);
+      toast.success('Spec Deleted', 'The specification has been deleted successfully');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to delete spec';
+      toast.error('Delete Failed', message);
+    } finally {
+      setIsDeleting(null);
+    }
   };
 
   const handleRefresh = () => {
@@ -208,19 +239,35 @@ export function Operations() {
             ) : (
               <div className="space-y-3">
                 {specs.map((spec) => (
-                  <button
+                  <div
                     key={spec.id}
-                    onClick={() => handleSpecSelect(spec.id)}
-                    className="w-full flex items-center justify-between p-4 rounded-lg border hover:bg-accent transition-colors text-left"
+                    className="flex items-center justify-between p-4 rounded-lg border hover:bg-accent transition-colors"
                   >
-                    <div>
+                    <button
+                      onClick={() => handleSpecSelect(spec.id)}
+                      className="flex-1 text-left"
+                    >
                       <p className="font-medium">{spec.title}</p>
                       <p className="text-sm text-muted-foreground">
                         v{spec.version} • {spec.operationCount} operations
                       </p>
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => handleDeleteSpec(spec.id, e)}
+                        disabled={isDeleting === spec.id}
+                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors disabled:opacity-50"
+                        title="Delete specification"
+                      >
+                        {isDeleting === spec.id ? (
+                          <LoadingSpinner size="sm" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </button>
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
                     </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                  </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -388,7 +435,7 @@ export function Operations() {
                       type="checkbox"
                       checked={selectedOperationIds.has(operation.operationId)}
                       onChange={() => toggleOperationSelect(operation.operationId)}
-                      className="h-4 w-4 rounded border-gray-300"
+                      className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800"
                     />
 
                     {/* Expand/Collapse */}
@@ -484,7 +531,7 @@ export function Operations() {
                                     ({param.in})
                                   </span>
                                   {param.required && (
-                                    <span className="text-red-500 text-xs">
+                                    <span className="text-red-500 dark:text-red-400 text-xs">
                                       required
                                     </span>
                                   )}

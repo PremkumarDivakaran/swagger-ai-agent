@@ -26,7 +26,7 @@ import {
   getAuthorizationHeader,
 } from '../../domain/models';
 import { NotFoundError, ValidationError } from '../../core/errors';
-import { generateId } from '../../utils';
+import { generateFakerParamValue } from '../../utils/faker-schema';
 
 /**
  * Input for executing a run
@@ -582,30 +582,18 @@ export class ExecuteRunUseCase {
   }
 
   /**
-   * Generate a default value for a parameter when not provided
+   * Generate a default value for a path/query parameter using Faker for meaningful data.
    */
-  private generateDefaultParamValue(param: any): string | number | boolean | undefined {
-    // Use example if available
-    if (param.example !== undefined) return param.example;
-    if (param.schema?.example !== undefined) return param.schema.example;
-    if (param.schema?.default !== undefined) return param.schema.default;
-
-    // Generate based on type
-    const type = param.schema?.type || 'string';
-    switch (type) {
-      case 'integer':
-      case 'number':
-        return 1;
-      case 'boolean':
-        return true;
-      case 'string':
-        if (param.schema?.format === 'uuid') {
-          return generateId();
-        }
-        return 'test-value';
-      default:
-        return 'test-value';
-    }
+  private generateDefaultParamValue(param: {
+    name?: string;
+    schema?: { type?: string; format?: string; example?: unknown; default?: unknown };
+    example?: unknown;
+  }): string | number | boolean | undefined {
+    return generateFakerParamValue({
+      name: param.name,
+      schema: param.schema,
+      example: param.example,
+    });
   }
 }
 

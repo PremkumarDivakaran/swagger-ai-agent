@@ -6,6 +6,9 @@
 import { createApp, AppDependencies } from './app';
 import { loadConfig } from './config';
 import { createLogger, ILogger } from '../infrastructure/logging';
+import { LlmFactory } from './llm-factory';
+import { LlmRouter } from '../infrastructure/llm';
+import { setLlmRouter } from '../api/routes/shared-repositories';
 
 /**
  * Initializes all application dependencies
@@ -20,7 +23,25 @@ function initializeDependencies(): AppDependencies {
     serviceName: 'swagger-ai-agent',
   });
 
-  return { config, logger };
+  // Initialize LLM with selected provider
+  const llmEnabled = process.env.LLM_ENABLED === 'true';
+  const llmProvider = process.env.LLM_PROVIDER || 'testleaf';
+
+  const llmRouter = LlmFactory.createLlmRouter({
+    enabled: llmEnabled,
+    provider: llmProvider,
+    logger,
+  });
+
+  if (llmRouter) {
+    logger.info('✨ LLM features enabled', {
+      provider: llmProvider,
+    });
+    // Set LLM router for use in routes
+    setLlmRouter(llmRouter);
+  }
+
+  return { config, logger, llmRouter };
 }
 
 /**

@@ -13,7 +13,7 @@ import { SwaggerParserAdapter } from '../../infrastructure/swagger/SwaggerParser
 import { OpenApiNormalizer, NormalizationOptions } from '../../infrastructure/swagger/OpenApiNormalizer';
 import { ISpecRepository } from '../../domain/repositories';
 import { NormalizedSpec, SpecMetadata } from '../../domain/models';
-import { ValidationError } from '../../core/errors';
+import { ValidationError, ConflictError } from '../../core/errors';
 
 /**
  * Input for spec ingestion
@@ -102,7 +102,31 @@ export class IngestSpecUseCase {
       input.options
     );
 
-    // Step 6: Assign ID and persist
+    // Step 6: Check for duplicate specs
+    // Check by title + version combination
+    const existingByTitleVersion = await this.specRepository.findByTitleAndVersion(
+      normalizedSpec.info.title,
+      normalizedSpec.info.version
+    );
+    if (existingByTitleVersion) {
+      throw new ConflictError(
+        `A spec with title "${normalizedSpec.info.title}" and version "${normalizedSpec.info.version}" already exists (ID: ${existingByTitleVersion.id})`,
+        'DUPLICATE_SPEC'
+      );
+    }
+
+    // Also check by source location (for URL imports)
+    if (loadResult.sourceLocation && loadResult.sourceLocation !== 'inline') {
+      const existingBySource = await this.specRepository.existsBySource(loadResult.sourceLocation);
+      if (existingBySource) {
+        throw new ConflictError(
+          `A spec from this source "${loadResult.sourceLocation}" has already been imported`,
+          'DUPLICATE_SOURCE'
+        );
+      }
+    }
+
+    // Step 7: Assign ID and persist
     const specWithId: NormalizedSpec = {
       ...normalizedSpec,
       id: uuidv4(),

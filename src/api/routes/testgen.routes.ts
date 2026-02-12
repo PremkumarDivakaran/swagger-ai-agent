@@ -1,6 +1,6 @@
 /**
  * Test Generation Routes
- * HTTP routes for test generation endpoints
+ * HTTP routes for AI REST Assured test generation
  */
 
 import { Router } from 'express';
@@ -9,119 +9,105 @@ import {
   TestGenController,
 } from '../controllers/testgen.controller';
 import {
-  createGenerateAxiosTestsUseCase,
-} from '../../application/testgen/generate-axios-tests.usecase';
+  createExecuteTestsUseCase,
+} from '../../application/testgen/execute-tests.usecase';
 import {
-  createExportTestSuiteUseCase,
-} from '../../application/testgen/export-test-suite.usecase';
-import {
-  validateGenerateAxiosTests,
-  validateExportTestSuite,
+  validateExecuteTests,
+  validateAgentRun,
 } from '../validators/testgen.validator';
-import { specRepository, environmentRepository } from './shared-repositories';
+import { AgentOrchestrator } from '../../application/agents';
+import * as SharedRepos from './shared-repositories';
 
 const router = Router();
 
-// Create use cases
-const generateAxiosTestsUseCase = createGenerateAxiosTestsUseCase(
-  specRepository,
-  environmentRepository
-);
-const exportTestSuiteUseCase = createExportTestSuiteUseCase();
+// Create the AI Agent orchestrator (needs LLM)
+function getAgentOrchestrator(): AgentOrchestrator | null {
+  if (!SharedRepos.llmRouter) return null;
+  return new AgentOrchestrator(SharedRepos.llmRouter, SharedRepos.specRepository);
+}
+
+// Singleton orchestrator (so run status persists across requests)
+let _orchestrator: AgentOrchestrator | null | undefined;
+function orchestrator(): AgentOrchestrator | null {
+  if (_orchestrator === undefined) _orchestrator = getAgentOrchestrator();
+  return _orchestrator;
+}
 
 // Create controller
-const controller = createTestGenController(
-  generateAxiosTestsUseCase,
-  exportTestSuiteUseCase,
-  specRepository
-);
+function getController(): TestGenController {
+  return createTestGenController(
+    createExecuteTestsUseCase(),
+    SharedRepos.specRepository,
+    orchestrator()
+  );
+}
+
+// ──────────────────────────────────────────────
+//  Test execution endpoints (used by AI Agent)
+// ──────────────────────────────────────────────
 
 /**
- * POST /testgen/generate-axios-tests
- * Generate Axios + Jest test code from a spec
- * 
- * Request body:
- * {
- *   "specId": "spec-123",
- *   "selection": {
- *     "mode": "tag",
- *     "tags": ["pet"]
- *   },
- *   "options": {
- *     "includeNegativeTests": true,
- *     "includeAuthTests": true,
- *     "includeBoundaryTests": false
- *   }
- * }
- * 
- * Response:
- * {
- *   "code": "import axios...",
- *   "fileName": "petstore-api.test.ts",
- *   "testCount": 15,
- *   "operationCount": 5,
- *   "testCases": [...]
- * }
+ * POST /testgen/execute-tests
+ * Execute generated tests
  */
 router.post(
-  '/generate-axios-tests',
-  validateGenerateAxiosTests,
-  (req, res, next) => controller.generateAxiosTests(req, res, next)
+  '/execute-tests',
+  validateExecuteTests,
+  (req, res, next) => getController().executeTests(req, res, next)
 );
 
 /**
- * GET /testgen/spec/:specId/preview
- * Get a preview of generated tests for a spec
- * 
- * Query params:
- * - maxOperations: Maximum number of operations to include in preview (default: 5)
- * 
- * Response:
- * {
- *   "previewCode": "...",
- *   "estimatedTestCount": 30,
- *   "estimatedOperationCount": 15,
- *   "availableTags": ["pet", "store", "user"],
- *   "sampleTestCases": [...]
- * }
+ * GET /testgen/execution/:executionId
+ * Get test execution status and results
  */
 router.get(
-  '/spec/:specId/preview',
-  (req, res, next) => controller.getTestPreview(req, res, next)
+  '/execution/:executionId',
+  (req, res, next) => getController().getExecutionStatus(req, res, next)
 );
 
 /**
- * POST /testgen/export
- * Export generated tests as downloadable files
- * 
+ * GET /testgen/execution/:executionId/report*
+ * Serve Allure report (HTML, JS, CSS, data) for viewing in browser
+ */
+router.get(
+  '/execution/:executionId/report*',
+  (req, res, next) => getController().serveExecutionReport(req, res, next)
+);
+
+// ──────────────────────────────────────────────
+//  AI REST Assured endpoints
+// ──────────────────────────────────────────────
+
+/**
+ * POST /testgen/agent/run
+ * Start an AI REST Assured run.
+ * The agent autonomously: Plans → Writes tests → Executes → Reflects → Fixes → Re-runs
+ *
  * Request body:
  * {
  *   "specId": "spec-123",
- *   "selection": { "mode": "full" },
- *   "exportOptions": {
- *     "format": "single-file",
- *     "includePackageJson": true,
- *     "includeJestConfig": true,
- *     "includeReadme": true
- *   },
- *   "testOptions": {
- *     "includeNegativeTests": true
- *   }
+ *   "maxIterations": 5,
+ *   "baseDirectory": "./swagger-tests",
+ *   "basePackage": "com.api.tests",
+ *   "autoExecute": true
  * }
- * 
- * Response:
- * {
- *   "format": "single-file",
- *   "files": [
- *     { "name": "petstore.test.ts", "content": "...", "mimeType": "application/typescript" }
- *   ],
- *   "totalSize": 12345
- * }
+ *
+ * Response: { "runId": "uuid", "status": "planning", "message": "..." }
  */
 router.post(
-  '/export',
-  validateExportTestSuite,
-  (req, res, next) => controller.exportTestSuite(req, res, next)
+  '/agent/run',
+  validateAgentRun,
+  (req, res, next) => getController().startAgentRun(req, res, next)
+);
+
+/**
+ * GET /testgen/agent/run/:runId
+ * Poll the status of an AI REST Assured run.
+ * Returns phase, log, iterations, test plan, and final results.
+ */
+router.get(
+  '/agent/run/:runId',
+  (req, res, next) => getController().getAgentRunStatus(req, res, next)
 );
 
 export default router;

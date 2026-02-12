@@ -33,3 +33,9 @@ temp/
 
 # Uploaded specs (if any)
 uploads/
+
+# swagger-tests
+swagger-tests/
+
+# cache
+.cache/
