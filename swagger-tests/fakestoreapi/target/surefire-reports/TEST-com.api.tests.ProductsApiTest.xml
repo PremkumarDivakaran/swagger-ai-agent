@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.api.tests.ProductsApiTest" time="1.256" tests="5" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="gopherProxySet" value="false"/>
+    <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>
+    <property name="java.specification.version" value="11"/>
+    <property name="sun.cpu.isalist" value=""/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/Users/predivak/Personal/PersonalLearning/AI_Agents_And_Tools/Repos/ai-agent/swagger-ai-agent/swagger-tests/fakestoreapi/target/test-classes:/Users/predivak/Personal/PersonalLearning/AI_Agents_And_Tools/Repos/ai-agent/swagger-ai-agent/swagger-tests/fakestoreapi/target/classes:/Users/predivak/.m2/repository/io/rest-assured/rest-assured/5.4.0/rest-assured-5.4.0.jar:/Users/predivak/.m2/repository/org/apache/groovy/groovy/4.0.16/groovy-4.0.16.jar:/Users/predivak/.m2/repository/org/apache/groovy/groovy-xml/4.0.16/groovy-xml-4.0.16.jar:/Users/predivak/.m2/repository/org/apache/httpcomponents/httpclient/4.5.13/httpclient-4.5.13.jar:/Users/predivak/.m2/repository/org/apache/httpcomponents/httpcore/4.4.13/httpcore-4.4.13.jar:/Users/predivak/.m2/repository/commons-logging/commons-logging/1.2/commons-logging-1.2.jar:/Users/predivak/.m2/repository/commons-codec/commons-codec/1.11/commons-codec-1.11.jar:/Users/predivak/.m2/repository/org/apache/httpcomponents/httpmime/4.5.13/httpmime-4.5.13.jar:/Users/predivak/.m2/repository/org/ccil/cowan/tagsoup/tagsoup/1.2.1/tagsoup-1.2.1.jar:/Users/predivak/.m2/repository/io/rest-assured/json-path/5.4.0/json-path-5.4.0.jar:/Users/predivak/.m2/repository/org/apache/groovy/groovy-json/4.0.16/groovy-json-4.0.16.jar:/Users/predivak/.m2/repository/io/rest-assured/rest-assured-common/5.4.0/rest-assured-common-5.4.0.jar:/Users/predivak/.m2/repository/io/rest-assured/xml-path/5.4.0/xml-path-5.4.0.jar:/Users/predivak/.m2/repository/org/apache/commons/commons-lang3/3.11/commons-lang3-3.11.jar:/Users/predivak/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/Users/predivak/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/Users/predivak/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/Users/predivak/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/Users/predivak/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/predivak/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/Users/predivak/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/Users/predivak/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:/Users/predivak/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-junit5/2.25.0/allure-junit5-2.25.0.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-junit-platform/2.25.0/allure-junit-platform-2.25.0.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-java-commons/2.25.0/allure-java-commons-2.25.0.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-model/2.25.0/allure-model-2.25.0.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-test-filter/2.25.0/allure-test-filter-2.25.0.jar:/Users/predivak/.m2/repository/org/junit/platform/junit-platform-launcher/1.9.2/junit-platform-launcher-1.9.2.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-rest-assured/2.25.0/allure-rest-assured-2.25.0.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-attachments/2.25.0/allure-attachments-2.25.0.jar:/Users/predivak/.m2/repository/org/freemarker/freemarker/2.3.31/freemarker-2.3.31.jar:/Users/predivak/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.17.0/jackson-databind-2.17.0.jar:/Users/predivak/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.17.0/jackson-annotations-2.17.0.jar:/Users/predivak/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.17.0/jackson-core-2.17.0.jar:/Users/predivak/.m2/repository/net/bytebuddy/byte-buddy/1.14.9/byte-buddy-1.14.9.jar:/Users/predivak/.m2/repository/org/slf4j/slf4j-simple/2.0.12/slf4j-simple-2.0.12.jar:/Users/predivak/.m2/repository/org/slf4j/slf4j-api/2.0.12/slf4j-api-2.0.12.jar:"/>
+    <property name="java.vm.vendor" value="Amazon.com Inc."/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://aws.amazon.com/corretto/"/>
+    <property name="user.timezone" value="Asia/Kolkata"/>
+    <property name="java.vm.specification.version" value="11"/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="IN"/>
+    <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home/lib"/>
+    <property name="sun.java.command" value="/Users/predivak/Personal/PersonalLearning/AI_Agents_And_Tools/Repos/ai-agent/swagger-ai-agent/swagger-tests/fakestoreapi/target/surefire/surefirebooter-20260213112409210_3.jar /Users/predivak/Personal/PersonalLearning/AI_Agents_And_Tools/Repos/ai-agent/swagger-ai-agent/swagger-tests/fakestoreapi/target/surefire 2026-02-13T11-24-09_076-jvmRun1 surefire-20260213112409210_1tmp surefire_0-20260213112409210_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/Users/predivak/Personal/PersonalLearning/AI_Agents_And_Tools/Repos/ai-agent/swagger-ai-agent/swagger-tests/fakestoreapi/target/test-classes:/Users/predivak/Personal/PersonalLearning/AI_Agents_And_Tools/Repos/ai-agent/swagger-ai-agent/swagger-tests/fakestoreapi/target/classes:/Users/predivak/.m2/repository/io/rest-assured/rest-assured/5.4.0/rest-assured-5.4.0.jar:/Users/predivak/.m2/repository/org/apache/groovy/groovy/4.0.16/groovy-4.0.16.jar:/Users/predivak/.m2/repository/org/apache/groovy/groovy-xml/4.0.16/groovy-xml-4.0.16.jar:/Users/predivak/.m2/repository/org/apache/httpcomponents/httpclient/4.5.13/httpclient-4.5.13.jar:/Users/predivak/.m2/repository/org/apache/httpcomponents/httpcore/4.4.13/httpcore-4.4.13.jar:/Users/predivak/.m2/repository/commons-logging/commons-logging/1.2/commons-logging-1.2.jar:/Users/predivak/.m2/repository/commons-codec/commons-codec/1.11/commons-codec-1.11.jar:/Users/predivak/.m2/repository/org/apache/httpcomponents/httpmime/4.5.13/httpmime-4.5.13.jar:/Users/predivak/.m2/repository/org/ccil/cowan/tagsoup/tagsoup/1.2.1/tagsoup-1.2.1.jar:/Users/predivak/.m2/repository/io/rest-assured/json-path/5.4.0/json-path-5.4.0.jar:/Users/predivak/.m2/repository/org/apache/groovy/groovy-json/4.0.16/groovy-json-4.0.16.jar:/Users/predivak/.m2/repository/io/rest-assured/rest-assured-common/5.4.0/rest-assured-common-5.4.0.jar:/Users/predivak/.m2/repository/io/rest-assured/xml-path/5.4.0/xml-path-5.4.0.jar:/Users/predivak/.m2/repository/org/apache/commons/commons-lang3/3.11/commons-lang3-3.11.jar:/Users/predivak/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/Users/predivak/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/Users/predivak/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/Users/predivak/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/Users/predivak/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/predivak/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/Users/predivak/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/Users/predivak/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:/Users/predivak/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-junit5/2.25.0/allure-junit5-2.25.0.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-junit-platform/2.25.0/allure-junit-platform-2.25.0.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-java-commons/2.25.0/allure-java-commons-2.25.0.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-model/2.25.0/allure-model-2.25.0.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-test-filter/2.25.0/allure-test-filter-2.25.0.jar:/Users/predivak/.m2/repository/org/junit/platform/junit-platform-launcher/1.9.2/junit-platform-launcher-1.9.2.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-rest-assured/2.25.0/allure-rest-assured-2.25.0.jar:/Users/predivak/.m2/repository/io/qameta/allure/allure-attachments/2.25.0/allure-attachments-2.25.0.jar:/Users/predivak/.m2/repository/org/freemarker/freemarker/2.3.31/freemarker-2.3.31.jar:/Users/predivak/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.17.0/jackson-databind-2.17.0.jar:/Users/predivak/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.17.0/jackson-annotations-2.17.0.jar:/Users/predivak/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.17.0/jackson-core-2.17.0.jar:/Users/predivak/.m2/repository/net/bytebuddy/byte-buddy/1.14.9/byte-buddy-1.14.9.jar:/Users/predivak/.m2/repository/org/slf4j/slf4j-simple/2.0.12/slf4j-simple-2.0.12.jar:/Users/predivak/.m2/repository/org/slf4j/slf4j-api/2.0.12/slf4j-api-2.0.12.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/Users/predivak"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2024-07-16"/>
+    <property name="java.home" value="/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/Users/predivak/Personal/PersonalLearning/AI_Agents_And_Tools/Repos/ai-agent/swagger-ai-agent/swagger-tests/fakestoreapi"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.CGraphicsEnvironment"/>
+    <property name="surefire.real.class.path" value="/Users/predivak/Personal/PersonalLearning/AI_Agents_And_Tools/Repos/ai-agent/swagger-ai-agent/swagger-tests/fakestoreapi/target/surefire/surefirebooter-20260213112409210_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="11.0.24+8-LTS"/>
+    <property name="user.name" value="predivak"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="26.2"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Corretto-11.0.24.8.1"/>
+    <property name="localRepository" value="/Users/predivak/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/corretto/corretto-11/issues/"/>
+    <property name="java.io.tmpdir" value="/var/folders/15/gghyr4h54sx5n4k0b7p1fpcm0000gn/T/"/>
+    <property name="java.version" value="11.0.24"/>
+    <property name="user.dir" value="/Users/predivak/Personal/PersonalLearning/AI_Agents_And_Tools/Repos/ai-agent/swagger-ai-agent/swagger-tests/fakestoreapi"/>
+    <property name="os.arch" value="x86_64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="java.awt.printerjob" value="sun.lwawt.macosx.CPrinterJob"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="java.library.path" value="/Users/predivak/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.vendor" value="Amazon.com Inc."/>
+    <property name="java.vm.version" value="11.0.24+8-LTS"/>
+    <property name="java.specification.maintenance.version" value="2"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
+    <property name="java.class.version" value="55.0"/>
+  </properties>
+  <testcase name="addProduct" classname="com.api.tests.ProductsApiTest" time="0.307">
+    <system-out><![CDATA[Request method:	POST
+Request URI:	https://fakestoreapi.com/products
+Proxy:			<none>
+Request params:	<none>
+Query params:	<none>
+Form params:	<none>
+Path params:	<none>
+Headers:		Accept=application/json, application/javascript, text/javascript, text/json
+				Content-Type=application/json
+Cookies:		<none>
+Multiparts:		<none>
+Body:
+{
+    "title": "Wireless Mouse",
+    "price": 29.99,
+    "description": "Ergonomic wireless mouse",
+    "category": "electronics",
+    "image": "https://example.com/mouse.jpg"
+}
+HTTP/1.1 403 Forbidden
+Date: Fri, 13 Feb 2026 05:54:17 GMT
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: close
+accept-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cf-mitigated: challenge
+critical-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cross-origin-embedder-policy: require-corp
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+origin-agent-cluster: ?1
+permissions-policy: accelerometer=(),browsing-topics=(),camera=(),clipboard-read=(),clipboard-write=(),geolocation=(),gyroscope=(),hid=(),interest-cohort=(),magnetometer=(),microphone=(),payment=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=()
+referrer-policy: same-origin
+server-timing: chlray;desc="9cd211fb9940ff71"
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+Cache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Expires: Thu, 01 Jan 1970 00:00:01 GMT
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=FoyS3KZhm0bX0bp3DuHlByPBAJ%2FTVeKaFnPsR2LHgPYGU%2F3v5CO71D8pJ3w8EwM9A5exN%2Fx7F5cNuEXyD72hpAhtXwBLGeuzPxSEU67lCOD9Ctxbpz8FGT66tMMEm4%2FmvrvT"}],"group":"cf-nel","max_age":604800}
+NEL: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+Vary: Accept-Encoding
+Server: cloudflare
+CF-RAY: 9cd211fb9940ff71-BOM
+Content-Encoding: gzip
+alt-svc: h3=":443"; ma=86400
+server-timing: cfL4;desc="?proto=TCP&rtt=1412&min_rtt=1411&rtt_var=530&sent=6&recv=6&lost=0&retrans=0&sent_bytes=3130&recv_bytes=982&delivery_rate=2759744&cwnd=252&unsent_bytes=0&cid=8b30bae02761ecbd&ts=77&x=0"
+
+<html lang="en-US">
+  <head>
+    <title>Just a moment...</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <meta name="robots" content="noindex,nofollow"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <style>*{box-sizing:border-box;margin:0;padding:0}html{line-height:1.15;-webkit-text-size-adjust:100%;color:#313131;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"}body{display:flex;flex-direction:column;height:100vh;min-height:100vh}.main-content{margin:8rem auto;padding-left:1.5rem;max-width:60rem}@media (width &lt;= 720px){.main-content{margin-top:4rem}}.h2{line-height:2.25rem;font-size:1.5rem;font-weight:500}@media (width &lt;= 720px){.h2{line-height:1.5rem;font-size:1.25rem}}#challenge-error-text{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0ibm9uZSI+PHBhdGggZmlsbD0iI0IyMEYwMyIgZD0iTTE2IDNhMTMgMTMgMCAxIDAgMTMgMTNBMTMuMDE1IDEzLjAxNSAwIDAgMCAxNiAzbTAgMjRhMTEgMTEgMCAxIDEgMTEtMTEgMTEuMDEgMTEuMDEgMCAwIDEtMTEgMTEiLz48cGF0aCBmaWxsPSIjQjIwRjAzIiBkPSJNMTcuMDM4IDE4LjYxNUgxNC44N0wxNC41NjMgOS41aDIuNzgzem0tMS4wODQgMS40MjdxLjY2IDAgMS4wNTcuMzg4LjQwNy4zODkuNDA3Ljk5NCAwIC41OTYtLjQwNy45ODQtLjM5Ny4zOS0xLjA1Ny4zODktLjY1IDAtMS4wNTYtLjM4OS0uMzk4LS4zODktLjM5OC0uOTg0IDAtLjU5Ny4zOTgtLjk4NS40MDYtLjM5NyAxLjA1Ni0uMzk3Ii8+PC9zdmc+");background-repeat:no-repeat;background-size:contain;padding-left:34px}@media (prefers-color-scheme: dark){body{background-color:#222;color:#d9d9d9}}</style>
+    <meta http-equiv="refresh" content="360"/>
+  </head>
+  <body>
+    <div class="main-wrapper" role="main">
+      <div class="main-content">
+        <noscript>
+          <div class="h2">
+            <span id="challenge-error-text">Enable JavaScript and cookies to continue</span>
+          </div>
+        </noscript>
+      </div>
+    </div>
+    <script>(function(){window._cf_chl_opt = {cvId: '3',cZone: 'fakestoreapi.com',cType: 'managed',cRay: '9cd211fb9940ff71',cH: 'm6A.bKZ9jQ4OWMEJsSoFNvODkiYFg0qI_6a8rFA2OjE-1770962057-1.2.1.1-.Ya_uK.ukcEKg2WRY3IRsAu218YN8R.Z1XvsErLX9CSrcFLiWl1vLl2uvJj6pW_q',cUPMDTk:"\/products?__cf_chl_tk=xQFh7oq5rV1hNH6kEWAKqGbE6nO3kdgNFj3y0TQ8WKE-1770962057-1.0.1.1-n8IYI4O65ITtcIgaqS8OBY.y.DNFyKZpsFreTcQUs5I",cFPWv: 'g',cITimeS: '1770962057',cTplC:0,cTplV:5,cTplB: '0',fa:"\/products?__cf_chl_f_tk=xQFh7oq5rV1hNH6kEWAKqGbE6nO3kdgNFj3y0TQ8WKE-1770962057-1.0.1.1-n8IYI4O65ITtcIgaqS8OBY.y.DNFyKZpsFreTcQUs5I",md: 'KPj7QRW7Qs1xHMBadHT.dTbjKGUyLTyTHGluTlVCMg8-1770962057-1.2.1.1-_vyF3Y9FjAj.LDpf90DrAglY_uKykFYqE1LukCBTs2rKZWgKm7T9VtFkhbqsVIpsTTR7PUaF_oRYGV3mVq3t3YBkJsQvdycuxwAWrGAAsF6rlFDVuwWis9FZrBIWuWPdRULwLYGBq5jeTGL3mXS4Bwet2FDN7nWRiBBJQwmcOlkANRqRtWDCYXkrbIShmmoPuKRaXVaIOQPQ7Aub9XnhHKMai2gf7eAzUqBDvqeNNhck.HyF3Z_DOIeKCzgiBhhGEGHuMZon990tyhAvTwiyx_fvS1BXq3XbbtHdE2ZRcSJLh.46cZKH5n3uwz.DZ3x1Q3C6AH0QpCVKxfm9OI09lgdRjyV4qe7iT87q9rvR4_6HbvvqFH8pmUB66AV3.PvSEz_jjaQ.SiljmGD3.vW4PR97Djati1RZcVHXkCaebB9m9qX1sYOM_7l9IF3KFahjv4Pk8f.pOC.jhTEiT_Dv_diMG4UgXVK6.Tce0AQchCYQSzxkRCcV_XSeSN9pw8VyOLOW_NlGL7LnMLgX520nDyywgsJkbXh07Xlcznd1gta2K1fyuBRmKPVDA3n3DLjHVaLSntxZlTkAd2gpCrv9EjKbix3uiPqTmuqIBzku.ZhTqftX3x0XJsgLyJxBFmYp2NXhLmI_wjZ0NzzNGL4HeOYKRLDSi8T8GRpyw6iohmfqIcUqRRAY5UhYwPPqapsd7c5sbJULbKdCasHXcWpTO.6N09H90PUDezZguDPE_HYNlvvLkbc9RwvedNsEKBN5UspJbW3nECdNLkQPehlPWG6zwVQLymCp6T_Oa7EqSQE_k7NFPf5DZiornvsrX22kIAoaPZnSFAsLsLVQEr3dcVQyPl0UdIPlNMn3Hq_UE18',mdrd: '3Qg23RNrHlqX5Cu_lR0mmjy3dTDIIMBL75iOk4PsyTY-1770962057-1.2.1.1-7J0p5dhfYt3WsbKAov.RgkWf5jWPgHRG.FpH45dLmVGcNiAEgS9tKuk_V89sQQrH82KcWDtmHzxx5920YScdGrNPto8jLSL5KC2iOsU6D8g0MQ3fRXDivvYZkr1lZgqAzKpYQIP4xWLT8bO8DUruAH4CTYEaaMzGglzsymh4N6FJ4_NU8.jl_3wzCNjQPgKAm39Zc2IelXmd7D2_npBwhJSvHwih2E6ycqxVNWcWKz9ZwkLX8UPo.7E_wEy6DV5ejIRrynlSMokP_NvPs9DOTaZ8PnXqX9os6KWZmP93sUWcg_AEklYuuGgWAOPn5AW7ufJIwpggbduRrZK2B3pk8qZMl_0iqygUoIMTr42xZsvR4FviAhXMY2SUvdoG87ti8ohh0ONDxEWTbNo8gRIY164APeiJbZrh4Pwqzw.KP9Om_hJkuNRWJekTta0QohfprD1FoRFjlleY0eUgCkdtlWlY1ohKpKoL4_Ct5p1fPTB2Cg5dM4PFQu7g4TwyzRjzZOUKwPm0uBCJbQ9bA.vfbmZtIZop88pKJQP_BX34Bfw4y_OBgDbdRjG868XuWb_CeOb0dN7WKPISRiIGmyRA1HY37i.Hfe6p93A8zR._t8Nv1PW3E9xFRt46wEDmhfXHskoVWS4FoSUrE4GIxOHELHvloPS_4Ad5uusQwXqs.vIOQDemE3PbJFSg8ELiLq2bjiSKmuQCQTrNW4ve743YG160OkC.HKAjs96fqv_MedTYauk0MdcCd2j.mxA2eZQ.l2mA93Y7D.SrD01V5tqms2NsoTMpad.Aow9h8MaWTAa4kiKQ1KSxx8kglun8lLdT37NRPvAOv.wBDua16UWoW2PWLaZ951_MqFYYnBDgvbB_zsj2znRj4IxYRwKLjk9ckfykgjvLLMZqHWCmkB0_Lxk0UMePvyWVJleuYo0eZDj.R8h46Rq1b97uYCYUqc9bUnwHIkmUGZp6wa.WaS6VRJo2S0Yqqhi.mUXsQIbC3F9ti2QueNVuAWXNhziJMMUZF75.kv0drz5msCoKPLVbnVd9UCdMEOGfNATRLfMXP1wbsqa4AfMaoUvQodMxA4rboNEn1OwEkGfWb8TChyJ86hHSGqcIM6ZUBH23N5JVDU0oYM2FyiDLV3qJkyf5m__lYALYGirxfdxI7czooSWX.ZwH2VDjwq1doUgyjn9se96EkdTJu_HRuVp72XCo6KyPqIy7ccMPoiyFULhmIVyU0QetNSkOqALRswN4iyl063Bd5g8ZPCWSwPzEYxhiWi_kl0eUFz9qnIBbOPVvl5iY5QJyFw_iTgwK1ic5in2XxxquYjto_G3AqVwc6ftv9CzG4sDaNf3ehc9XeKpW37PshdGo4pfXuNfKAr79_aUoC0MByARunFmgY48iBeGlb4oY.qFbr1dlb8Ew.qqllkcqbWwUoQc3HGZqslIaFyz8ZRhlLgDVDJ3IcLpJ1TIEyJOW2Id8j6ox4w__0rqFi3r8JsTzhoXPq9AF_2Td34bSTkQpR73sczSeFgcdiRsat0pBYfa735_w6bDPBloLrmw7J2wD4caBmPzxjSJCbukEJJHmAkS5WBM.fhIhiwgqx29Y7AJDBtFmLCchcVZ74sOlwuhdh58d5KBLiCK3KqLFVwI2ZxuwjZy12skofX4yJU2hBzosgfmtWKAJowXHSbbTP7usM5d92hZfswfH6qu_uNnfjgTgUb5o_AcSG7q9R3ASIv1gm_p7q.ekV0WIUNVGfxpslrJJgNRPs3xv.EnUQ9YPr9L12MzpnIK7r9q8IboXLhstK5VF8DVOkNTSQ7Xmk.eQgcXxEjG4OxG_YaHuc7YsBo_DRhev31Fuy_3xjc3g6xMkNm3AmPpRodLTWnfM5KGftV82NRBJh7y38pjXV2KgwSFO_g2rU1ErtOOzLYg63JGjQuOSY3HVdW6hybJohWMERRNiYzBjAbM1qJ_l.lXraT.c8lFQifQemvvqYexrnrznf9evtfDqocDL5ijvKioH3x81HvOAs1uHOphNiBS7sJ.RGmSDwTYTlq0R0zNAm6ldPkvIHtgs.uRO5zPsiaaKE63XyJ45pLamDrWxopvTNxjvETOLWxShIEkjBtDmbZNUcpUODRF5ssLubcLyGJ5d3k74ds7PcL3PN0RV9yJUwSsugPmgOLRw5j7atjf35gdX8v.uUq6y7HNc_C5Ns8I77xdBm8abWcDiKq9vnTtUX2ns_4X4t9P7_LAvnq_5TFt.yfefzEIzOCxcQ7kVfsPZDVl67IHXxhCmwvoWHdcToWC1YloLvvrK.sI51ne94ApGcgT9eAvAe9v872B9Qu.fOxQycmYl76JkcD6n1ndB3_FcqKl69FIaKC5d8KAlz9N6PljvTg8HFug4qhehIHIrvnBwqjWl_J33fvn1MXaQV5CXbnqyGJzSEA4il2ut0uqSkMKTL8sYX.DkXcC_fmYo_ld.75ZrOKCaKdddEA978UNLGYHgmuQ3os1IXgIUPT4cBmQsAqkkKdQZJFqx6TA5gcaYqXPkPmwlZX0fU2pm6xjLslnugFzCQV7Al6yuxmI4FNuV54XbdgbLrdsesilGHLJllNOvLN_641_P_iO_FVHCwaATYrx9JYRPgcIhWN._KzzhLarlaKwDoWuUG.NTnrT9YxeHNPRQAq3UhpY',};var a = document.createElement('script');a.src = '/cdn-cgi/challenge-platform/h/g/orchestrate/chl_page/v1?ray=9cd211fb9940ff71';window._cf_chl_opt.cOgUHash = location.hash === '' &amp;&amp; location.href.indexOf('#') !== -1 ? '#' : location.hash;window._cf_chl_opt.cOgUQuery = location.search === '' &amp;&amp; location.href.slice(0, location.href.length - window._cf_chl_opt.cOgUHash.length).indexOf('?') !== -1 ? '?' : location.search;if (window.history &amp;&amp; window.history.replaceState) {var ogU = location.pathname + window._cf_chl_opt.cOgUQuery + window._cf_chl_opt.cOgUHash;history.replaceState(null, null,"\/products?__cf_chl_rt_tk=xQFh7oq5rV1hNH6kEWAKqGbE6nO3kdgNFj3y0TQ8WKE-1770962057-1.0.1.1-n8IYI4O65ITtcIgaqS8OBY.y.DNFyKZpsFreTcQUs5I"+ window._cf_chl_opt.cOgUHash);a.onload = function() {history.replaceState(null, null, ogU);}}document.getElementsByTagName('head')[0].appendChild(a);}());</script>
+  </body>
+</html>
+]]></system-out>
+  </testcase>
+  <testcase name="getAllProducts" classname="com.api.tests.ProductsApiTest" time="0.223">
+    <system-out><![CDATA[Request method:	GET
+Request URI:	https://fakestoreapi.com/products
+Proxy:			<none>
+Request params:	<none>
+Query params:	<none>
+Form params:	<none>
+Path params:	<none>
+Headers:		Accept=application/json, application/javascript, text/javascript, text/json
+				Content-Type=application/json
+Cookies:		<none>
+Multiparts:		<none>
+Body:			<none>
+HTTP/1.1 403 Forbidden
+Date: Fri, 13 Feb 2026 05:54:17 GMT
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: close
+accept-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cf-mitigated: challenge
+critical-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cross-origin-embedder-policy: require-corp
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+origin-agent-cluster: ?1
+permissions-policy: accelerometer=(),browsing-topics=(),camera=(),clipboard-read=(),clipboard-write=(),geolocation=(),gyroscope=(),hid=(),interest-cohort=(),magnetometer=(),microphone=(),payment=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=()
+referrer-policy: same-origin
+server-timing: chlray;desc="9cd211fd087480c8"
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+Cache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Expires: Thu, 01 Jan 1970 00:00:01 GMT
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=aPBjanyhfJ9aqrXny8QA1pAmhD4Nwq1QN3o2azH4UR6izToVTcyEN3FNt%2FGW8Ftg0UOn59H5uY9cGzxnTzTJPFTCjo4O8Y16tqTIjQuCjnIU7KHRXtDqYJ75q6prQfNDT%2BmA"}],"group":"cf-nel","max_age":604800}
+NEL: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+Vary: Accept-Encoding
+Server: cloudflare
+CF-RAY: 9cd211fd087480c8-BOM
+Content-Encoding: gzip
+alt-svc: h3=":443"; ma=86400
+server-timing: cfL4;desc="?proto=TCP&rtt=1423&min_rtt=1360&rtt_var=425&sent=6&recv=7&lost=0&retrans=0&sent_bytes=3130&recv_bytes=814&delivery_rate=2783416&cwnd=252&unsent_bytes=0&cid=deabc62cdafd079b&ts=83&x=0"
+
+<html lang="en-US">
+  <head>
+    <title>Just a moment...</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <meta name="robots" content="noindex,nofollow"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <style>*{box-sizing:border-box;margin:0;padding:0}html{line-height:1.15;-webkit-text-size-adjust:100%;color:#313131;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"}body{display:flex;flex-direction:column;height:100vh;min-height:100vh}.main-content{margin:8rem auto;padding-left:1.5rem;max-width:60rem}@media (width &lt;= 720px){.main-content{margin-top:4rem}}.h2{line-height:2.25rem;font-size:1.5rem;font-weight:500}@media (width &lt;= 720px){.h2{line-height:1.5rem;font-size:1.25rem}}#challenge-error-text{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0ibm9uZSI+PHBhdGggZmlsbD0iI0IyMEYwMyIgZD0iTTE2IDNhMTMgMTMgMCAxIDAgMTMgMTNBMTMuMDE1IDEzLjAxNSAwIDAgMCAxNiAzbTAgMjRhMTEgMTEgMCAxIDEgMTEtMTEgMTEuMDEgMTEuMDEgMCAwIDEtMTEgMTEiLz48cGF0aCBmaWxsPSIjQjIwRjAzIiBkPSJNMTcuMDM4IDE4LjYxNUgxNC44N0wxNC41NjMgOS41aDIuNzgzem0tMS4wODQgMS40MjdxLjY2IDAgMS4wNTcuMzg4LjQwNy4zODkuNDA3Ljk5NCAwIC41OTYtLjQwNy45ODQtLjM5Ny4zOS0xLjA1Ny4zODktLjY1IDAtMS4wNTYtLjM4OS0uMzk4LS4zODktLjM5OC0uOTg0IDAtLjU5Ny4zOTgtLjk4NS40MDYtLjM5NyAxLjA1Ni0uMzk3Ii8+PC9zdmc+");background-repeat:no-repeat;background-size:contain;padding-left:34px}@media (prefers-color-scheme: dark){body{background-color:#222;color:#d9d9d9}}</style>
+    <meta http-equiv="refresh" content="360"/>
+  </head>
+  <body>
+    <div class="main-wrapper" role="main">
+      <div class="main-content">
+        <noscript>
+          <div class="h2">
+            <span id="challenge-error-text">Enable JavaScript and cookies to continue</span>
+          </div>
+        </noscript>
+      </div>
+    </div>
+    <script>(function(){window._cf_chl_opt = {cvId: '3',cZone: 'fakestoreapi.com',cType: 'managed',cRay: '9cd211fd087480c8',cH: 'a7FYvPIESW9KkacIXgPeNftWeqQbcmtp6eIi4j1K5vU-1770962057-1.2.1.1-8RU5ujLZhtMhfmfYtuJB9TlhICnVyYp7B7Lg8TY9_GJ9vlfqOVCfuYGdk2wweqU4',cUPMDTk:"\/products?__cf_chl_tk=8_x0cf2rvfkurq7CN5IZKRTNJvKRAEM3aNLhLbVwr4U-1770962057-1.0.1.1-kRrg87hMP6QMuagAu4lQFqVNY2tBqG1dN5PAI0qreL4",cFPWv: 'g',cITimeS: '1770962057',cTplC:0,cTplV:5,cTplB: '0',fa:"\/products?__cf_chl_f_tk=8_x0cf2rvfkurq7CN5IZKRTNJvKRAEM3aNLhLbVwr4U-1770962057-1.0.1.1-kRrg87hMP6QMuagAu4lQFqVNY2tBqG1dN5PAI0qreL4",md: 'kboJ9dJEdcr5Zjou.U0Z87kEH_QPumHE1NAFlpyG8eM-1770962057-1.2.1.1-PMxYh5LJIEPnohF9l11FMNjMh21hKtwcvIay0J.CMYPIIt9HrvdBbZML9aQtFhGXKu7eh13KNdLbpGnEWfjAA472lyRRiSTf3mTGJKBsTbdXHAIJzNi_Wph4WCPNKnfoRUbDhctwdPd.ML0XFAWjUz3B8ZDTkii2e.5.8OcV_vgGRP89i4OK2nvQMwGQF3iZLjO03QqnRvhhSz_rBJGpwBCs9OPsNGnP0kGBRFF_zj9Def0dIKUUahPcKi9y3Nzq._vamR2cRpHb3E.306z3k8QTe.nOH_4w0dnfk6hW2EHhedwzga_wixJPkn.FotkbNWbh0cHr85sYWO2I2JAgkUi5lp0bkMGpXPBzCto1pC_bQojTMGR4zF5ZJwHKQoOu903ZRPnzTih_0b2UzgzMf9ZAdZorOhmQqUYs6S2omoGbITacGwgEgX0l2vqsO3bRFi30QJ.ipYzQH7jNwRdNdQqlhAWokIV.l4yWt.SbC_ATwMxdqOXgG6ykE_G17Bx1Luwuwgl5bh7h0D72X0Do_ajFPNXV92pwFFZ2Okgf4NYYCshJw9tOfGfPV6qRbpAzEOe9Aes0D2WKZmkny52p9APp1xuA0fwgbpj3TPVFPdKzs__tVy4dSdmuYdrRoZLDb_S7.GKH6MMZKNYLpf46n5B5HxHFU2zMJXaIVyFHXqB7s3kKH728dsYjo1tLh6rfSuZNxt6rVBEtI7Qvzm0lNx8PeO16TUlxZ3a8oC4BmpvRV98y_WzDthnIRgRYh_BBG3.OsqbnldceLQMy5WygmZkVmbm2UWblg0jOUEBO93jzw_9KlFjwggWDukI2_SH54PnEiIULd8iYlWNK44N20BACCSAVHyFVRa2.Thiz65U',mdrd: 'RuxRL6bFQziIWMlIhpm3_aMoTJ6k7x380z4RQxSIcK0-1770962057-1.2.1.1-PbE7MH6Q0tSlPlQYEUBCIafOOqkvBkZXuvcDN9Z12mqG6iC1AU8vPdJ7uBTWda9B0_d8BCrTX9_I8PVEHTKtJcwEUdWzKnh5Edyjl1NUE0a2FyIv_RRNPgm0XRscsjEwJ_6R2gHQY0KgfqJHzv_aIxwbLtCR7NuoibjQQo68nBXfY.5.o6C.8KX1nkcmbmt0WvqR1FIgjkLd1sbXdwV7oV2ZnByJZh26pHuroutLAr_jPpttnPHyyT9AjGKZaWwBsLn0C._Jbu2Jv9XNl7eLUP9yMEMRIkO6R_.7LxPqprtENzPJYr7b88E6M0BllKCNgqP3_2N7i42Ebn3EMmPRku2VjIGI.2jbNye6wCrDiHUxJXkJX6KYyEOVCM3kpE396P4fMj640nLdIuSlhuT.X1fWzT029DWv6dSJnTJH3FfJRubyqVxJ9pYj8SKRTyjQPQjAvNRFF.DduinbJVxCriSsREELnlaG.ySE82A16BtECWEoDkHJOF7bwfdyRb_5WHU2G0gH1enmE26MTkMTsiwUV3yVvB8PJ25xxNJUYlZ2PuAF5SdseLsSCGOJ5HNjeyH7.gGnMFhqajsF0Zp1t36YB6XK950Bqzt8eqYtyu8fIDYv_JGyfo9s6EhnvhqP26NJnOZKp_.txMLKDoG5Gvnp95KLwQvmG65kQ1ASE.3GCmSmnJTcUHp_qPEURLNf8gCM310IfqNzmwI0U7pjAbwHqAv4D5hEpIBGIHFMRZ7XOgAYvx1sg0dx2awe42Uf4rsDKedudnZEx1xGiItjbJcZryIEJNUDT3zshGHGmckzIkGJnXy5znmwKYqvVWjA6m40RJPp6Zdx3edI.9Z0Zby7pSu0Jae5xcmRYW9Y_woDdjJpreZzhPQWB1mVm9p4T5wTKihHEVapSGoaOkvv3ZbMezw5vNQX3bDR6kYnh4B.kbra8al0SV5lcvCjEZx3fGU70yldjpbPDq7Pr5528LslpgEftaPRGw_IAWYKBX5bN8WUzw2KbDv9prBU65xfWCnacpbqXaqdSnut2VHyUT25dJdjSZGyre5xMlpig6jo.WrkHRYMTg0lGB8hc5e04qYOo8ylw6ciyBEyHhw0OBiYIYDG6oPGUx0DVHP7PXDsBmc1zRtPKL.HxDdlJKLMGfBgcUP0p3mImGnutyjVwrFZ4kCVya7DermjjJSIGxDWqlBIZqji9MMiD9.kPlVU9IsUGQ._6DAVFBGpaHhJNiZu0Af.ZPS7veGlhtSaXjUhyJmNEToPJ0pOUbwfbDLNTB39XWBy5b_.lMR.zU7KDIeQ.zS7edhsT2q_Uwxs3pgealHtoJR5vCDsWhsjKoiUVrU4k9iSrhVkGUcCqxVL8m6eBgrgMOXTBL5QzDY2.5k7_.rBfOEvUmsQQdAHOP.xfh69ba_AYocsUrwS1I.0w9eCRxRT5Pga5Yie8nCddN.4VRENM23IT96e.6IYHUK0xQZU6c6_SQ9i2ZH5lp5HgzXy7w58fK.WoQXjGXn.f0sNXTXCQKDaw85TP4j2FDtTMHnW5DkP4bwa59z8tMeLdaldnD6YlcyE8YXgZVTp1yV.2644LusrKmpLh417CDq_47hyeypdjwkqFMvuk8QnN02D15P1OWd8Ec2.zamGPkuAozwb9JNhhdTeSEn0lCm7jVLBUcmFdfR3k.04rvAjrA.skgsAq8_tKiSC.a3_.gFq3Em153OXLXl48YeMHXunJvpuQXjqOdz8.nK41vjfS.WNiBVwry4Fo0swEL4u3fqe6PYPreU94LTIeIy3Tu2JYVRvIiS3Pl1Gm8toKniz2jY.gTqQeXch_eonHhKdSnlfYmJHgHWFUeLGBEOum3xbdu6NDxf4k2dpXI2wbg9It2dYPH9YXZpGVnDSjv400J92HrJkgdBm4XdEe5lbRAzlowI.LrKZZO742jxqW3rQVLklPbPcRSZu8rDmZ7J6zxLWcWFjLWXuV.oK2MAVdWmMOYP._7Z2G1_lp4d68LVpBuC1a6mUi34kJbORUJwZojNJfFivKhxtUUrv4vGilHBx1l5IB4SQSILG4aEw1VrJPL1FCOxV_ljyTSFyQVCSIE2T1n3_FLMGRT61wTtSEcpV9bEHGRMZxcHaUKmjeVXIxfeyfEWSySlPtimhKbMaBtjlUUkVTXp.qM3VPqjW9NU839zxJVbXe1SihTEeFvhLv6YkfXppJfZ6wPhzeG6clAVMoPaXAHgvfugK6QC9wnfbRQJ1KxmKZhSCvY6I_i5U7kwvi8kSBBNITJqRFnZINc11ZlHUEaH5gnKZ8e69zazBf2dvzLCc5bR9Abgy5Fze0AMcAyGD3hjgb_cS8oRuPwMigLm4cZO1JDdQTkhQoZLL2IBqQaWiWutXYKeWpQsh64rqHYekuVYmr_Zlw7VUgS_S0EkjNhue198aas2RtoGyPo9PIRx6_LPcTo2xTHHcn3.TX2te9ItEWRAX2aFJ8uXfCVdzi5cUnAwHZw3c.yDHXJEmPri4qlT2JvkNhBMfDg',};var a = document.createElement('script');a.src = '/cdn-cgi/challenge-platform/h/g/orchestrate/chl_page/v1?ray=9cd211fd087480c8';window._cf_chl_opt.cOgUHash = location.hash === '' &amp;&amp; location.href.indexOf('#') !== -1 ? '#' : location.hash;window._cf_chl_opt.cOgUQuery = location.search === '' &amp;&amp; location.href.slice(0, location.href.length - window._cf_chl_opt.cOgUHash.length).indexOf('?') !== -1 ? '?' : location.search;if (window.history &amp;&amp; window.history.replaceState) {var ogU = location.pathname + window._cf_chl_opt.cOgUQuery + window._cf_chl_opt.cOgUHash;history.replaceState(null, null,"\/products?__cf_chl_rt_tk=8_x0cf2rvfkurq7CN5IZKRTNJvKRAEM3aNLhLbVwr4U-1770962057-1.0.1.1-kRrg87hMP6QMuagAu4lQFqVNY2tBqG1dN5PAI0qreL4"+ window._cf_chl_opt.cOgUHash);a.onload = function() {history.replaceState(null, null, ogU);}}document.getElementsByTagName('head')[0].appendChild(a);}());</script>
+  </body>
+</html>
+]]></system-out>
+  </testcase>
+  <testcase name="addProduct_emptyBody" classname="com.api.tests.ProductsApiTest" time="0.219">
+    <system-out><![CDATA[Request method:	POST
+Request URI:	https://fakestoreapi.com/products
+Proxy:			<none>
+Request params:	<none>
+Query params:	<none>
+Form params:	<none>
+Path params:	<none>
+Headers:		Accept=application/json, application/javascript, text/javascript, text/json
+				Content-Type=application/json
+Cookies:		<none>
+Multiparts:		<none>
+Body:
+{
+    
+}
+HTTP/1.1 403 Forbidden
+Date: Fri, 13 Feb 2026 05:54:17 GMT
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: close
+accept-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cf-mitigated: challenge
+critical-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cross-origin-embedder-policy: require-corp
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+origin-agent-cluster: ?1
+permissions-policy: accelerometer=(),browsing-topics=(),camera=(),clipboard-read=(),clipboard-write=(),geolocation=(),gyroscope=(),hid=(),interest-cohort=(),magnetometer=(),microphone=(),payment=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=()
+referrer-policy: same-origin
+server-timing: chlray;desc="9cd211fe6b60efd5"
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+Cache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Expires: Thu, 01 Jan 1970 00:00:01 GMT
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=DxeEtfreYyeW9to5MD5m2pEbRyX1ZLGl5x1GDvv8LpLZG%2FEZtFsQj3vr%2B4KHCDAnEIR7Dygo16S26SGeBP0y064AwdLAM6jG%2BdhGtyPBgrNW29l89Zy69%2FSReFMZbWRwRYv4"}],"group":"cf-nel","max_age":604800}
+NEL: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+Vary: Accept-Encoding
+Server: cloudflare
+CF-RAY: 9cd211fe6b60efd5-BOM
+Content-Encoding: gzip
+alt-svc: h3=":443"; ma=86400
+server-timing: cfL4;desc="?proto=TCP&rtt=1270&min_rtt=1267&rtt_var=363&sent=6&recv=7&lost=0&retrans=0&sent_bytes=3129&recv_bytes=836&delivery_rate=3030350&cwnd=252&unsent_bytes=0&cid=100d117914dfb7ed&ts=78&x=0"
+
+<html lang="en-US">
+  <head>
+    <title>Just a moment...</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <meta name="robots" content="noindex,nofollow"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <style>*{box-sizing:border-box;margin:0;padding:0}html{line-height:1.15;-webkit-text-size-adjust:100%;color:#313131;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"}body{display:flex;flex-direction:column;height:100vh;min-height:100vh}.main-content{margin:8rem auto;padding-left:1.5rem;max-width:60rem}@media (width &lt;= 720px){.main-content{margin-top:4rem}}.h2{line-height:2.25rem;font-size:1.5rem;font-weight:500}@media (width &lt;= 720px){.h2{line-height:1.5rem;font-size:1.25rem}}#challenge-error-text{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0ibm9uZSI+PHBhdGggZmlsbD0iI0IyMEYwMyIgZD0iTTE2IDNhMTMgMTMgMCAxIDAgMTMgMTNBMTMuMDE1IDEzLjAxNSAwIDAgMCAxNiAzbTAgMjRhMTEgMTEgMCAxIDEgMTEtMTEgMTEuMDEgMTEuMDEgMCAwIDEtMTEgMTEiLz48cGF0aCBmaWxsPSIjQjIwRjAzIiBkPSJNMTcuMDM4IDE4LjYxNUgxNC44N0wxNC41NjMgOS41aDIuNzgzem0tMS4wODQgMS40MjdxLjY2IDAgMS4wNTcuMzg4LjQwNy4zODkuNDA3Ljk5NCAwIC41OTYtLjQwNy45ODQtLjM5Ny4zOS0xLjA1Ny4zODktLjY1IDAtMS4wNTYtLjM4OS0uMzk4LS4zODktLjM5OC0uOTg0IDAtLjU5Ny4zOTgtLjk4NS40MDYtLjM5NyAxLjA1Ni0uMzk3Ii8+PC9zdmc+");background-repeat:no-repeat;background-size:contain;padding-left:34px}@media (prefers-color-scheme: dark){body{background-color:#222;color:#d9d9d9}}</style>
+    <meta http-equiv="refresh" content="360"/>
+  </head>
+  <body>
+    <div class="main-wrapper" role="main">
+      <div class="main-content">
+        <noscript>
+          <div class="h2">
+            <span id="challenge-error-text">Enable JavaScript and cookies to continue</span>
+          </div>
+        </noscript>
+      </div>
+    </div>
+    <script>(function(){window._cf_chl_opt = {cvId: '3',cZone: 'fakestoreapi.com',cType: 'managed',cRay: '9cd211fe6b60efd5',cH: '5pmCOKpmvk..1lSKHfvOQ87IfNYGDIwwFzeCJMeSL.A-1770962057-1.2.1.1-l1IX2kjimUWQMHnzmgxd5BFKmGFjrQKKrdgavk1.0mznFJcZVX5Phlj6lN7dGOZs',cUPMDTk:"\/products?__cf_chl_tk=DDeCNspX834Vtdqx8Evd7Yu3n5W4SdGdbuz9rYjax0Y-1770962057-1.0.1.1-JKCX7vnt1kU8dGvrd2.aP4sbYUimUZsChiHWHU898Hk",cFPWv: 'g',cITimeS: '1770962057',cTplC:0,cTplV:5,cTplB: '0',fa:"\/products?__cf_chl_f_tk=DDeCNspX834Vtdqx8Evd7Yu3n5W4SdGdbuz9rYjax0Y-1770962057-1.0.1.1-JKCX7vnt1kU8dGvrd2.aP4sbYUimUZsChiHWHU898Hk",md: 'MA2tUHhFmVKgRF_AZs.Ey9uNmoCNTFdSg4zUWiNDVRU-1770962057-1.2.1.1-hrIqwjiOLbzF0sReikyAODWcRj23bkq5D_1LYvbwgG4w6kDc1gKrBuTLzDKVPaIkZpUGct6gnRgQyUW.YXwOopsQ68bEVbidJlp8MkZVV6DXWstHR5u.Y75gQmXPBhxQ8ynoKewg0FrNJ9iQcC69PGXm6usGkBkJHdZKVzHCGMNW9XfjTGugw0thBqTG6II55v0ZWjmWT7KPflQ9ovfKBWreW_7cTwQh8jCwQ1hizK7aWBZq289Zt1KKV0i3LhJ64L2aIn6PU_F_xpDoKd6EqFkDnEWNV.GZYxrJKHtpuik8ayHPk0GunTWs8eqASsHYjqohOZvL5hKreRStW0Zbz9MhjB6eXAeQW.icQA4tGoe1IBbh4UtTsPP9B47GWqo5zN57.DGQIi8Z8dpQQpMCqkWhXbtaKokqewbu5BZDbUnjnvynjuXuL293CCIqUEtAjQ.euFllWHb35uvpuhMC6UgeRw1Yw5spvisrFu.PtwYt_JAbgBJg3_5hPU47NGhMpjdbp6rRumRXQ44E5AWss0hsLDp_tNXczRVDpjsumSwH23pmov0YOkKmgYwJxvRribqw5I0RvNCI_VHg0lY0YxX0cite68nbiBaWof9_uPhcSNbT391HdNoptYgcrMxiX6rrYObeLyuAxlmv7SjYSJES_a3BEWgh1QbRPOqyyY5NpnyTpI3e7O9rS0XpBYb6EhzEQn2iIYNFzNi2ifgLe_..UOqLBMUDD52gxPRQ00_XptgqirKDasQu5JxMx_yWQeH2UD3T5CHfOpQX4uQbE_N8Pv0OJIibAKfc031ds2PB5.MKEDrbTpo4xmnkUgJkeGiDIiuOnE055Na1HizjjWpLk7ApPdQbkM1cdRXNtWI',mdrd: 'UqR749tMtFnHbfKe9dEcF2AZND0cRi4D0AX7SA3c4.M-1770962057-1.2.1.1-.K0u3SS_8aMqRLwB6quWh5oNwRHxrxRswxFDubCCMggi8CIhn5nXmL3auAQNLxt5X2Q2fG8_8z5K9i.dLDdvvNzkRh2rtdSPmBn9ZbASMq3WKKolC06la3gTF2gwRurCqo4FpOalmnVSQ525B1.s_00GUUM5gC5NwHpLAqG6sYZXYXclFRQagMi1Mpze4DjeDb43NumOV35OuDNb7wm2UDxbocyNXPROYJrZN3Zvf8I.vZR9iS9bggQhz6tRSWjdj9eNH6qaWiBqQNTz6Gls0sZ9hv2GASVTmnHaN8YHblGvh0V12FxpNTzvjiJsrfwjg3g4523QZP1oBTPVxNZO67HGrJf.vQH9T.PEIGZIsScAjILx08SSiEybUyqe9kQReI8YrXSX8S6OSNFumsz.gBGyIHpjd9MZsCo8If7l4YledDQ9aGYIKFHG0UcD94KIRBsQRARwvhQ09p27ddkQ_brBPAN6UUumLCX0xHkWRnFRbpWnL38iGZCQsFzObahDGP0eJAmCRD1ZkxaSfnIOIOEewu6ef17FopceDxFsBHl06VJYRb.K05yPDtULoXfRVTkWM7W1zMy.rp5cNMNxkEax2Yl9eFkcyV9klOcTxcwGEff6cLGF_0CCF622AooE3.ULeEChVel8Opp6SFWqMavm9qM_6Tk0foISAsAHJPyBhzsgAvM0UBxFVQIdv_3dsGsBCS4hUR2PgUTNWfeQIF.zVbhGNsQ9Dl3qU9q91_luqNhj40Cg2DTYNbwW1NALNikNffSz0QQZk3xNkD5BYl2LQTEKErzQbcIx14qsFN_9NkDEjO2btsDK14L9L4C.IJ.WVSxUEgujwL2VxW46VN3O.2Y4g9W6a_7rcRS.vwz6MHuNLtjdKAS1EsewdqjHPNXimktr9pFoEU9T5r50f7CUOXS2JsRBdMQv5QXDGlnZxRuZrmsnMrUiArRg8u.O9k3FbqsqOx.p3pLp9kuRJrnTeU2KIpk7zQQqy.s9wvBJpnNuwcyNy9SRBPno1qbMc2ZYFYL3FRrgYgJs68qlJhnsFbqVkR0VnUOlYl8izmJYU4TfJSBRHxXpiKWJFIDi2f2pY6fuAMOqvkA1Nb9XO7nqn5Gup9f5b84BhiMpkviT99cX2oPpeZDj8mxbm21l2AGoFyQYlg6TOAZnTB_FT3UxsDFAn_sJmpHsi.eMLwwU.wbOE2sFx72wVJBOzyinXjcvnBJeKgpx1IjgIx3aM.A8KIuruLxusYDQNuefBPD5D65s.qFBHUsogX9kCiJTVvVmagLC6HyK3AC3I40lyjwiawAdMAVyDBRsjaJ2biLh76NrIinyJwPGubE958BHADkXS1xfjYoB6LVf2j.cR7S_LDFRaMwjVVz0dLo_P39983HdZXLa7hR1nHUMmnPfg03MI4538.1DgsLY8UNmjGz6W38SE9AF95bCPzBfJcPjPf0ZJ1jMhWZJv5RTm4vWa19eew8SMqdY77Qycd2Pb8VSR22fJQL3OYYlIsnjCN1QkiP_z1tepP.Yj4TP8.T4Mym1B61EtKmeRBVNZDSPV.8rahYYaH91RSn0UPjv.UTJcygKi58O_.VvAs0OufZqKsCD7vR5uaEhIIigJq_Gz4V.fSEpargvyn1PQpWtwAtFvHbyaP.Wgca85HyHcdwaFF1cI.feTuNePanY29n5beefS9fmOBzRrBcb_n56aJt4vRUlP61VEFgj.3p7tgvRUO8qN_v_i2j42QDLPyItvssAiFXQYSDS9aS4KzHoM42a9u84TByBDSezECvtDsaA7Bm0s3ahc1RVx6R9oJUAVSk5P7C5hCF4jSPAyFO2sZNEXP0TUpU0uzd_MN1mFZBRM8LYsay7AhUbTxLiB..LOrkwShaltDpQP3a91xKDGfzjLUhvkd8StOqOXx1IoWYGxMH3sZoS1tD5t5H1WIsAXGmp_5YoF7BxKYoMLjCtTxZKrzHXYkffIkoT0csauPwjO1.epFRcyEkXCfu8yyXlrGmKBYgz_h.sVbQiMQPbMSrFSelsAOZLFxQzF.QJOlvlpgnkHp6uSMYdyv8xiHIJwmeACginMHO8hkymdsG3AeLM9s_Y62xTHeZ2GhD0jbYAOH1W58eHRDzxyLVkwUZjyq1G.ozmJkhe9MRr1Tbrw6HIPxazlazDIbtB4LCJjrVf7sasYYTv8guNjttJIrEYjdff3_8PUGhwWmKhpyPEgiaFZfy9JS2Er0kalS0WtQABa5xL0ZPhjUImmY6TrllT9KUu1Tog7UN02I3Wk_PMxjjB6XghFhux8pNGQ5XQ93D7K9ZoQ7p_QxDB4oprHNLrq.2P8EV2Cw1t3ObabutxNdAtfHtyP5WCj09uQUPG41C4ei6mujzwpxkL1QFAQ1khifPJl7Ii9non0HLM467HiRk0ZcyT33ZaJNOaEpJ4b01yi7f5Hga_FIiGQnnRD8qRd7p9M0nx5BrBwv0ABGi8R.lx2GQQDq3qMtIM5hpO9XCBZCovuALtoU3GC.bZOx.Kyg',};var a = document.createElement('script');a.src = '/cdn-cgi/challenge-platform/h/g/orchestrate/chl_page/v1?ray=9cd211fe6b60efd5';window._cf_chl_opt.cOgUHash = location.hash === '' &amp;&amp; location.href.indexOf('#') !== -1 ? '#' : location.hash;window._cf_chl_opt.cOgUQuery = location.search === '' &amp;&amp; location.href.slice(0, location.href.length - window._cf_chl_opt.cOgUHash.length).indexOf('?') !== -1 ? '?' : location.search;if (window.history &amp;&amp; window.history.replaceState) {var ogU = location.pathname + window._cf_chl_opt.cOgUQuery + window._cf_chl_opt.cOgUHash;history.replaceState(null, null,"\/products?__cf_chl_rt_tk=DDeCNspX834Vtdqx8Evd7Yu3n5W4SdGdbuz9rYjax0Y-1770962057-1.0.1.1-JKCX7vnt1kU8dGvrd2.aP4sbYUimUZsChiHWHU898Hk"+ window._cf_chl_opt.cOgUHash);a.onload = function() {history.replaceState(null, null, ogU);}}document.getElementsByTagName('head')[0].appendChild(a);}());</script>
+  </body>
+</html>
+]]></system-out>
+  </testcase>
+  <testcase name="addProduct_invalidTypes" classname="com.api.tests.ProductsApiTest" time="0.204">
+    <system-out><![CDATA[Request method:	POST
+Request URI:	https://fakestoreapi.com/products
+Proxy:			<none>
+Request params:	<none>
+Query params:	<none>
+Form params:	<none>
+Path params:	<none>
+Headers:		Accept=application/json, application/javascript, text/javascript, text/json
+				Content-Type=application/json
+Cookies:		<none>
+Multiparts:		<none>
+Body:
+{
+    "title": 12345,
+    "price": "not-a-number",
+    "description": true
+}
+HTTP/1.1 403 Forbidden
+Date: Fri, 13 Feb 2026 05:54:18 GMT
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: close
+accept-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cf-mitigated: challenge
+critical-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cross-origin-embedder-policy: require-corp
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+origin-agent-cluster: ?1
+permissions-policy: accelerometer=(),browsing-topics=(),camera=(),clipboard-read=(),clipboard-write=(),geolocation=(),gyroscope=(),hid=(),interest-cohort=(),magnetometer=(),microphone=(),payment=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=()
+referrer-policy: same-origin
+server-timing: chlray;desc="9cd211ffbce140e1"
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+Cache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Expires: Thu, 01 Jan 1970 00:00:01 GMT
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=iOX6tAtweAkk5VwtnP3U2BbgzMEmJBw%2FhkMn0OjbrQ34NDgeApk7H23C567MX%2FMLxtlTI3yfUXD5UUU2XCshdKVOz3sH1YU97X1vlD4HLQoRNfcGJ1ltDCD90Cy7aWAyYgNz"}],"group":"cf-nel","max_age":604800}
+NEL: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+Vary: Accept-Encoding
+Server: cloudflare
+CF-RAY: 9cd211ffbce140e1-BOM
+Content-Encoding: gzip
+alt-svc: h3=":443"; ma=86400
+server-timing: cfL4;desc="?proto=TCP&rtt=1472&min_rtt=1367&rtt_var=468&sent=6&recv=7&lost=0&retrans=0&sent_bytes=3129&recv_bytes=892&delivery_rate=2783416&cwnd=252&unsent_bytes=0&cid=619b5ed4d01405a2&ts=79&x=0"
+
+<html lang="en-US">
+  <head>
+    <title>Just a moment...</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <meta name="robots" content="noindex,nofollow"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <style>*{box-sizing:border-box;margin:0;padding:0}html{line-height:1.15;-webkit-text-size-adjust:100%;color:#313131;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"}body{display:flex;flex-direction:column;height:100vh;min-height:100vh}.main-content{margin:8rem auto;padding-left:1.5rem;max-width:60rem}@media (width &lt;= 720px){.main-content{margin-top:4rem}}.h2{line-height:2.25rem;font-size:1.5rem;font-weight:500}@media (width &lt;= 720px){.h2{line-height:1.5rem;font-size:1.25rem}}#challenge-error-text{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0ibm9uZSI+PHBhdGggZmlsbD0iI0IyMEYwMyIgZD0iTTE2IDNhMTMgMTMgMCAxIDAgMTMgMTNBMTMuMDE1IDEzLjAxNSAwIDAgMCAxNiAzbTAgMjRhMTEgMTEgMCAxIDEgMTEtMTEgMTEuMDEgMTEuMDEgMCAwIDEtMTEgMTEiLz48cGF0aCBmaWxsPSIjQjIwRjAzIiBkPSJNMTcuMDM4IDE4LjYxNUgxNC44N0wxNC41NjMgOS41aDIuNzgzem0tMS4wODQgMS40MjdxLjY2IDAgMS4wNTcuMzg4LjQwNy4zODkuNDA3Ljk5NCAwIC41OTYtLjQwNy45ODQtLjM5Ny4zOS0xLjA1Ny4zODktLjY1IDAtMS4wNTYtLjM4OS0uMzk4LS4zODktLjM5OC0uOTg0IDAtLjU5Ny4zOTgtLjk4NS40MDYtLjM5NyAxLjA1Ni0uMzk3Ii8+PC9zdmc+");background-repeat:no-repeat;background-size:contain;padding-left:34px}@media (prefers-color-scheme: dark){body{background-color:#222;color:#d9d9d9}}</style>
+    <meta http-equiv="refresh" content="360"/>
+  </head>
+  <body>
+    <div class="main-wrapper" role="main">
+      <div class="main-content">
+        <noscript>
+          <div class="h2">
+            <span id="challenge-error-text">Enable JavaScript and cookies to continue</span>
+          </div>
+        </noscript>
+      </div>
+    </div>
+    <script>(function(){window._cf_chl_opt = {cvId: '3',cZone: 'fakestoreapi.com',cType: 'managed',cRay: '9cd211ffbce140e1',cH: '3ggV5vLCb5seo.bEGdoQ3ptNqVZKArsuMvIBvtQmkYk-1770962058-1.2.1.1-0Hqao1.MDV6S_IPkX14l.U_rZD9Y_vrFBpIymbuFX.XeThl9OA4BFcQlJJyjQs6w',cUPMDTk:"\/products?__cf_chl_tk=0RrE.ekho_UYITnmpPWGs9Hhe9cqgOKi842aRTh996I-1770962058-1.0.1.1-doaAGx.xDFithMjGpfyNhEasEHq2bmYlTne.kL6mn_g",cFPWv: 'g',cITimeS: '1770962058',cTplC:0,cTplV:5,cTplB: '0',fa:"\/products?__cf_chl_f_tk=0RrE.ekho_UYITnmpPWGs9Hhe9cqgOKi842aRTh996I-1770962058-1.0.1.1-doaAGx.xDFithMjGpfyNhEasEHq2bmYlTne.kL6mn_g",md: 'dyPs5m7V9w_kZIOFsNNhx6DXfiNwhx2u7tnH8LTx9Eg-1770962058-1.2.1.1-CKN5_mEBUVcCbanh_9Krhd.XSBlYYC75_kmbkEfFGkya215dQdfbfQhBHmw5ly17r57bLnwdikgLEZWFrFvbHB3qk9GEKaGHw7gXNcTtJzfprsZnfLSjtl3A_b4see.5qoOVkQVEjXtYcDCgKajJDFm4zIHJ4MqFHOqcQd4Uy7XMJ0U04mDMZ61GE3P0ylGuDSrfY9P9hepSsFlbye_WxI.ze1._OuaK5mGEsunv1hg8n13aaPXGdy1GNBESUwYvmV64AkmCMOmFYTykX78JO.AE6arKSYVnimi4_me6.NnNcIaCzySYBjBT8m0xCLeVp7TaG0HYGHSAyegzh7Hltp2JYNHQ1zqJs6aucWkP8cGr8tIX0_lKj9pabG7NlWvmdVopPNzqlmnc6Psad4CNtbTbPacWis3JLH_5.Glq89ka2RNrUl8jYb7vy_3688AOhbMQHA7hlGZ5XcEhb28MsKpIE0aNleToR9O.8fJPvuIAaQIL8AhsEHKqupwWaGBtxAsG8jAlunwj10tzb34xQwTzrjmsOlGy3QnK90B4JmnzdJ_QP1uyGYc.BHpEfMNP.qY_l9kRHo3ESe16owZDQCLy7DIiqbwm3gtWuojrKbBF1m2_Hb46yXO.jzKvTN6fgozHAGoTbBmwKMylW25rCg9HzMIAWcu9kRNn5ouRBv3nVpEZ.ClfCahyjpAU8fI5u1woL7VyD16dHFuiBN.IU_e1G6BciejgQi754.Rtjt3RDoqquvMEVEJjIv77QJNwTjMbhtpV9EULaPpIbWg2hUQzoBMceD03aKmSRUzy0Nqyal17NDBQh5ppr70U8_LRgcr66wisgvYzoNB_MJVJCe_evUe23KiZQB0Uo5PpjU0',mdrd: '9Hti2utibQxngho9MowJNYEUvLNE57dLMxHR_5CREME-1770962058-1.2.1.1-VOttvw6iLc9BgCCR5b3l38ps5BlpQap3CpIOVIHI0IhGUwnHfyZH9uYIbiEyfATpgggyx4obOISMML4MtEDknTN0ikwniQstaLY9gnOusvQbxGs1PRdmf0i3.YeAV44WOiPJNlMFYPiGAAMw2u9xXlt5NUJ.kmyCPjwJN_9.TiDeN0cWDHDheqIZA1mG2vlqpcMefJ180JM5gXougFU3zg.TIvaN2O_vtb0ZW_pGzuay_4J7I3EqXdnYjWonDMMSq6prsvSB7QCwbtVKVRDLfzH1_K9lGuuxARMv_aCfzlrnK8_gcDJYFFb75Qeb_sDin2gE43lSBbiMydtiJulApvrWiTW5_vVbdjNNX5S1DotAKyV72YQNvR2U8B9T97rQfNRn7VcHhCcfb7SjP8Z6wxzhF0kNXYq1HTLv2Q0aoxYZpNI5SYsRpEq_HOW2fjYJ0HpsCnXUE0BCT.b8C1irfktakU8qfa.IUVtD8MUHCe1PCoutIFdGn8dcVhb_u_geZtUQNzLOxO8le6nM4UXw51N0dG7W88AY0mrKSyuopO1bv8CmIBLp8GtOCRTH1ucr3mHzlUjkwahlgDGkpSRHBmIMV0ISjaC41w7MMKdLfQCHQw_7tTFB6sGAUHpzPO03s4igHXp3boM6XxNswHEyA1mZcbbR9Vyv4eeh4eqg_Kp2mFLmeyYh_W5NmyRowS5M5gQlyxI3Hj35IfXepDbP5KicgoeIbUxDnQrdBsHyMu4kwHD7v7RdMa2cIFGTtNWOe70w0sXT3E.RHQBEMjd5WStnIC2h8QuLpc49WQZgyuTRmKH0AHT1ZzlD24uNytvJQHN4YyWN_3YLx1J.lCDZgWVkndRZs9emCP2NtwTilfD0B31tmuYs9bgoLkQpNsAZLUwTZ9_P8tF7AyVxe6tE3I699Ju_IiNjZqVoecqaeXnnEmVtisU3rlBg0tf5WlZQGCbiH7Jrb4dzU_fuMDIVACiKWstrisOA_TTKZAKdwuLRsA50f1KX8kVACK0tLszErpPh0g8FhWxJkWQj0Hm368.t54BUEBgE8lvMiVOHadVQ.Y82m3Fc.qtoDdaNGsKfQLqHSmWZkw_N6mV7dKR7cWxi9KGF6ZJNkrcbKEip2YLrzwf3t85JP7w9VAw_7Qn1dH8XQNqpBdTrnogj9ao0g.K4WECfj.Sor7UvfGLYnV7IjHdEMy7OWjesWUgUBHP5ACK9Gq1YOZ8pGvp46sM14d2c3UHdHQ8iHrkW8WmkJPSouhX1ENCS5n5Pv7BDc4HPHoDWiUbGuMESn6RD0dAlnknHsn8OfwGLGvkWvUyqhThuC4XkpvTdkPOu30d7nSWO9MQPHSb._PUN9vZVXybZxTroJEh6JGdSkJL2dhDrz60O96dSxqrxDJmG5UVupSLclVv5uCb11hhjOdLCSoRz3D8zUt7djBFf9LIg0eIsA0Vz8repIhKbiN3iclFwSSQNySmJxac7wfQyVqhZ4_OGizOjMMXbtVx2Zs5yeeLbJTB.errDAX.dp8Aq6E1HlI.gk4o_LBgAeBl16Y2vRZPSMxMjwR22CSxjcGLGBY50B3HQFih0YcZSA3FUx9CBem4qRjkfnP3_EAcV0zCjzxLa9zf1ap2UtUo8iUESaNa2LnSKiw4f5IrZWQem5CiJmSrXqemEpOut.jZzVXDkmfLqdd9ahdiCtR9IYAcC0s8Bp3Bs0SFjObgkIvLoXPCSNgw2d.yXhCQNvc5wdDfd.DttjHa.OqiOTkO23KrVwmfh92OouYa6hVr8WB3lhDxmQqROVptzl10.Pb5XnrkbYXsaXWVy7IitK45BrAyf2snO3Tk3EqFnGSDK8ZpRcVKTGBfi3QW4_LXeojn0qohaI.9BrAlCsJMPX_MO.C1uREd9T4dq3y6qdtDMf.hkAq7xBvjaRep6dHfJ51YSwkF5yR2jCojudO3dRY.6SlETIxc0rT9saTYDzMc6er8fT7UaZ2M8wAsoo42EP4NOSAydXLb2cy.vm0fF.PC0bqx0Y5xrVcczvRTDL5ML9mtwFS7rLNQAR3JqF6IwJqJBnHVaPYAd5X0aaF9j627._IZExStF2JenqlBhdbdAaQ4ZteZ9pRtzjbTUtdC35KEaKJwR7TPjYWlknypNkCr7jbP4q34hqUz.sYAaWK2tNT5tDpUZRH23exK8sgHXggCpdfHY0qxLhVpKqjIXyJN1TojaKMzLdBZM_fIllTor927nDbJ9K6bP7.NTYYtADKQLjB5eaD2YB6LUYZHEXKHwDudVYpE9ooh.iNR_9OetizOGMStgrbFXoeLak784d9y5DTlGWoCxh_3fZtGnGhPLKulJdFzodgn8R_q.33v59.EHz3fyIUDwT9ffuaJjckCt93D9L0BZMuICZ_1ZDcAg0SX2ZuBbG6b3o7GMj7KPOnUCyno4pz7NWA3SC6GFK7Nn24Xqa4oEZ7E9JMYTyImXn2Xc4dX6ce6d3klRuPlr5w1FXkD4xmGhTghrAWNKo1csDyvlm8opQp3pZVliO7l3A4dp4Cti7pGm7wMdxaO86UDxR0xh2dwZgxpJAxrgqN4MEXCyzLPgoUcN0Z9ZYWWS_YxYzLqG_7g',};var a = document.createElement('script');a.src = '/cdn-cgi/challenge-platform/h/g/orchestrate/chl_page/v1?ray=9cd211ffbce140e1';window._cf_chl_opt.cOgUHash = location.hash === '' &amp;&amp; location.href.indexOf('#') !== -1 ? '#' : location.hash;window._cf_chl_opt.cOgUQuery = location.search === '' &amp;&amp; location.href.slice(0, location.href.length - window._cf_chl_opt.cOgUHash.length).indexOf('?') !== -1 ? '?' : location.search;if (window.history &amp;&amp; window.history.replaceState) {var ogU = location.pathname + window._cf_chl_opt.cOgUQuery + window._cf_chl_opt.cOgUHash;history.replaceState(null, null,"\/products?__cf_chl_rt_tk=0RrE.ekho_UYITnmpPWGs9Hhe9cqgOKi842aRTh996I-1770962058-1.0.1.1-doaAGx.xDFithMjGpfyNhEasEHq2bmYlTne.kL6mn_g"+ window._cf_chl_opt.cOgUHash);a.onload = function() {history.replaceState(null, null, ogU);}}document.getElementsByTagName('head')[0].appendChild(a);}());</script>
+  </body>
+</html>
+]]></system-out>
+  </testcase>
+  <testcase name="addProduct_specialChars" classname="com.api.tests.ProductsApiTest" time="0.245">
+    <system-out><![CDATA[Request method:	POST
+Request URI:	https://fakestoreapi.com/products
+Proxy:			<none>
+Request params:	<none>
+Query params:	<none>
+Form params:	<none>
+Path params:	<none>
+Headers:		Accept=application/json, application/javascript, text/javascript, text/json
+				Content-Type=application/json
+Cookies:		<none>
+Multiparts:		<none>
+Body:
+{
+    "title": "Test <script>alert(1)</script>",
+    "price": 0,
+    "description": "O'Reilly & Sons \"quoted\""
+}
+HTTP/1.1 403 Forbidden
+Date: Fri, 13 Feb 2026 05:54:18 GMT
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: close
+accept-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cf-mitigated: challenge
+critical-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cross-origin-embedder-policy: require-corp
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+origin-agent-cluster: ?1
+permissions-policy: accelerometer=(),browsing-topics=(),camera=(),clipboard-read=(),clipboard-write=(),geolocation=(),gyroscope=(),hid=(),interest-cohort=(),magnetometer=(),microphone=(),payment=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=()
+referrer-policy: same-origin
+server-timing: chlray;desc="9cd212016b4c47e3"
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+Cache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Expires: Thu, 01 Jan 1970 00:00:01 GMT
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=7LR%2Fr6fNEdgaFLW%2FgkCq5IKybPEFciJGkPa7EpfBO5zAsZbOWx0ZQ%2F%2FZ3G%2Bk7%2BrCbaHcKyMc1sd92%2BrWnnuWqArfEAGmhrmlj7d08fa3kEEbPrpvbQj4taM8oeM%2FbnY366Ob"}],"group":"cf-nel","max_age":604800}
+NEL: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+Vary: Accept-Encoding
+Server: cloudflare
+CF-RAY: 9cd212016b4c47e3-BOM
+Content-Encoding: gzip
+alt-svc: h3=":443"; ma=86400
+server-timing: cfL4;desc="?proto=TCP&rtt=1363&min_rtt=1338&rtt_var=391&sent=7&recv=8&lost=0&retrans=0&sent_bytes=3129&recv_bytes=930&delivery_rate=2842335&cwnd=252&unsent_bytes=0&cid=7ae66451dccb4bdb&ts=92&x=0"
+
+<html lang="en-US">
+  <head>
+    <title>Just a moment...</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <meta name="robots" content="noindex,nofollow"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <style>*{box-sizing:border-box;margin:0;padding:0}html{line-height:1.15;-webkit-text-size-adjust:100%;color:#313131;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"}body{display:flex;flex-direction:column;height:100vh;min-height:100vh}.main-content{margin:8rem auto;padding-left:1.5rem;max-width:60rem}@media (width &lt;= 720px){.main-content{margin-top:4rem}}.h2{line-height:2.25rem;font-size:1.5rem;font-weight:500}@media (width &lt;= 720px){.h2{line-height:1.5rem;font-size:1.25rem}}#challenge-error-text{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0ibm9uZSI+PHBhdGggZmlsbD0iI0IyMEYwMyIgZD0iTTE2IDNhMTMgMTMgMCAxIDAgMTMgMTNBMTMuMDE1IDEzLjAxNSAwIDAgMCAxNiAzbTAgMjRhMTEgMTEgMCAxIDEgMTEtMTEgMTEuMDEgMTEuMDEgMCAwIDEtMTEgMTEiLz48cGF0aCBmaWxsPSIjQjIwRjAzIiBkPSJNMTcuMDM4IDE4LjYxNUgxNC44N0wxNC41NjMgOS41aDIuNzgzem0tMS4wODQgMS40MjdxLjY2IDAgMS4wNTcuMzg4LjQwNy4zODkuNDA3Ljk5NCAwIC41OTYtLjQwNy45ODQtLjM5Ny4zOS0xLjA1Ny4zODktLjY1IDAtMS4wNTYtLjM4OS0uMzk4LS4zODktLjM5OC0uOTg0IDAtLjU5Ny4zOTgtLjk4NS40MDYtLjM5NyAxLjA1Ni0uMzk3Ii8+PC9zdmc+");background-repeat:no-repeat;background-size:contain;padding-left:34px}@media (prefers-color-scheme: dark){body{background-color:#222;color:#d9d9d9}}</style>
+    <meta http-equiv="refresh" content="360"/>
+  </head>
+  <body>
+    <div class="main-wrapper" role="main">
+      <div class="main-content">
+        <noscript>
+          <div class="h2">
+            <span id="challenge-error-text">Enable JavaScript and cookies to continue</span>
+          </div>
+        </noscript>
+      </div>
+    </div>
+    <script>(function(){window._cf_chl_opt = {cvId: '3',cZone: 'fakestoreapi.com',cType: 'managed',cRay: '9cd212016b4c47e3',cH: '3AFyhACUgHenzM6zrOJGMlAOdBhjtruwUfw.UMAlLb0-1770962058-1.2.1.1-byPCJwvF.ZNmJcEL.NuX4.WpUAtxShc24xU06sqOeYB_hdhjFnexfpNB_PoKgAzY',cUPMDTk:"\/products?__cf_chl_tk=AephJ5gQK1tl6uvEri_2zzm52dSLquZy3MObWjnOrZw-1770962058-1.0.1.1-FWLa5U1uxECZLekqYUg3liY36UnOe9ly9nmSuk3MfiE",cFPWv: 'g',cITimeS: '1770962058',cTplC:0,cTplV:5,cTplB: '0',fa:"\/products?__cf_chl_f_tk=AephJ5gQK1tl6uvEri_2zzm52dSLquZy3MObWjnOrZw-1770962058-1.0.1.1-FWLa5U1uxECZLekqYUg3liY36UnOe9ly9nmSuk3MfiE",md: '6AC6k99hEcT8nJJ3kbmqbpkQADt6ng8Raf8vcv3G97E-1770962058-1.2.1.1-HdFd5jR.RD5nAbkiAwlKRbaBUiJbuklEoTMoSJ8GpNfRuT6VyAWTD6eX9JqoAzjCLCGa7n6wEpL_rg0mQNY8aW2WSiVwdu3XmIVkaVDghfka4iQFK9D12VlHbnW0ZvHPxMhhszmTNQi9YmFh6kYx6RjVDRj.0CVk6lzVMtb90xa.gi3Fycz1xyKZEKHASWaPywBrE2VeQMucSCD_oMrqG_oMnVmLtwTEmyyzkrweVD_8x3ZcTTaUS7yUCrRlbTL9imton.HkXbCvkqT32aZy89tctipgce150hXaIQoCw09ZIzpoRTdu4r0299qxt2S_cKumIGZj8fifPgHJnXuNrkMwfAhrm5ffupRPxXNBfFMCF1OOTpuRnExyHU7_WNThJS6KpV_XLwYmJQyUuNOng3TpXETKWvwCWxAobLmUaMNcsRLXjxJAXe2dxFDnMJkgZ.qA6NOncSq6afavIwAcj5TtBj_jevFFiYIybKR0msXV1X40mEH8NqW39czX6lI1jI9.OE5JhtKwTgneVJIW6Omp3JEd2EYi9UbNNhjwIz3Tx2757cmkBekktru1LchQYlBH6sEtb22Uqz845_MG3dpgwSLhbVHU8ENNh4Z0oLz2WQjouHgBh983_j7E_XYuy3fuzrf2HPKradsAoDpENQO_0RILTGVzXBsd1IhKbjqLQgCJpg4dIcuGxFi.bc1kZPyjnKIaleRZbcQbjJzUsuewSMWhIG1lbrZEbVRpj5EBYdXAxhgKhhuzjJ4vF1sJRwk3a0iIvl9oMi2BIHWbd5DGSZ8ZhWskDIZSB7fu7KSudEDHKBfXmzJJIvTzExsvgKwdrj0ROsjvBq216bpGUUK3yqvrneSNZIkp6t6Zgt0',mdrd: '62DvbzvQdx6u.ivul5J6ZTdp6jNyA8jsQAvHODUMfDU-1770962058-1.2.1.1-3QPihID_XGNPleV_mik5_iGaRqY4NKHfCurshEOFMJKWQLj9ZdKIZNNH2LUmF8mTn3GvNce.Cv.FH8JiDS6R.gmc_ikQfXQH99rX4zIBt5X33OGvI42zc7aeAMp18f7fxR3tnE4Wl9LAeftUlK2YeJsBS7Y_b_Bddg1wx8aaDR8tExZlrIrNDV3wIlIPNqK1FhWWfqf9IilecMtJTBqJtvK6KRFCeDmedb3YmRksmYRHZhBsv8mwqMrT2XtL7q8H35V.w2oXkqQXDmkVfpxRe5xpx1FRITOoT50GnGe28Nnf3aSRIk0IGoXGHAsBLEAbwrBM7aYFfmdT2lTmCLj6s8kwrphz6_KZBvVmKv3FrdC6XPsN8JbXpOoCarPiwGPccS2yFWd9BRhqGJF613egbQg10GGPkq1TZr6FbzxtmbHYPYKysEJEu6ZZCxMRXJmVbS9_n.x0MFMzi4.3u47p4eIDiAKeCABtJwsQuJ6A8hHlF2CGjxQR4WX0x6jFsNEh.NErMYO23N_8BFdlnrPbVQhKwBMQLpzE0DRvSYoPbC6nvLtdPEcRaxWmGvdUP9AbxPwY8VWRAKIhS0_vCP7C0vS0fcvkZYqxcrNHFEQ0wvEZAd0ROTyQbqXHFGczVBYqaM5aWoSG.H6D9FwE8ZSayXfLcxuwvalPntVt69ZoKDN.b2A73U0Gqp2d5rcxiSQ9rEZPBRkGaBLnb_.GEeynjnEvCnCOV0idTulS8rHZQ7NtnJwkC26dZyRjq8ahErz5OCdeND.RwdLNbvVmfPqYmpKHsfDT7e.3qKF1mw00n5DUKpc4lSkIeQRTFLIyPKqZiiYzA6Juk9b19FyDI8qTQxd0_.nWzbSgIBeEUG3F03A7hyajOoiL511kt4I1d2tqUrzxChkUG76rz7_qy5yKVi0SpRPkY.C5GCi84.uf21t2cM9M2nl_5XDLTGJ782CdC9uCNsgj6M.BwicSa0NmOLXgbn_Hys.AsbwHCmuctiGp1.75_m.4ddPocwIb2uhUBkJFJB3xgJdfXjRYw2WV__6osf2DkGyKANDufCiNpYrDpM.jlkCOn35iK1AbsDWC2B22EzabEK10fWAsyAiYv3Eh6igW9XAqIjXHePONDGnGnneJT35EiyPNt7pqQFeCZDW051zZwWwlwiNxedRRUQYxbzngxB8EA2Pvc6e8otBXMNlIcBmEX4I46sxrAKkw7NVUlgv7PctsZs8SLuFb2uNUyGhHHGLtOzDCi3ncz0UcPPhW_kTQ79L34QVpPIUFWlNlQ.jHJZ7zf65EMf_0i_hlqdVBdZg8gWQNACc2.7AnfVnvUNp3uuTmRpd43k_1JKzianm_AxK09xf9ehHaUNgVBVZMvGmg7TR._BIKVdNA67A4P1IRNrXWLNVbKIFXFzEggWhsbz41ZmQPxpCmzsgy.RVoe6r6MRn7uWC4zR2uG2fmrtA2gmdo5xdWY4ypvwHPT.RsjqjCyslgnRAg_18q4W6svghner6e.wmcHz1M.NrSHWDErn53V4RLeS5rnQpIlrtn0.MZl2TCNUPkX0lyeLvdirtfX1VUIayRspv2wBa7bapTUJpp1B7RwGhzDZlg4tDDPiTaQRJ3xQxmaYG_zCk3DQ6qFLemCZ47gs.HdYlJHUCq1NvEghrPPmzIsZlhi748JRmhlfYQ2rFuhr694tmNEXk0hLGOGiyX740HwfWMvwfgojU7Vf.LIJDkJ.9OI1ZKuvEfPb3TqcdW2ZyACBlkMEfBwaE90ablpJx2XyYJq1rU7Dwrk7PVZOZfxbQm15xkaJotnLFmi51rIR08sg7si5ZdvaIBDn2tFPuLTXJl.M0A6lLotH5id5hIE6L3vV4Hd90WbZAyfMnich8OtQlwy7Bm7B4gr8gXwg3rYSv2t6YmLwZ8hoW7.AXlgm27NpoeXNmFeBco.NcKhLOJxhGFkRmQBNLsB_WePMSnBSOVmexJuUDvtKQ6fmXyQaPSpivD6QSh30rCrWdj.uqkKYwyxIoRWYw9vujarNKY1lDcfIppHZsCmQP_wiTG.7uYLXiF.CXairXf2ncnsm5nLcD.shiuujCwEoL2Yz12gU6mipcT5LI.KkVjxHlI8RcwMtvr6wC3AwRehOzcGgp2iMXd6F6_X6nCg21oCKx1h8Iy23wBAQ02zGhGYrxmh9eQxY1lMW5WXjiUzrIOOWwL8lZzvZB4ICtMx47N7rFfTEhCj0C0p2c71DDsyXAEZ39RHf2Ep1SN665zxmO16.MHMhAuAabxCCnekdLgKD150nWjnzJPj7seHrYKUVapZbwyw5OZz6V_19KN4lfDThGB6oriVb9XsPTg8RaACo2Lz03ao4fFWkb1m7YNBEPEIf3dAlzu7e1ma.i0q6pHu8MggnNErYQwTKtEFPtmrLpj8NGug3vW_ts791TaJAy8IEhFPVqfJN1Yokyi0JxRNrhfdbTtfZkL2q4GMOW3NcPLqw7Gy0TPHIhFMymkaatCAs9s0eP6wbXPGxw0N_jHb3uCblwZ_sNomjUQK4rDxCTXcUMRjx1AH522Dx1zXBayQUWcHbC5aobRrwRgTCdAnHUeuGLAFgxFpmUkkq.kFrSoDm9ZBh8yH98MXye8Zobr_XpmbAqEL.FWQjh1EBFWcw',};var a = document.createElement('script');a.src = '/cdn-cgi/challenge-platform/h/g/orchestrate/chl_page/v1?ray=9cd212016b4c47e3';window._cf_chl_opt.cOgUHash = location.hash === '' &amp;&amp; location.href.indexOf('#') !== -1 ? '#' : location.hash;window._cf_chl_opt.cOgUQuery = location.search === '' &amp;&amp; location.href.slice(0, location.href.length - window._cf_chl_opt.cOgUHash.length).indexOf('?') !== -1 ? '?' : location.search;if (window.history &amp;&amp; window.history.replaceState) {var ogU = location.pathname + window._cf_chl_opt.cOgUQuery + window._cf_chl_opt.cOgUHash;history.replaceState(null, null,"\/products?__cf_chl_rt_tk=AephJ5gQK1tl6uvEri_2zzm52dSLquZy3MObWjnOrZw-1770962058-1.0.1.1-FWLa5U1uxECZLekqYUg3liY36UnOe9ly9nmSuk3MfiE"+ window._cf_chl_opt.cOgUHash);a.onload = function() {history.replaceState(null, null, ogU);}}document.getElementsByTagName('head')[0].appendChild(a);}());</script>
+  </body>
+</html>
+]]></system-out>
+  </testcase>
+</testsuite>

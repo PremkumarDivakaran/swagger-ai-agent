@@ -1,0 +1,1 @@
+{"uuid":"7432eee0-5ecb-451d-857c-a221c926e692","name":"POST /products with invalid field types should handle gracefully","children":["075cf708-3def-4b73-82e0-558ca1e1ddab"],"befores":[],"afters":[],"start":1770962058031,"stop":1770962058238}
