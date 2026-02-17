@@ -230,3 +230,48 @@ export interface AgentRunStatusDto {
   startedAt: string;
   completedAt?: string;
 }
+
+// ──────────────────────────────────────────────
+//  Agent run file review DTOs
+// ──────────────────────────────────────────────
+
+export interface AgentRunFileDto {
+  path: string;
+  content: string;
+  language: string;
+}
+
+export interface AgentRunFilesResponseDto {
+  files: AgentRunFileDto[];
+  testSuitePath: string;
+}
+
+// ──────────────────────────────────────────────
+//  Agent run push to GitHub DTOs
+// ──────────────────────────────────────────────
+
+export interface AgentPushRequestDto {
+  branchName: string;
+  commitMessage: string;
+  baseBranch?: string;
+  repoFullName: string;
+}
+
+export interface AgentPushResponseDto {
+  success: boolean;
+  prUrl?: string;
+  branchName: string;
+  error?: string;
+}
+
+// ──────────────────────────────────────────────
+//  Agent rerun with feedback DTOs
+// ──────────────────────────────────────────────
+
+export interface AgentRerunRequestDto {
+  specId: string;
+  feedback: string;
+  maxIterations?: number;
+  baseDirectory?: string;
+  basePackage?: string;
+}

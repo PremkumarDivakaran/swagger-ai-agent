@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
+  Settings,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { Logo } from '@/components/common/Logo';
@@ -41,6 +42,12 @@ const navItems = [
     label: 'Test Lab',
     icon: Sparkles,
     description: 'Generate & execute tests',
+  },
+  {
+    path: '/settings',
+    label: 'Settings',
+    icon: Settings,
+    description: 'LLM & GitHub config',
   },
 ] as const;
 
@@ -80,10 +87,15 @@ export function Sidebar({ isOpen = false, onClose, className }: SidebarProps) {
         )}
       >
         {/* Header */}
-        <div className="flex h-16 items-center justify-between border-b border-border px-4 bg-card">
-          <Link to="/" className="flex items-center">
-            <Logo size="sm" showText={!isCollapsed} />
-          </Link>
+        <div className={cn(
+          'flex h-16 items-center border-b border-border bg-card',
+          isCollapsed ? 'justify-center px-2' : 'justify-between px-4'
+        )}>
+          {!isCollapsed && (
+            <Link to="/" className="flex items-center">
+              <Logo size="sm" showText />
+            </Link>
+          )}
 
           {/* Mobile close button */}
           <button
@@ -94,19 +106,31 @@ export function Sidebar({ isOpen = false, onClose, className }: SidebarProps) {
             <X className="h-5 w-5" />
           </button>
 
-          {/* Desktop collapse button */}
+          {/* Desktop collapse/expand button */}
           <button
             onClick={toggleSidebar}
-            className="hidden rounded-md p-1.5 hover:bg-accent lg:block"
+            className="hidden rounded-md p-1.5 hover:bg-accent lg:flex items-center justify-center"
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {isCollapsed ? (
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-5 w-5" />
             ) : (
               <ChevronLeft className="h-4 w-4" />
             )}
           </button>
         </div>
+
+        {/* Expand button when collapsed — prominent and always visible */}
+        {isCollapsed && (
+          <button
+            onClick={toggleSidebar}
+            className="hidden lg:flex items-center justify-center w-full py-2 border-b border-border hover:bg-accent transition-colors"
+            aria-label="Expand sidebar"
+            title="Expand sidebar"
+          >
+            <Sparkles className="h-4 w-4 text-primary" />
+          </button>
+        )}
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1 p-2 overflow-y-auto">

@@ -37,6 +37,7 @@
     "@anthropic-ai/sdk": "^0.10.0",
     "@apidevtools/swagger-parser": "^10.1.0",
     "@faker-js/faker": "^10.3.0",
+    "@octokit/rest": "^22.0.1",
     "@types/joi": "^17.2.2",
     "axios": "^1.6.2",
     "cors": "^2.8.5",
@@ -47,6 +48,7 @@
     "joi": "^18.0.2",
     "ollama": "^0.5.0",
     "openai": "^4.24.0",
+    "simple-git": "^3.31.1",
     "uuid": "^9.0.1",
     "winston": "^3.11.0",
     "zod": "^3.22.4"

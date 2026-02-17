@@ -110,4 +110,44 @@ router.get(
   (req, res, next) => getController().getAgentRunStatus(req, res, next)
 );
 
+// ──────────────────────────────────────────────
+//  Human-in-the-loop: Review, Push, Rerun
+// ──────────────────────────────────────────────
+
+/**
+ * GET /testgen/agent/run/:runId/files
+ * Returns generated test files for human review
+ */
+router.get(
+  '/agent/run/:runId/files',
+  (req, res, next) => getController().getAgentRunFiles(req, res, next)
+);
+
+/**
+ * POST /testgen/agent/run/:runId/push
+ * Push generated tests to GitHub and create a PR
+ */
+router.post(
+  '/agent/run/:runId/push',
+  (req, res, next) => getController().pushToGitHub(req, res, next)
+);
+
+/**
+ * POST /testgen/agent/run/:runId/rerun
+ * Rerun the agent with human feedback
+ */
+router.post(
+  '/agent/run/:runId/rerun',
+  (req, res, next) => getController().rerunWithFeedback(req, res, next)
+);
+
+/**
+ * GET /testgen/agent/run/:runId/report*
+ * Serve Allure report for an agent run
+ */
+router.get(
+  '/agent/run/:runId/report*',
+  (req, res, next) => getController().serveAgentRunReport(req, res, next)
+);
+
 export default router;

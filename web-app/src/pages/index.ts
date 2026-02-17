@@ -10,3 +10,4 @@ export { TestExecution } from './TestExecution';
 export { TestReport } from './TestReport';
 export { Specs } from './Specs';
 export { TestLab } from './TestLab';
+export { Settings } from './Settings';

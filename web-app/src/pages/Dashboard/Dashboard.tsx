@@ -86,23 +86,13 @@ export function Dashboard() {
     },
     {
       step: 2,
-      title: 'Generate Tests',
-      description: 'AI generates REST Assured tests autonomously',
-      icon: Sparkles,
+      title: 'Test Lab',
+      description: 'AI generates, executes, and self-heals REST Assured tests — fully autonomous',
+      icon: Beaker,
       href: '/test-lab',
       color: 'from-purple-500 to-pink-500',
       bgColor: 'bg-gradient-to-br from-purple-500/10 to-pink-500/10',
       stats: 'AI REST Assured',
-    },
-    {
-      step: 3,
-      title: 'Execute & Report',
-      description: 'Run tests and view detailed reports',
-      icon: Beaker,
-      href: '/test-lab',
-      color: 'from-green-500 to-emerald-500',
-      bgColor: 'bg-gradient-to-br from-green-500/10 to-emerald-500/10',
-      stats: 'Real-time results',
     },
   ];
 
@@ -229,7 +219,7 @@ export function Dashboard() {
             </p>
           </div>
           
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2">
             {workflowSteps.map((step) => {
               const Icon = step.icon;
               return (

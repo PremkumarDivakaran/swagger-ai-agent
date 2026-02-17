@@ -44,5 +44,15 @@ export const endpoints = {
     // AI REST Assured endpoints
     agentRun: '/api/testgen/agent/run',
     agentStatus: (runId: string) => `/api/testgen/agent/run/${runId}`,
+    agentFiles: (runId: string) => `/api/testgen/agent/run/${runId}/files`,
+    agentPush: (runId: string) => `/api/testgen/agent/run/${runId}/push`,
+    agentRerun: (runId: string) => `/api/testgen/agent/run/${runId}/rerun`,
+    agentReport: (runId: string) => `/api/testgen/agent/run/${runId}/report/`,
+  },
+
+  // Settings endpoints
+  settings: {
+    get: '/api/settings',
+    update: '/api/settings',
   },
 };

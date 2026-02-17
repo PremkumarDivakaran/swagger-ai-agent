@@ -10,6 +10,7 @@ import environmentRoutes, { createSpecEnvironmentRoutes } from './environment.ro
 import executionRoutes from './execution.routes';
 import testgenRoutes from './testgen.routes';
 import mcpRoutes from './mcp.routes';
+import settingsRoutes from './settings.routes';
 
 const router = Router();
 
@@ -95,5 +96,8 @@ router.use('/testgen', testgenRoutes);
 
 // MCP routes
 router.use('/mcp', mcpRoutes);
+
+// Settings routes
+router.use('/settings', settingsRoutes);
 
 export default router;

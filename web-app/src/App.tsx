@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { MainLayout } from '@/components/layout';
 import { ToastContainer } from '@/components/common';
-import { Dashboard, SwaggerImport, Operations, TestExecution, TestReport, Specs, TestLab } from '@/pages';
+import { Dashboard, SwaggerImport, Operations, TestExecution, TestReport, Specs, TestLab, Settings } from '@/pages';
 import { useSettingsStore, selectResolvedTheme } from '@/stores';
 
 function App() {
@@ -31,6 +31,7 @@ function App() {
           {/* New unified routes */}
           <Route path="/specs" element={<Specs />} />
           <Route path="/test-lab" element={<TestLab />} />
+          <Route path="/settings" element={<Settings />} />
           
           {/* Legacy routes - kept for backward compatibility */}
           <Route path="/import" element={<SwaggerImport />} />

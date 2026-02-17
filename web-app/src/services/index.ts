@@ -9,3 +9,4 @@ export { specService } from './spec.service';
 export { environmentService } from './environment.service';
 export { executionService } from './execution.service';
 export { testgenService } from './testgen.service';
+export { settingsService } from './settings.service';
