@@ -124,6 +124,11 @@ export const agentRunSchema = Joi.object({
   baseDirectory: Joi.string().optional().default('./swagger-tests'),
   basePackage: Joi.string().optional().default('com.api.tests'),
   autoExecute: Joi.boolean().optional().default(true),
+  operationFilter: Joi.object({
+    mode: Joi.string().valid('full', 'tag', 'single').required(),
+    tags: Joi.array().items(Joi.string()).optional(),
+    operationIds: Joi.array().items(Joi.string()).optional(),
+  }).optional(),
 });
 
 /**

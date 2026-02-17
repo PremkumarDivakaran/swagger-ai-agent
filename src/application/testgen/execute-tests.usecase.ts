@@ -9,7 +9,7 @@ import { promisify } from 'util';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ValidationError } from '../../core/errors/ValidationError';
-import { generateId } from '../../utils';
+import { generatePrefixedId } from '../../utils';
 
 const execAsync = promisify(exec);
 
@@ -125,7 +125,7 @@ export class ExecuteTestsUseCase {
       }
     }
 
-    const executionId = generateId('exec');
+    const executionId = generatePrefixedId('exec');
     const startedAt = new Date();
     const absoluteSuitePath = path.resolve(testSuitePath);
 

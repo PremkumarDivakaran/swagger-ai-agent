@@ -196,16 +196,40 @@ export class ReflectorAgent {
     }
   }
 
+  /**
+   * Convert parsed JSON to AgentReflection with normalization.
+   *
+   * CRITICAL: The LLM sometimes contradicts itself — it says failureSource
+   * is "test-code" but sets shouldRetry to false. We normalize this:
+   *   - test-code failures → ALWAYS retry (we can fix test code)
+   *   - environment / api-bug → respect the LLM's shouldRetry
+   *   - unknown → retry to be safe
+   */
   private toReflection(parsed: any): AgentReflection {
+    const failureSource = parsed.failureSource || 'unknown';
+    const fixes: TestFix[] = (parsed.fixes || []).map((f: any) => ({
+      filePath: f.filePath,
+      newContent: f.newContent,
+      explanation: f.explanation || '',
+    }));
+
+    // Normalize shouldRetry — don't let the LLM stop the loop for fixable issues
+    let shouldRetry: boolean;
+    if (failureSource === 'test-code') {
+      shouldRetry = true; // Always retry — test code is fixable
+    } else if (failureSource === 'environment') {
+      shouldRetry = false; // Can't fix environment issues by changing code
+    } else if (failureSource === 'api-bug') {
+      shouldRetry = parsed.shouldRetry ?? false; // Respect LLM but default to stop
+    } else {
+      shouldRetry = true; // Unknown — retry to be safe
+    }
+
     return {
-      failureSource: parsed.failureSource || 'unknown',
+      failureSource,
       summary: parsed.summary || 'Could not analyze failures.',
-      shouldRetry: parsed.shouldRetry ?? true,
-      fixes: (parsed.fixes || []).map((f: any) => ({
-        filePath: f.filePath,
-        newContent: f.newContent,
-        explanation: f.explanation || '',
-      })),
+      shouldRetry,
+      fixes,
     };
   }
 }

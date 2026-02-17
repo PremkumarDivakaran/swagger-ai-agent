@@ -41,6 +41,15 @@ export interface AgentRunConfig {
   basePackage?: string;
   /** Whether to auto-execute and self-heal (default true) */
   autoExecute?: boolean;
+  /** Operation filter — which operations to include */
+  operationFilter?: {
+    /** 'full' = all, 'tag' = filter by tags, 'single' = specific operationIds */
+    mode: 'full' | 'tag' | 'single';
+    /** Tags to include (when mode = 'tag') */
+    tags?: string[];
+    /** Specific operationIds to include (when mode = 'single') */
+    operationIds?: string[];
+  };
 }
 
 // ──────────────────────────────────────────────

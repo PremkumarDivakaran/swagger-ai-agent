@@ -25,6 +25,11 @@ export interface AgentRunRequest {
   baseDirectory?: string;
   basePackage?: string;
   autoExecute?: boolean;
+  operationFilter?: {
+    mode: 'full' | 'tag' | 'single';
+    tags?: string[];
+    operationIds?: string[];
+  };
 }
 
 export interface AgentRunResponse {

@@ -47,6 +47,8 @@ const STEPS: { id: Step; label: string; icon: any; color: string }[] = [
   { id: 'push', label: 'GitHub', icon: GitBranch, color: 'from-gray-600 to-gray-800' },
 ];
 
+const SESSION_KEY = 'testlab-session';
+
 export function TestLab() {
   const toast = useToast();
   const specs = useSpecStore((s) => s.specs);
@@ -84,7 +86,7 @@ export function TestLab() {
   const [rerunning, setRerunning] = useState(false);
 
   // Step 6
-  const [repoFullName, setRepoFullName] = useState('');
+  const [repoFullName, setRepoFullName] = useState('PremkumarDivakaran/swagger-tests');
   const [branchName, setBranchName] = useState('');
   const [commitMessage, setCommitMessage] = useState('');
   const [baseBranch, setBaseBranch] = useState('main');
@@ -93,14 +95,97 @@ export function TestLab() {
 
   const [showAllure, setShowAllure] = useState(false);
   const logRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => { loadSpecs(); }, []);
-  useEffect(() => { if (currentStep === 'select') loadSpecs(); }, [currentStep]);
-  useEffect(() => { if (selectedSpecId) loadOperations(selectedSpecId); }, [selectedSpecId]);
-  useEffect(() => { if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight; }, [agentLog]);
+  const [restored, setRestored] = useState(false);
 
   const loadSpecs = async () => { try { const r = await specService.listSpecs(); setSpecs(r.specs || []); } catch { toast.error('Failed to load specs'); } };
   const loadOperations = async (id: string) => { try { const r = await specService.listOperations(id); setOperations(r.operations || []); } catch { toast.error('Failed to load operations'); } };
+
+  // ── Restore session state on mount ──
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(SESSION_KEY);
+      if (saved) {
+        const s = JSON.parse(saved);
+        if (s.agentRunId) {
+          setCurrentStep(s.currentStep || 'select');
+          setCompletedSteps(new Set(s.completedSteps || []));
+          setSelectedSpecId(s.selectedSpecId || '');
+          setSelectionMode(s.selectionMode || 'full');
+          setSelectedTags(s.selectedTags || []);
+          setSelectedOperationIds(s.selectedOperationIds || []);
+          setBaseDirectory(s.baseDirectory || './swagger-tests');
+          setMaxIterations(s.maxIterations ?? 5);
+          setAgentRunId(s.agentRunId);
+          setAgentStatus(s.agentStatus || null);
+          setAgentLog(s.agentLog || []);
+          setTestSuitePath(s.testSuitePath || '');
+          setReviewFiles(s.reviewFiles || []);
+          setPushResult(s.pushResult || null);
+          setShowAllure(s.showAllure || false);
+        }
+      }
+    } catch { /* ignore parse errors */ }
+    setRestored(true);
+    loadSpecs();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Persist session state on changes ──
+  useEffect(() => {
+    if (!restored) return;
+    if (!agentRunId && currentStep === 'select') {
+      sessionStorage.removeItem(SESSION_KEY);
+      return;
+    }
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+      currentStep,
+      completedSteps: Array.from(completedSteps),
+      selectedSpecId,
+      selectionMode,
+      selectedTags,
+      selectedOperationIds,
+      baseDirectory,
+      maxIterations,
+      agentRunId,
+      agentStatus,
+      agentLog,
+      testSuitePath,
+      reviewFiles,
+      pushResult,
+      showAllure,
+    }));
+  }, [restored, currentStep, completedSteps, selectedSpecId, selectionMode,
+      selectedTags, selectedOperationIds, baseDirectory, maxIterations,
+      agentRunId, agentStatus, agentLog, testSuitePath, reviewFiles,
+      pushResult, showAllure]);
+
+  // ── Resume polling if restored mid-execution ──
+  useEffect(() => {
+    if (!restored || !agentRunId) return;
+    const phase = agentStatus?.phase;
+    if (phase && phase !== 'completed' && phase !== 'failed') {
+      setIsExecuting(true);
+      const poll = setInterval(async () => {
+        try {
+          const s = await testgenService.getAgentRunStatus(agentRunId);
+          setAgentStatus(s);
+          setAgentLog(s.log || []);
+          if (s.testSuitePath) setTestSuitePath(s.testSuitePath);
+          if (s.phase === 'completed' || s.phase === 'failed') {
+            clearInterval(poll);
+            setIsExecuting(false);
+            completeStep('execute');
+            if (s.phase === 'completed') toast.success(`Done: ${s.finalResult?.passed}/${s.finalResult?.total} passed`);
+            else toast.error(s.error || 'Run failed');
+          }
+        } catch { clearInterval(poll); setIsExecuting(false); }
+      }, 2500);
+      return () => clearInterval(poll);
+    }
+  }, [restored]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => { if (currentStep === 'select') loadSpecs(); }, [currentStep]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (selectedSpecId) loadOperations(selectedSpecId); }, [selectedSpecId]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight; }, [agentLog]);
 
   const goToStep = (step: Step) => {
     const si = STEPS.findIndex((s) => s.id === step);
@@ -117,7 +202,12 @@ export function TestLab() {
   const handleLaunchAgent = async () => {
     setIsGenerating(true);
     try {
-      const response = await testgenService.startAgentRun({ specId: selectedSpecId, maxIterations, baseDirectory, basePackage: 'com.api.tests', autoExecute: true });
+      const operationFilter = selectionMode === 'full'
+        ? undefined
+        : selectionMode === 'tag'
+          ? { mode: 'tag' as const, tags: selectedTags }
+          : { mode: 'single' as const, operationIds: selectedOperationIds };
+      const response = await testgenService.startAgentRun({ specId: selectedSpecId, maxIterations, baseDirectory, basePackage: 'com.api.tests', autoExecute: true, operationFilter });
       if (response?.runId) {
         setAgentRunId(response.runId); setAgentLog([]); setAgentStatus(null);
         toast.success('AI REST Assured started!');
@@ -188,9 +278,12 @@ export function TestLab() {
   };
 
   const handleReset = () => {
+    sessionStorage.removeItem(SESSION_KEY);
     setCurrentStep('select'); setCompletedSteps(new Set()); setAgentRunId(''); setAgentStatus(null); setAgentLog([]);
     setTestSuitePath(''); setIsExecuting(false); setIsGenerating(false); setReviewFiles([]); setShowFeedbackInput(false);
     setRejectionFeedback(''); setPushResult(null); setShowAllure(false);
+    setSelectedSpecId(''); setSelectionMode('full'); setSelectedTags([]); setSelectedOperationIds([]);
+    setBranchName(''); setCommitMessage('');
   };
 
   const allureReportUrl = agentRunId ? `${apiConfig.baseUrl}/api/testgen/agent/run/${agentRunId}/report/` : '';
@@ -264,8 +357,8 @@ export function TestLab() {
       </Card>
 
       {/* Step Content */}
-      <Card>
-        <CardContent className="pt-6 pb-6">
+      <Card className="overflow-hidden">
+        <CardContent className="pt-6 pb-6 overflow-hidden">
 
           {/* ─── Step 1: Select Spec ─── */}
           {currentStep === 'select' && (
@@ -569,20 +662,35 @@ export function TestLab() {
 
           {/* ─── Step 5: Review ─── */}
           {currentStep === 'review' && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 p-2 shadow-md">
-                  <Eye className="h-5 w-5 text-white" />
+            <div className="space-y-5 max-w-full overflow-hidden">
+              {/* Sticky action bar — always visible */}
+              <div className="flex flex-wrap items-center justify-between gap-3 bg-card z-10">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 p-2 shadow-md flex-shrink-0">
+                    <Eye className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-lg font-bold truncate">Review Generated Tests</h2>
+                    <p className="text-xs text-muted-foreground">{reviewFiles.length} files generated</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-lg font-bold">Review Generated Tests</h2>
-                  <p className="text-xs text-muted-foreground">Approve to push to GitHub, or reject with feedback for AI to improve</p>
-                </div>
+                {!showFeedbackInput && (
+                  <div className="flex gap-2 flex-shrink-0">
+                    <Button variant="outline" onClick={handleReject} className="text-red-600 border-red-300 hover:bg-red-50 dark:hover:bg-red-950/20" icon={<ThumbsDown className="h-4 w-4" />}>
+                      Reject
+                    </Button>
+                    <Button onClick={handleApprove} className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-md" icon={<ThumbsUp className="h-4 w-4" />}>
+                      Approve & Push
+                    </Button>
+                  </div>
+                )}
               </div>
 
+              {/* File viewer — constrained to prevent horizontal overflow */}
               {reviewFiles.length > 0 && (
-                <div className="flex gap-4 h-[500px]">
-                  <div className="w-60 flex-shrink-0 border-2 rounded-xl overflow-y-auto">
+                <div className="flex flex-col lg:flex-row gap-4 overflow-hidden" style={{ height: '460px' }}>
+                  {/* File list */}
+                  <div className="w-full lg:w-56 flex-shrink-0 border-2 rounded-xl overflow-y-auto max-h-32 lg:max-h-full">
                     {reviewFiles.map((file, idx) => (
                       <button key={file.path} onClick={() => setSelectedFileIndex(idx)}
                         className={cn('w-full text-left px-3 py-2.5 text-xs border-b hover:bg-accent transition-colors',
@@ -593,13 +701,15 @@ export function TestLab() {
                       </button>
                     ))}
                   </div>
-                  <div className="flex-1 border-2 rounded-xl overflow-hidden shadow-inner">
-                    <div className="bg-muted px-4 py-2.5 text-xs font-mono border-b font-semibold">{reviewFiles[selectedFileIndex]?.path}</div>
-                    <pre className="p-4 text-xs font-mono overflow-auto h-[calc(100%-2.5rem)] bg-gray-50 dark:bg-gray-950"><code>{reviewFiles[selectedFileIndex]?.content}</code></pre>
+                  {/* Code viewer */}
+                  <div className="flex-1 min-w-0 border-2 rounded-xl overflow-hidden shadow-inner">
+                    <div className="bg-muted px-4 py-2.5 text-xs font-mono border-b font-semibold truncate">{reviewFiles[selectedFileIndex]?.path}</div>
+                    <pre className="p-4 text-xs font-mono overflow-auto h-[calc(100%-2.5rem)] max-w-full bg-gray-50 dark:bg-gray-950"><code>{reviewFiles[selectedFileIndex]?.content}</code></pre>
                   </div>
                 </div>
               )}
 
+              {/* Feedback input (shown on reject) */}
               {showFeedbackInput && (
                 <div className="space-y-3 p-5 border-2 border-yellow-400 rounded-xl bg-yellow-50 dark:bg-yellow-950/20">
                   <label className="block text-sm font-bold">Feedback for AI</label>
@@ -615,18 +725,10 @@ export function TestLab() {
                 </div>
               )}
 
+              {/* Navigation */}
               <div className="flex justify-between pt-2">
                 <Button variant="outline" onClick={() => setCurrentStep('execute')} icon={<ChevronLeft className="h-4 w-4" />}>Back</Button>
-                {!showFeedbackInput && (
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={handleReject} className="text-red-600 border-red-300 hover:bg-red-50 dark:hover:bg-red-950/20" icon={<ThumbsDown className="h-4 w-4" />}>
-                      Reject
-                    </Button>
-                    <Button onClick={handleApprove} className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-md" icon={<ThumbsUp className="h-4 w-4" />}>
-                      Approve & Push
-                    </Button>
-                  </div>
-                )}
+                <div />
               </div>
             </div>
           )}

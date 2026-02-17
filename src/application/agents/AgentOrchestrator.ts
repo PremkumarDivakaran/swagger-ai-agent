@@ -123,6 +123,23 @@ export class AgentOrchestrator {
     if (!spec) throw new NotFoundError('Spec', config.specId);
     this.log(runId, 'planning', `Loaded spec: ${spec.info?.title} (${spec.operations.length} operations)`);
 
+    // ── Phase 1b: Apply operation filter ──
+    const filter = config.operationFilter;
+    if (filter && filter.mode !== 'full') {
+      const beforeCount = spec.operations.length;
+      if (filter.mode === 'tag' && filter.tags && filter.tags.length > 0) {
+        const tagSet = new Set(filter.tags.map(t => t.toLowerCase()));
+        spec.operations = spec.operations.filter(op =>
+          op.tags && op.tags.some((t: string) => tagSet.has(t.toLowerCase()))
+        );
+        this.log(runId, 'planning', `🔍 Filtered by tags [${filter.tags.join(', ')}]: ${spec.operations.length}/${beforeCount} operations`);
+      } else if (filter.mode === 'single' && filter.operationIds && filter.operationIds.length > 0) {
+        const idSet = new Set(filter.operationIds);
+        spec.operations = spec.operations.filter(op => idSet.has(op.operationId));
+        this.log(runId, 'planning', `🔍 Filtered by selection: ${spec.operations.length}/${beforeCount} operations`);
+      }
+    }
+
     // ── Phase 2: Plan ──
     this.setPhase(runId, 'planning');
     this.log(runId, 'planning', '🧠 PlannerAgent: Analyzing spec and building test strategy...');
@@ -221,7 +238,7 @@ export class AgentOrchestrator {
         run.iterations.push(iterationEntry);
         run.finalResult = execResult;
         this.setPhase(runId, 'completed');
-        this.log(runId, 'completed', `Reflector says: do not retry. Done.`);
+        this.log(runId, 'completed', `⛔ Cannot fix: ${reflection.failureSource} — ${reflection.summary}`);
         run.completedAt = new Date();
         return;
       }

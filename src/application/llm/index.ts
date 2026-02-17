@@ -1,16 +1,4 @@
 /**
  * LLM module exports
+ * (Legacy payload builder removed — all LLM usage is via the agentic pipeline)
  */
-
-export {
-  BuildPayloadUseCase,
-  createBuildPayloadUseCase,
-  createBuildPayloadUseCaseWithClient,
-  BuildPayloadInput,
-  BuildPayloadVariantsInput,
-  SuggestScenariosInput,
-  PayloadGenerationResult,
-  PayloadVariantsResult,
-  SuggestScenariosResult,
-  TestScenarioSuggestion,
-} from './build-payload.usecase';

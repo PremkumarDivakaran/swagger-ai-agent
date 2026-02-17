@@ -52,12 +52,11 @@ export class GitHubService {
       githubToken,
     } = options;
 
-    // repoRoot is the parent of suitePath (e.g. swagger-tests/)
     const repoRoot = path.dirname(suitePath);
     const specFolder = path.basename(suitePath);
 
     try {
-      // 1. Init git repo at repoRoot
+      // 1. Init fresh git repo
       await this.execGit('init', repoRoot);
       await this.execGit(`config user.email "swagger-ai-agent@automated.dev"`, repoRoot);
       await this.execGit(`config user.name "Swagger AI Agent"`, repoRoot);
@@ -70,19 +69,7 @@ export class GitHubService {
         await this.execGit(`remote set-url target "${remoteUrl}"`, repoRoot);
       }
 
-      // 3. Fetch and checkout base branch
-      try {
-        await this.execGit(
-          `fetch target +refs/heads/${baseBranch}:refs/remotes/target/${baseBranch}`,
-          repoRoot
-        );
-        await this.execGit(`checkout -B ${branchName} target/${baseBranch}`, repoRoot);
-      } catch {
-        // Empty repo — create orphan branch
-        await this.execGit(`checkout -b ${branchName}`, repoRoot);
-      }
-
-      // 4. Write .gitignore (after checkout to avoid conflicts)
+      // 3. Write .gitignore BEFORE staging
       const gitignoreContent = [
         '# Build artifacts',
         '**/target/',
@@ -114,7 +101,7 @@ export class GitHubService {
       ].join('\n');
       fs.writeFileSync(path.join(repoRoot, '.gitignore'), gitignoreContent, 'utf-8');
 
-      // 5. Generate README for the spec folder
+      // 4. Generate README for the spec folder
       const readmePath = path.join(suitePath, 'README.md');
       if (!fs.existsSync(readmePath)) {
         const readme = [
@@ -140,17 +127,41 @@ export class GitHubService {
         fs.writeFileSync(readmePath, readme, 'utf-8');
       }
 
-      // 6. Stage files (respects .gitignore)
+      // 5. Stage all files first (respects .gitignore)
       await this.execGit(`add .gitignore`, repoRoot);
       await this.execGit(`add "${specFolder}"`, repoRoot);
 
-      // 7. Commit
-      await this.execGit(`commit -m "${commitMessage.replace(/"/g, '\\"')}"`, repoRoot);
+      // 6. Create a tree object from the index (staged files)
+      const tree = await this.execGit('write-tree', repoRoot);
 
-      // 8. Push
+      // 7. Fetch the base branch to get its history
+      let parentArg = '';
+      try {
+        await this.execGit(
+          `fetch target +refs/heads/${baseBranch}:refs/remotes/target/${baseBranch}`,
+          repoRoot
+        );
+        const parentSha = await this.execGit(`rev-parse target/${baseBranch}`, repoRoot);
+        parentArg = `-p ${parentSha}`;
+      } catch {
+        // Empty remote repo or no base branch — commit with no parent
+      }
+
+      // 8. Create a commit object with the tree and the correct parent
+      //    This ensures our branch shares history with the base branch
+      const commitSha = await this.execGit(
+        `commit-tree ${tree} ${parentArg} -m "${commitMessage.replace(/"/g, '\\"')}"`,
+        repoRoot
+      );
+
+      // 9. Point the branch at our new commit and checkout
+      await this.execGit(`branch -f ${branchName} ${commitSha}`, repoRoot);
+      await this.execGit(`checkout ${branchName}`, repoRoot);
+
+      // 10. Push
       await this.execGit(`push -u target ${branchName} --force`, repoRoot);
 
-      // 9. Create PR via GitHub API
+      // 11. Create PR via GitHub API
       let prUrl: string | undefined;
       try {
         prUrl = await this.createPR({
@@ -162,11 +173,10 @@ export class GitHubService {
           githubToken,
         });
       } catch (prError: any) {
-        // PR creation may fail if one already exists
         console.warn('PR creation note:', prError.message);
       }
 
-      // 10. Cleanup: remove .git and .gitignore from repoRoot
+      // 12. Cleanup: remove .git and .gitignore from repoRoot
       try {
         await execAsync(`rm -rf .git`, { cwd: repoRoot });
         fs.unlinkSync(path.join(repoRoot, '.gitignore'));
