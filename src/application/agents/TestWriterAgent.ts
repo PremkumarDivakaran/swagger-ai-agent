@@ -14,7 +14,7 @@
  *    - The LLM can chain operations: "use the id from POST in GET"
  *    - The LLM writes assertions that match the actual response
  *    - The LLM can handle edge cases, auth flows, pagination
- *    - When tests fail, the LLM can rewrite them (see ReflectorAgent)
+ *    - When tests fail, the LLM can rewrite them (see SelfHealAgent)
  *
  *  INPUT:  AgentTestPlan + spec info
  *  OUTPUT: AgentTestSuite (complete Maven project files)
@@ -128,7 +128,7 @@ export class TestWriterAgent {
   }
 
   /**
-   * Rewrite a test class based on failure feedback from the ReflectorAgent.
+   * Rewrite a test class based on failure feedback from the SelfHealAgent.
    * This is called during the self-healing loop.
    */
   async rewriteTestClass(

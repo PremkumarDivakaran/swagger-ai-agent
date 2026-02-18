@@ -13,6 +13,6 @@ export {
 } from './test-writer.prompt';
 
 export {
-  REFLECTOR_SYSTEM_PROMPT,
-  buildReflectorPrompt,
-} from './reflector.prompt';
+  SELF_HEAL_SYSTEM_PROMPT,
+  buildSelfHealPrompt,
+} from './self-heal.prompt';

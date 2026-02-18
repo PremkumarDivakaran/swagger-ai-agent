@@ -166,7 +166,7 @@ export function SwaggerImport({ onImportSuccess }: SwaggerImportProps = {}) {
                 isActive ? `${m.borderActive} shadow-lg scale-[1.02]` : 'border-border hover:border-muted-foreground/40 hover:shadow-md'
               )}
             >
-              <div className={cn('absolute inset-0 opacity-40 transition-opacity bg-gradient-to-br', m.color, !isActive && 'opacity-0 group-hover:opacity-20')} />
+              <div className={cn('absolute inset-0 transition-opacity bg-gradient-to-br', m.color, isActive ? 'opacity-10' : 'opacity-0 group-hover:opacity-5')} />
               {isActive && <div className="absolute top-2.5 right-2.5"><CheckCircle className="h-4 w-4 text-green-500" /></div>}
               <div className="relative">
                 <div className={cn('mb-2.5 inline-flex rounded-lg p-2 bg-gradient-to-br shadow-md', m.color)}>
@@ -181,7 +181,7 @@ export function SwaggerImport({ onImportSuccess }: SwaggerImportProps = {}) {
       </div>
 
       {/* Content Area */}
-      <div className={cn('rounded-xl border-2 p-6 transition-all', activeMeta.borderActive, 'bg-gradient-to-br', `${activeMeta.color.replace('from-', 'from-').replace('to-', 'to-')}/5`)}>
+      <div className={cn('rounded-xl border-2 p-6 transition-all', activeMeta.borderActive, 'bg-card')}>
         {/* URL Tab */}
         {activeTab === 'url' && (
           <div className="space-y-4">

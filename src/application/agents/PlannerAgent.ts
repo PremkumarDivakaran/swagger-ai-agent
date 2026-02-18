@@ -268,13 +268,13 @@ export class PlannerAgent {
       lines.push(`- ${op.method} ${op.path} (operationId: ${op.operationId})`);
       if (op.summary) lines.push(`  Summary: ${op.summary}`);
       if (op.parameters.length > 0) {
-        const params = op.parameters.map(p => `${p.name} (${p.in}, ${p.required ? 'required' : 'optional'})`);
+        const params = op.parameters.map(p => `${p.name} (${p.in}, type: ${p.schema?.type || 'string'}, ${p.required ? 'required' : 'optional'})`);
         lines.push(`  Parameters: ${params.join(', ')}`);
       }
       if (op.requestBody) {
         const schema = op.requestBody.content?.['application/json']?.schema;
         if (schema) {
-          lines.push(`  Request body schema: ${JSON.stringify(schema, null, 2).substring(0, 500)}`);
+          lines.push(`  Request body schema: ${JSON.stringify(schema, null, 2).substring(0, 800)}`);
         }
       }
       if (op.responses.length > 0) {
@@ -285,10 +285,21 @@ export class PlannerAgent {
     }
 
     if (spec.schemas && Object.keys(spec.schemas).length > 0) {
-      lines.push('### Schemas');
+      lines.push('### Schemas (IMPORTANT: use these exact field types in test data)');
       for (const [name, schema] of Object.entries(spec.schemas)) {
-        const schemaStr = JSON.stringify(schema, null, 2).substring(0, 400);
-        lines.push(`${name}: ${schemaStr}`);
+        lines.push(`\n#### ${name}`);
+        const s = schema as any;
+        if (s.properties) {
+          for (const [field, prop] of Object.entries(s.properties) as [string, any][]) {
+            const type = prop.type || 'object';
+            const format = prop.format ? `/${prop.format}` : '';
+            const enumVals = prop.enum ? ` enum=[${prop.enum.join(',')}]` : '';
+            lines.push(`  - ${field}: ${type}${format}${enumVals}`);
+          }
+        } else {
+          const schemaStr = JSON.stringify(schema, null, 2).substring(0, 400);
+          lines.push(`  ${schemaStr}`);
+        }
       }
     }
 

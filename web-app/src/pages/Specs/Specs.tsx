@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Import, FileCode, Search, Upload } from 'lucide-react';
 import { SwaggerImport } from '../SwaggerImport/SwaggerImport';
@@ -13,6 +13,11 @@ export function Specs() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') || 'import';
   const [activeTab, setActiveTab] = useState(initialTab === 'operations' ? 'browse' : initialTab);
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'import' || tab === 'browse') setActiveTab(tab);
+  }, [searchParams]);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);

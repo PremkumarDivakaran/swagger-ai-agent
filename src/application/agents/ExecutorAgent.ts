@@ -9,11 +9,11 @@
  *
  *  WHY THIS IS AN AGENT (not just a script):
  *    The ExecutorAgent returns structured results that the
- *    ReflectorAgent can reason about. It also generates the
+ *    SelfHealAgent can reason about. It also generates the
  *    Allure report for the UI.
  *
  *  NO LLM HERE — this is pure execution. The intelligence is
- *  in the Planner, Writer, and Reflector.
+ *  in the Planner, Writer, and SelfHeal agents.
  *
  *  INPUT:  path to the Maven project
  *  OUTPUT: AgentExecutionResult (structured pass/fail per test)
@@ -185,7 +185,7 @@ export class ExecutorAgent {
           : ['Unknown', fullName];
 
         // Use the simple class name from the failure line (e.g. "AuthApiTest")
-        // for correct file matching in the Reflector
+        // for correct file matching in the SelfHealAgent
         results.push({
           testName,
           className: simpleClass,

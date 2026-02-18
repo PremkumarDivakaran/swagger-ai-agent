@@ -4,7 +4,7 @@
  * ============================================================
  *
  *  Prompts used by PlannerAgent to analyze OpenAPI specs
- *  and generate positive test plans via the LLM.
+ *  and generate test plans via the LLM.
  * ============================================================
  */
 
@@ -13,11 +13,9 @@ export const PLANNER_SYSTEM_PROMPT =
 
 /**
  * Build the main planning prompt.
- * The LLM receives the spec summary and returns a JSON test plan
- * with positive tests, dependencies, and realistic request bodies.
  */
 export function buildPlannerPrompt(specSummary: string): string {
-  return `You are an expert API test architect. Analyze this OpenAPI specification and produce a test plan for POSITIVE (happy path) scenarios.
+  return `You are an expert API test architect. Analyze this OpenAPI specification and produce a REAL-WORLD API test plan.
 
 ## API Specification
 
@@ -25,20 +23,49 @@ ${specSummary}
 
 ## Your Task
 
-For EACH operation, create ONE positive test with:
-- Realistic request body (for POST/PUT/PATCH)
-- Meaningful assertions (check response fields, not just status)
-- Correct dependencies (e.g., POST before GET-by-id)
+For EACH operation, generate:
+- At least ONE positive (happy path) test
+- At least TWO negative/validation tests
+- Boundary scenarios when applicable
 
-Return a JSON object:
+Test scenarios must reflect REAL usage patterns:
+- Create → Retrieve → Update → Delete lifecycle
+- Authentication failures (if relevant)
+- Invalid body / missing required fields
+- Invalid IDs, malformed inputs, boundary values
+
+## Dynamic Test Data Rules (MANDATORY)
+
+- NEVER use static data like "John", "test", or fixed IDs.
+- Data must be generated dynamically at runtime.
+- CRITICAL: Match field types to the Swagger/OpenAPI schema:
+  - integer fields → use random integers (NOT UUIDs or strings)
+  - number fields → use random doubles/floats
+  - string fields → use random strings or UUIDs
+  - boolean fields → use true/false
+  - date-time fields → use timestamps
+  - enum fields → use a valid enum value from the schema
+- POST bodies should NOT contain server-generated fields like id.
+- In suggestedBody, describe the correct data types (e.g., "petId: random int, quantity: random int").
+
+## Assertions
+
+Each item must include assertions that verify:
+- status code
+- key response fields
+- response structure
+- error structure for negative tests
+
+## Output Format (STRICT JSON)
+
 {
   "title": "Human-readable test plan title",
-  "reasoning": "2-3 sentences explaining your test strategy",
+  "reasoning": "Short explanation of coverage strategy",
   "dependencies": [
     {
       "sourceOperationId": "createProduct",
       "targetOperationId": "getProductById",
-      "dataFlow": "id from POST response used as {id} path parameter"
+      "dataFlow": "id from POST response used as path parameter"
     }
   ],
   "items": [
@@ -46,23 +73,21 @@ Return a JSON object:
       "operationId": "createProduct",
       "method": "POST",
       "path": "/products",
-      "testDescription": "Create a new product with valid data",
-      "category": "positive",
-      "expectedStatus": 200,
+      "testDescription": "Create product with valid dynamic data",
+      "category": "positive | negative | boundary | validation",
+      "expectedStatus": 201,
       "dependsOn": [],
-      "assertions": ["status 200", "response has id"],
+      "assertions": ["status code", "response has id", "field validation"],
       "needsBody": true,
-      "suggestedBody": "{\\"title\\":\\"Wireless Mouse\\",\\"price\\":29.99,\\"description\\":\\"Ergonomic wireless mouse\\",\\"category\\":\\"electronics\\"}"
+      "dynamicDataStrategy": "Generate title using UUID and random price"
     }
   ]
 }
 
 ## Rules
-1. One positive test per operation — I will add negative/edge tests separately
-2. For POST/PUT/PATCH, always include a realistic suggestedBody (valid JSON as escaped string)
-3. For POST, do NOT include "id" in suggestedBody (the API generates it)
-4. Include meaningful assertions (not just status code — check response fields)
-5. Identify ALL dependencies (data flowing from one operation to another)
-6. EVERY operation in the spec MUST appear in items
-7. Return ONLY valid JSON. No markdown, no explanation outside the JSON.`;
+1. EVERY operation must appear in items.
+2. Include both positive AND negative scenarios for each operation.
+3. Model realistic dependency flows.
+4. Do NOT use static request bodies.
+5. Return ONLY valid JSON. No explanation outside JSON.`;
 }

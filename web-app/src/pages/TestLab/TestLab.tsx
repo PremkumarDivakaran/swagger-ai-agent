@@ -100,33 +100,56 @@ export function TestLab() {
   const loadSpecs = async () => { try { const r = await specService.listSpecs(); setSpecs(r.specs || []); } catch { toast.error('Failed to load specs'); } };
   const loadOperations = async (id: string) => { try { const r = await specService.listOperations(id); setOperations(r.operations || []); } catch { toast.error('Failed to load operations'); } };
 
-  // ── Restore session state on mount ──
+  // ── Restore session state on mount (validate against backend first) ──
   useEffect(() => {
-    try {
-      const saved = sessionStorage.getItem(SESSION_KEY);
-      if (saved) {
-        const s = JSON.parse(saved);
-        if (s.agentRunId) {
-          setCurrentStep(s.currentStep || 'select');
-          setCompletedSteps(new Set(s.completedSteps || []));
-          setSelectedSpecId(s.selectedSpecId || '');
-          setSelectionMode(s.selectionMode || 'full');
-          setSelectedTags(s.selectedTags || []);
-          setSelectedOperationIds(s.selectedOperationIds || []);
-          setBaseDirectory(s.baseDirectory || './swagger-tests');
-          setMaxIterations(s.maxIterations ?? 5);
-          setAgentRunId(s.agentRunId);
-          setAgentStatus(s.agentStatus || null);
-          setAgentLog(s.agentLog || []);
-          setTestSuitePath(s.testSuitePath || '');
-          setReviewFiles(s.reviewFiles || []);
-          setPushResult(s.pushResult || null);
-          setShowAllure(s.showAllure || false);
+    let cancelled = false;
+
+    const restoreState = (s: any) => {
+      setCurrentStep(s.currentStep || 'select');
+      setCompletedSteps(new Set(s.completedSteps || []));
+      setSelectedSpecId(s.selectedSpecId || '');
+      setSelectionMode(s.selectionMode || 'full');
+      setSelectedTags(s.selectedTags || []);
+      setSelectedOperationIds(s.selectedOperationIds || []);
+      setBaseDirectory(s.baseDirectory || './swagger-tests');
+      setMaxIterations(s.maxIterations ?? 5);
+      setAgentRunId(s.agentRunId);
+      setTestSuitePath(s.testSuitePath || '');
+      setReviewFiles(s.reviewFiles || []);
+      setPushResult(s.pushResult || null);
+      setShowAllure(s.showAllure || false);
+    };
+
+    const restore = async () => {
+      try {
+        const saved = sessionStorage.getItem(SESSION_KEY);
+        if (saved) {
+          const s = JSON.parse(saved);
+          if (s.agentRunId) {
+            // Validate the saved run still exists on the backend
+            try {
+              const status = await testgenService.getAgentRunStatus(s.agentRunId);
+              if (cancelled) return;
+              // Backend recognizes this run — restore state with fresh status
+              restoreState(s);
+              setAgentStatus(status);
+              setAgentLog(status.log || []);
+            } catch {
+              // Backend returned 404 or error — server was restarted, clear stale state
+              if (cancelled) return;
+              sessionStorage.removeItem(SESSION_KEY);
+            }
+          }
         }
+      } catch { /* ignore parse errors */ }
+      if (!cancelled) {
+        setRestored(true);
+        loadSpecs();
       }
-    } catch { /* ignore parse errors */ }
-    setRestored(true);
-    loadSpecs();
+    };
+
+    restore();
+    return () => { cancelled = true; };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Persist session state on changes ──

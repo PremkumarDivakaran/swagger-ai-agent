@@ -17,7 +17,7 @@
  *                     operation dependencies and build a test strategy
  *  2. TestWriterAgent – asks the LLM to write complete Java test code
  *  3. ExecutorAgent  – runs `mvn test`, captures results
- *  4. ReflectorAgent – sends failures back to the LLM, gets fixes
+ *  4. SelfHealAgent – sends failures back to the LLM, gets fixes
  *  5. Orchestrator   – coordinates the loop (max N iterations)
  *
  * ============================================================
@@ -163,7 +163,7 @@ export interface AgentExecutionResult {
 //  Reflector Agent types
 // ──────────────────────────────────────────────
 
-/** A fix suggested by the ReflectorAgent */
+/** A fix suggested by the SelfHealAgent */
 export interface TestFix {
   /** Which file to patch */
   filePath: string;
@@ -173,7 +173,7 @@ export interface TestFix {
   explanation: string;
 }
 
-/** Output of the ReflectorAgent */
+/** Output of the SelfHealAgent */
 export interface AgentReflection {
   /** Are the failures in the test code or in the API itself? */
   failureSource: 'test-code' | 'api-bug' | 'environment' | 'unknown';
@@ -194,8 +194,8 @@ export type AgentPhase =
   | 'writing'       // TestWriterAgent is writing code
   | 'persisting'    // Writing files to disk
   | 'executing'     // Running mvn test
-  | 'reflecting'    // ReflectorAgent analyzing failures
-  | 'fixing'        // Applying fixes from ReflectorAgent
+  | 'reflecting'    // SelfHealAgent analyzing failures
+  | 'fixing'        // Applying fixes from SelfHealAgent
   | 'completed'     // All done
   | 'failed';       // Unrecoverable error
 

@@ -4,7 +4,7 @@
  * Architecture:
  *
  *   ┌──────────┐    ┌─────────────┐    ┌──────────┐    ┌───────────┐
- *   │ Planner  │───▶│ Test Writer │───▶│ Executor │───▶│ Reflector │
+ *   │ Planner  │───▶│ Test Writer │───▶│ Executor │───▶│ Self-Heal │
  *   │  Agent   │    │   Agent     │    │  Agent   │    │   Agent   │
  *   └──────────┘    └─────────────┘    └──────────┘    └─────┬─────┘
  *        ▲                                                    │
@@ -15,7 +15,7 @@
  *   PlannerAgent.ts    – LLM reads spec → builds test plan + dependencies
  *   TestWriterAgent.ts – LLM writes complete Java test classes
  *   ExecutorAgent.ts   – Runs mvn test, parses results
- *   ReflectorAgent.ts  – LLM analyzes failures → produces fixes
+ *   SelfHealAgent.ts   – LLM analyzes failures → produces fixes
  *   AgentOrchestrator.ts – Coordinates Plan→Write→Execute→Reflect→Fix loop
  */
 
@@ -23,5 +23,5 @@ export * from './types';
 export { PlannerAgent } from './PlannerAgent';
 export { TestWriterAgent } from './TestWriterAgent';
 export { ExecutorAgent } from './ExecutorAgent';
-export { ReflectorAgent } from './ReflectorAgent';
+export { SelfHealAgent } from './SelfHealAgent';
 export { AgentOrchestrator } from './AgentOrchestrator';

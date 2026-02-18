@@ -10,7 +10,7 @@
  *    2. WRITE    → TestWriterAgent asks LLM to write test code
  *    3. PERSIST  → Write files to disk
  *    4. EXECUTE  → ExecutorAgent runs mvn test
- *    5. REFLECT  → ReflectorAgent analyzes failures
+ *    5. REFLECT  → SelfHealAgent analyzes failures
  *    6. FIX      → TestWriterAgent rewrites broken tests
  *    7. LOOP     → Go back to step 4 (up to maxIterations)
  *
@@ -38,7 +38,7 @@ import { NotFoundError } from '../../core/errors/NotFoundError';
 import { PlannerAgent } from './PlannerAgent';
 import { TestWriterAgent } from './TestWriterAgent';
 import { ExecutorAgent } from './ExecutorAgent';
-import { ReflectorAgent } from './ReflectorAgent';
+import { SelfHealAgent } from './SelfHealAgent';
 import type {
   AgentRunConfig,
   AgentRunStatus,
@@ -51,7 +51,7 @@ export class AgentOrchestrator {
   private readonly planner: PlannerAgent;
   private readonly writer: TestWriterAgent;
   private readonly executor: ExecutorAgent;
-  private readonly reflector: ReflectorAgent;
+  private readonly selfHeal: SelfHealAgent;
 
   /** In-memory store for run status (UI polls this) */
   private runs = new Map<string, AgentRunStatus>();
@@ -63,7 +63,7 @@ export class AgentOrchestrator {
     this.planner = new PlannerAgent(llmRouter);
     this.writer = new TestWriterAgent(llmRouter);
     this.executor = new ExecutorAgent();
-    this.reflector = new ReflectorAgent(llmRouter);
+    this.selfHeal = new SelfHealAgent(llmRouter);
   }
 
   /**
@@ -123,27 +123,36 @@ export class AgentOrchestrator {
     if (!spec) throw new NotFoundError('Spec', config.specId);
     this.log(runId, 'planning', `Loaded spec: ${spec.info?.title} (${spec.operations.length} operations)`);
 
-    // ── Phase 1b: Apply operation filter ──
+    // ── Phase 1b: Apply operation filter (on a shallow copy — never mutate the stored spec) ──
+    const filteredSpec = { ...spec, operations: [...spec.operations] };
     const filter = config.operationFilter;
     if (filter && filter.mode !== 'full') {
-      const beforeCount = spec.operations.length;
+      const beforeCount = filteredSpec.operations.length;
       if (filter.mode === 'tag' && filter.tags && filter.tags.length > 0) {
         const tagSet = new Set(filter.tags.map(t => t.toLowerCase()));
-        spec.operations = spec.operations.filter(op =>
+        filteredSpec.operations = filteredSpec.operations.filter(op =>
           op.tags && op.tags.some((t: string) => tagSet.has(t.toLowerCase()))
         );
-        this.log(runId, 'planning', `🔍 Filtered by tags [${filter.tags.join(', ')}]: ${spec.operations.length}/${beforeCount} operations`);
+        this.log(runId, 'planning', `🔍 Filtered by tags [${filter.tags.join(', ')}]: ${filteredSpec.operations.length}/${beforeCount} operations`);
       } else if (filter.mode === 'single' && filter.operationIds && filter.operationIds.length > 0) {
         const idSet = new Set(filter.operationIds);
-        spec.operations = spec.operations.filter(op => idSet.has(op.operationId));
-        this.log(runId, 'planning', `🔍 Filtered by selection: ${spec.operations.length}/${beforeCount} operations`);
+        filteredSpec.operations = filteredSpec.operations.filter(op => idSet.has(op.operationId));
+        this.log(runId, 'planning', `🔍 Filtered by selection: ${filteredSpec.operations.length}/${beforeCount} operations`);
+      }
+
+      if (filteredSpec.operations.length === 0) {
+        this.log(runId, 'failed', `❌ No operations matched the filter. Check your tag/operation selection and try again.`);
+        this.setPhase(runId, 'failed');
+        const status = this.runs.get(runId);
+        if (status) status.error = 'No operations matched the selected filter.';
+        return;
       }
     }
 
     // ── Phase 2: Plan ──
     this.setPhase(runId, 'planning');
     this.log(runId, 'planning', '🧠 PlannerAgent: Analyzing spec and building test strategy...');
-    const testPlan = await this.planner.plan(spec);
+    const testPlan = await this.planner.plan(filteredSpec);
     const run = this.runs.get(runId)!;
     run.testPlan = testPlan;
     this.log(runId, 'planning', `📡 LLM provider: ${this.llmRouter.lastProvider}`);
@@ -227,9 +236,9 @@ export class AgentOrchestrator {
 
       // Reflect on failures
       this.setPhase(runId, 'reflecting');
-      this.log(runId, 'reflecting', '🔍 ReflectorAgent: Analyzing failures...');
+      this.log(runId, 'reflecting', '🔍 SelfHealAgent: Analyzing failures...');
       const testFileMap = this.readTestFiles(suitePath, basePackage);
-      const reflection = await this.reflector.reflect(execResult, testFileMap, iteration);
+      const reflection = await this.selfHeal.reflect(execResult, testFileMap, iteration);
       iterationEntry.reflection = reflection;
       this.log(runId, 'reflecting', `📡 LLM provider: ${this.llmRouter.lastProvider}`);
       this.log(runId, 'reflecting', `Diagnosis: ${reflection.failureSource} — ${reflection.summary}`);
