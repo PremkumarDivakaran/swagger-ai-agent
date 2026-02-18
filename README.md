@@ -86,7 +86,7 @@ User clicks "Launch AI REST Assured"
 - **Node.js** 18+
 - **Java** 11+ and **Maven** (for executing generated REST Assured tests)
 - **Git**
-- An LLM API key (Groq, OpenAI, or TestLeaf)
+- An LLM API key (Groq or OpenAI)
 
 ### Installation
 
@@ -110,7 +110,7 @@ NODE_ENV=development
 PORT=3001
 LOG_LEVEL=info
 
-# LLM — pick one provider: groq | openai | testleaf
+# LLM — pick one provider: groq | openai
 LLM_ENABLED=true
 LLM_PROVIDER=groq
 
@@ -122,9 +122,6 @@ GROQ_MODEL=llama-3.3-70b-versatile
 OPENAI_API_KEY=your_openai_api_key
 OPENAI_MODEL=gpt-4o-mini
 
-# TestLeaf (custom GPT-based API)
-TESTLEAF_API_KEY=your_testleaf_api_key
-TESTLEAF_MODEL=gpt-4o-mini
 
 # GitHub (for Push to GitHub / PR creation)
 GITHUB_TOKEN=your_github_personal_access_token
@@ -268,7 +265,6 @@ Pure business logic with no framework dependencies (Clean Architecture principle
 | `LlmRouter.ts` | Routes all LLM requests to the configured provider. Supports caching and structured logging |
 | `GroqProvider.ts` | Groq API integration (Llama models, free tier available) |
 | `OpenAiProvider.ts` | OpenAI API integration (GPT-4o-mini, etc.) |
-| `TestLeafProvider.ts` | Custom GPT-based API at `api.testleaf.com` |
 | `LlmCache.ts` | In-memory cache for LLM responses to avoid duplicate API calls |
 
 #### `src/utils/` — Shared Utilities
@@ -394,7 +390,7 @@ The system uses a single LLM provider at a time, configured via `LLM_PROVIDER` i
 |----------|---------|----------|--------|
 | **Groq** | `groq` | `api.groq.com` | `llama-3.3-70b-versatile` (free tier) |
 | **OpenAI** | `openai` | `api.openai.com` | `gpt-4o-mini`, `gpt-4o` |
-| **TestLeaf** | `testleaf` | `api.testleaf.com` | `gpt-4o-mini` (custom GPT wrapper) |
+
 
 All providers implement the same `ILlmProvider` interface. Switching providers requires only changing one env variable — no code changes needed.
 
@@ -478,7 +474,7 @@ SWAGGER_CACHE_TTL=3600
 
 # LLM — choose one provider
 LLM_ENABLED=true
-LLM_PROVIDER=groq             # groq | openai | testleaf
+LLM_PROVIDER=groq             # groq | openai
 
 # Provider API keys (only the selected provider's key is required)
 GROQ_API_KEY=your_key
@@ -487,8 +483,6 @@ GROQ_MODEL=llama-3.3-70b-versatile
 OPENAI_API_KEY=your_key
 OPENAI_MODEL=gpt-4o-mini
 
-TESTLEAF_API_KEY=your_key
-TESTLEAF_MODEL=gpt-4o-mini
 
 # GitHub
 GITHUB_TOKEN=your_github_pat
