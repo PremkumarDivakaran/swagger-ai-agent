@@ -1,17 +1,21 @@
-# Swagger AI Agent - Complete Guide
+# Swagger AI Agent
 
-> **Automated API Testing Platform**: Generate and execute BDD/Axios tests from OpenAPI specifications with a modern web interface.
+> An autonomous AI agent that reads OpenAPI/Swagger specifications, generates REST Assured (Java) API tests using LLMs, executes them, self-heals failures, and pushes passing tests to GitHub — all from a single button click.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [What is This?](#what-is-this)
+- [How the AI Agent Works](#how-the-ai-agent-works)
 - [Quick Start](#quick-start)
-- [Backend Architecture](#backend-architecture)
-- [Frontend Application](#frontend-application)
-- [Complete User Workflow](#complete-user-workflow)
-- [API Documentation](#api-documentation)
-- [Testing the System](#testing-the-system)
 - [Project Structure](#project-structure)
+  - [Backend (`src/`)](#backend-src)
+  - [Frontend (`web-app/`)](#frontend-web-app)
+  - [Other Folders](#other-folders)
+- [The Agent Pipeline in Detail](#the-agent-pipeline-in-detail)
+- [LLM Providers](#llm-providers)
+- [UI Workflow](#ui-workflow)
+- [API Reference](#api-reference)
+- [Configuration](#configuration)
 - [Tech Stack](#tech-stack)
 - [Troubleshooting](#troubleshooting)
 
@@ -19,16 +23,59 @@
 
 ## What is This?
 
-**Swagger AI Agent** is an intelligent test generation and execution platform that:
+**Swagger AI Agent** is a full-stack platform that automates API test creation end-to-end:
 
-1. **Imports** OpenAPI/Swagger specifications (URL, file, or inline)
-2. **Analyzes** API operations, parameters, and schemas
-3. **Generates** production-ready tests in two formats:
-   - **BDD Tests (Cucumber)**: Complete test structure with features, steps, and runner
-   - **Axios Tests (Jest)**: Single test file with Axios + Jest
-4. **Persists** generated tests to disk with proper structure
-5. **Executes** tests and shows real-time results
-6. **Reports** comprehensive test outcomes with pass/fail details
+1. **Import** an OpenAPI/Swagger spec (URL, file upload, or paste)
+2. **AI plans** the test strategy — positive, negative, and edge-case scenarios
+3. **AI writes** complete REST Assured + JUnit 5 Java test classes
+4. **Executes** them via Maven (`mvn test`)
+5. **Self-heals** — when tests fail, the AI diagnoses root causes and rewrites code
+6. **Iterates** until all tests pass or max iterations are reached
+7. **Human reviews** the generated tests in the UI
+8. **Pushes** approved tests to GitHub as a Pull Request
+
+No manual test code writing required. One click triggers the full autonomous pipeline.
+
+---
+
+## How the AI Agent Works
+
+```
+User clicks "Launch AI REST Assured"
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    AgentOrchestrator                            │
+│                                                                 │
+│  ┌────────────┐    ┌──────────────┐    ┌──────────────┐        │
+│  │  Planner   │───▶│  TestWriter  │───▶│   Executor   │        │
+│  │   Agent    │    │    Agent     │    │    Agent     │        │
+│  │  (LLM)     │    │   (LLM)     │    │  (mvn test)  │        │
+│  └────────────┘    └──────────────┘    └──────┬───────┘        │
+│        ▲                                       │                │
+│        │                               ┌──────▼───────┐        │
+│        │                               │  SelfHeal    │        │
+│        │                               │    Agent     │        │
+│        │                               │   (LLM)     │        │
+│        │                               └──────┬───────┘        │
+│        │                                       │                │
+│        └───────── feedback loop ───────────────┘                │
+│                                                                 │
+│  Repeat until all tests pass or max iterations reached          │
+└─────────────────────────────────────────────────────────────────┘
+         │
+         ▼
+  User reviews → Approves → Push to GitHub (PR)
+```
+
+### The Four Agents
+
+| Agent | What it Does | Uses LLM? |
+|-------|-------------|-----------|
+| **PlannerAgent** | Reads the OpenAPI spec, identifies operation dependencies, creates a test plan with positive/negative/edge-case scenarios | Yes — for positive tests, dependencies, and assertions. Negative/edge-case tests are generated programmatically |
+| **TestWriterAgent** | Takes the plan and writes complete Java test classes (REST Assured + JUnit 5), including `pom.xml`, base config, and Faker-based test data | Yes — generates entire Java files with imports, assertions, and dependency chaining |
+| **ExecutorAgent** | Runs `mvn test`, parses Surefire XML reports, captures per-test pass/fail/error with messages | No — pure shell execution and XML parsing |
+| **SelfHealAgent** | Analyzes test failures, distinguishes test bugs from API bugs, produces code fixes | Yes — diagnoses root cause and rewrites broken code. Has 3-layer defense against "fixing" actual API bugs |
 
 ---
 
@@ -36,14 +83,14 @@
 
 ### Prerequisites
 
-- **Node.js** 18+ and npm
-- **Git** for cloning
-- **OpenAPI/Swagger** specification (URL or file)
+- **Node.js** 18+
+- **Java** 11+ and **Maven** (for executing generated REST Assured tests)
+- **Git**
+- An LLM API key (Groq, OpenAI, or TestLeaf)
 
 ### Installation
 
 ```bash
-# Clone the repository
 git clone <your-repo-url>
 cd swagger-ai-agent
 
@@ -51,677 +98,526 @@ cd swagger-ai-agent
 npm install
 
 # Install frontend dependencies
-cd web-app
-npm install
-cd ..
+cd web-app && npm install && cd ..
 ```
 
 ### Configuration
 
-```bash
-# Backend configuration (optional)
-cp .env.example .env
-# Edit .env with your settings
+Create a `.env` file in the project root:
 
-# Frontend configuration (optional)
-cd web-app
-# Create .env if needed
-echo "VITE_API_BASE_URL=http://localhost:3001" > .env
+```env
+NODE_ENV=development
+PORT=3001
+LOG_LEVEL=info
+
+# LLM — pick one provider: groq | openai | testleaf
+LLM_ENABLED=true
+LLM_PROVIDER=groq
+
+# Groq (free tier available)
+GROQ_API_KEY=your_groq_api_key
+GROQ_MODEL=llama-3.3-70b-versatile
+
+# OpenAI
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-4o-mini
+
+# TestLeaf (custom GPT-based API)
+TESTLEAF_API_KEY=your_testleaf_api_key
+TESTLEAF_MODEL=gpt-4o-mini
+
+# GitHub (for Push to GitHub / PR creation)
+GITHUB_TOKEN=your_github_personal_access_token
 ```
 
-### Running the Application
+### Run the Application
 
 ```bash
-# Terminal 1: Start Backend Server
-npm start
-# Backend runs on http://localhost:3001
-
-# Terminal 2: Start Frontend
-cd web-app
+# Terminal 1 — Backend (http://localhost:3001)
 npm run dev
-# Frontend runs on http://localhost:5173
+
+# Terminal 2 — Frontend (http://localhost:5173)
+cd web-app && npm run dev
 ```
 
-### First Test in 5 Minutes
-
-1. **Open Browser**: `http://localhost:5173`
-2. **Import Spec**: Click "Import Swagger" → Paste Petstore URL → Import
-3. **Generate Tests**: Click "Test Lab" → Select spec → Choose BDD → Generate & Save
-4. **Run Tests**: Click "Run Tests" → Watch real-time execution
-5. **View Report**: See pass/fail statistics and detailed results
-
----
-
-## Backend Architecture
-
-### Clean Architecture Layers
-
-```
-src/
-├── core/               # Application core (server, config, errors)
-├── domain/             # Business logic and models
-│   ├── models/         # Domain entities
-│   └── repositories/   # Repository interfaces
-├── application/        # Use cases (business operations)
-│   ├── spec/           # Spec management
-│   ├── testgen/        # Test generation
-│   ├── execution/      # Test execution
-│   └── environment/    # Environment management
-├── infrastructure/     # External dependencies
-│   ├── swagger/        # OpenAPI parsing
-│   ├── llm/            # LLM integration
-│   └── persistence/    # Data storage
-└── api/                # HTTP layer
-    ├── routes/         # API routes
-    ├── controllers/    # Request handlers
-    ├── dto/            # Data transfer objects
-    └── validators/     # Request validation
-```
-
-### Key Backend Components
-
-#### 1. **Spec Management**
-- **Import**: `POST /api/spec/import` - Import OpenAPI specs
-- **List**: `GET /api/spec` - List all specs
-- **Get**: `GET /api/spec/:specId` - Get spec details
-- **Operations**: `GET /api/spec/:specId/operations` - List operations
-- **Delete**: `DELETE /api/spec/:specId` - Delete spec
-
-#### 2. **Test Generation**
-- **Axios Tests**: `POST /api/testgen/generate-axios-tests` - Generate Jest+Axios tests
-- **BDD Tests**: `POST /api/testgen/generate-bdd-tests` - Generate Cucumber tests
-- **Persist**: `POST /api/testgen/persist-bdd-tests` - Save tests to disk
-
-#### 3. **Test Execution**
-- **Execute**: `POST /api/testgen/execute-tests` - Run generated tests
-- **Status**: `GET /api/testgen/execution/:executionId` - Poll execution status
-
-#### 4. **Environment Management**
-- **Create**: `POST /api/environment` - Create environment config
-- **List**: `GET /api/spec/:specId/environments` - List environments
-- **Update**: `PUT /api/environment/:envId` - Update environment
-
----
-
-## Frontend Application
-
-### Modern React Architecture
-
-```
-web-app/src/
-├── pages/              # Page components
-│   ├── Dashboard/      # System health dashboard
-│   ├── Specs/          # Import + View specs (combined)
-│   └── TestLab/        # Generate + Execute tests (workflow)
-├── components/         # Reusable components
-│   ├── common/         # Buttons, Cards, etc.
-│   └── layout/         # Header, Sidebar, Layout
-├── services/           # API client services
-├── stores/             # Zustand state management
-├── types/              # TypeScript types
-├── config/             # App configuration
-└── utils/              # Helper functions
-```
-
-### Navigation Structure
-
-```
-┌────────────────────────────────────┐
-│  Dashboard         [Home]          │  System health and quick stats
-├────────────────────────────────────┤
-│  Specs             [Import+View]   │  Import and explore OpenAPI specs
-├────────────────────────────────────┤
-│  Test Lab          [Gen+Execute]   │  Generate and run tests
-└────────────────────────────────────┘
-```
-
-### Key Features
-
-1. **Dashboard**
-   - Backend health status
-   - Quick statistics
-   - Recent activity
-
-2. **Specs Page** (Improved Organization)
-   - **Tab 1: Import** - Import new specs
-   - **Tab 2: Browse** - View all imported specs
-   - **Tab 3: Operations** - Explore API operations
-   - Unified workflow, no jumping between pages
-
-3. **Test Lab** (Unified Workflow)
-   - **Step 1: Select Spec** - Choose spec and operations
-   - **Step 2: Configure** - Select test type and options
-   - **Step 3: Generate** - Generate tests (preview or persist)
-   - **Step 4: Execute** - Run tests and view results
-   - Linear workflow with progress indicator
-
----
-
-## Complete User Workflow
-
-### Workflow 1: Import → Generate → Execute (Full Flow)
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│ 1. IMPORT SWAGGER SPEC                                      │
-├─────────────────────────────────────────────────────────────┤
-│  Dashboard → Specs → Import Tab                             │
-│  • Paste URL: https://petstore.swagger.io/v2/swagger.json  │
-│  • Or upload file                                           │
-│  • Click "Import"                                           │
-│  ✓ Spec imported successfully                               │
-└─────────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────────┐
-│ 2. BROWSE OPERATIONS (Optional)                             │
-├─────────────────────────────────────────────────────────────┤
-│  Specs → Operations Tab                                      │
-│  • View all API endpoints                                   │
-│  • Filter by tags                                           │
-│  • Understand API structure                                 │
-└─────────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────────┐
-│ 3. GENERATE TESTS                                           │
-├─────────────────────────────────────────────────────────────┤
-│  Test Lab → Select Spec → Configure                         │
-│  • Test Type: BDD (Cucumber) or Axios (Jest)               │
-│  • Operations: All / By Tag / Single                        │
-│  • Options: Negative tests, Auth tests, etc.               │
-│  • Click "Generate & Save to Disk"                          │
-│  ✓ Tests saved to ./swagger-tests/petstore-api             │
-└─────────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────────┐
-│ 4. EXECUTE TESTS                                            │
-├─────────────────────────────────────────────────────────────┤
-│  Test Lab → Execute Tab (automatically shown)                │
-│  • Click "Run Tests"                                        │
-│  • Watch real-time progress                                 │
-│  • See pass/fail statistics                                 │
-│  ✓ 14/15 tests passed                                       │
-└─────────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────────┐
-│ 5. VIEW DETAILED REPORT                                     │
-├─────────────────────────────────────────────────────────────┤
-│  • Summary: Total, Passed, Failed, Skipped                  │
-│  • Test Suites: Feature file breakdown                      │
-│  • Individual Tests: Each test result with duration         │
-│  • Console Output: Full terminal output                     │
-│  • Errors: Detailed error messages                          │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Workflow 2: Quick Test (Axios)
-
-```
-Test Lab → Select Spec → Axios Tests → Generate → Download
-```
-
-### Workflow 3: BDD with Customization
-
-```
-Test Lab → BDD Tests → Filter by Tag → Custom Options → Generate & Save → Execute
-```
-
----
-
-## API Documentation
-
-### Spec Management
-
-#### Import Spec
-```http
-POST /api/spec/import
-Content-Type: application/json
-
-{
-  "source": {
-    "type": "url",
-    "url": "https://petstore.swagger.io/v2/swagger.json"
-  }
-}
-```
-
-#### List Specs
-```http
-GET /api/spec
-```
-
-#### Get Operations
-```http
-GET /api/spec/{specId}/operations?tags=pet,store
-```
-
-### Test Generation
-
-#### Generate BDD Tests
-```http
-POST /api/testgen/generate-bdd-tests
-Content-Type: application/json
-
-{
-  "specId": "spec-123",
-  "selection": {
-    "mode": "tag",
-    "tags": ["pet"]
-  },
-  "options": {
-    "framework": "cucumber",
-    "language": "typescript",
-    "includeNegativeTests": true,
-    "includeAuthTests": true,
-    "groupBy": "tag"
-  }
-}
-```
-
-#### Persist Tests
-```http
-POST /api/testgen/persist-bdd-tests
-Content-Type: application/json
-
-{
-  "specId": "spec-123",
-  "options": { /* same as above */ },
-  "baseDirectory": "./swagger-tests",
-  "overwrite": false
-}
-```
-
-### Test Execution
-
-#### Execute Tests
-```http
-POST /api/testgen/execute-tests
-Content-Type: application/json
-
-{
-  "testSuitePath": "./swagger-tests/petstore-api",
-  "framework": "cucumber",
-  "env": {
-    "API_BASE_URL": "https://petstore.swagger.io/v2"
-  }
-}
-```
-
-#### Get Status
-```http
-GET /api/testgen/execution/{executionId}
-```
-
----
-
-## Testing the System
-
-### Automated Testing Script
-
-Save as `test-full-workflow.sh`:
+Or use the combined command:
 
 ```bash
-#!/bin/bash
-set -e
-
-API_URL="http://localhost:3001/api"
-
-echo "=== Full Workflow Test ==="
-
-# 1. Import Spec
-echo "\n1. Importing Petstore Spec..."
-SPEC_RESPONSE=$(curl -s -X POST "$API_URL/spec/import" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "source": {
-      "type": "url",
-      "url": "https://petstore.swagger.io/v2/swagger.json"
-    }
-  }')
-
-SPEC_ID=$(echo $SPEC_RESPONSE | jq -r '.data.specId')
-echo "✓ Spec ID: $SPEC_ID"
-
-# 2. Generate BDD Tests
-echo "\n2. Generating BDD Tests..."
-curl -s -X POST "$API_URL/testgen/persist-bdd-tests" \
-  -H "Content-Type: application/json" \
-  -d "{
-    \"specId\": \"$SPEC_ID\",
-    \"selection\": { \"mode\": \"tag\", \"tags\": [\"pet\"] },
-    \"options\": {
-      \"framework\": \"cucumber\",
-      \"language\": \"typescript\",
-      \"includeNegativeTests\": true
-    },
-    \"baseDirectory\": \"./swagger-tests\",
-    \"overwrite\": true
-  }" | jq '.'
-
-echo "\n✓ Tests persisted"
-
-# 3. Execute Tests
-echo "\n3. Executing Tests..."
-EXEC_RESPONSE=$(curl -s -X POST "$API_URL/testgen/execute-tests" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "testSuitePath": "./swagger-tests/swagger-petstore",
-    "framework": "cucumber"
-  }')
-
-EXEC_ID=$(echo $EXEC_RESPONSE | jq -r '.data.executionId')
-echo "✓ Execution ID: $EXEC_ID"
-
-# 4. Poll Status
-echo "\n4. Polling execution status..."
-for i in {1..30}; do
-  STATUS=$(curl -s "$API_URL/testgen/execution/$EXEC_ID" | jq -r '.data.status')
-  echo "  Status: $STATUS"
-  
-  if [ "$STATUS" = "completed" ] || [ "$STATUS" = "failed" ]; then
-    break
-  fi
-  
-  sleep 2
-done
-
-# 5. Get Final Report
-echo "\n5. Final Report:"
-curl -s "$API_URL/testgen/execution/$EXEC_ID" | jq '.data.results'
-
-echo "\n=== Test Complete ==="
+npm run start:app
 ```
 
-### Manual Testing Steps
+### Your First AI Test Run in 3 Minutes
 
-#### Test 1: Import and View Spec
 1. Open `http://localhost:5173`
-2. Click "Specs" in sidebar
-3. Go to "Import" tab
-4. Paste URL: `https://petstore.swagger.io/v2/swagger.json`
-5. Click "Import"
-6. Go to "Operations" tab
-7. Verify operations are listed
-
-**Expected**: Spec imported, operations visible
-
-#### Test 2: Generate BDD Tests
-1. Click "Test Lab" in sidebar
-2. Select the imported spec
-3. Choose "BDD Tests (Cucumber)"
-4. Select "By Tags" → enter "pet"
-5. Enable "Negative Tests" and "Auth Tests"
-6. Click "Generate & Save to Disk"
-
-**Expected**: Success message, file list shown
-
-#### Test 3: Execute Tests
-1. Scroll to "Test Execution" panel
-2. Click "Run Tests"
-3. Watch status change to "Running"
-4. Wait for completion
-
-**Expected**: Tests execute, report displays results
-
-#### Test 4: Generate Axios Tests
-1. Test Lab → Select spec
-2. Choose "Axios Tests (Jest)"
-3. Click "Generate Tests"
-4. Click "Download" or "Copy to Clipboard"
-
-**Expected**: Test file downloads successfully
+2. Go to **Specs** → Paste `https://petstore.swagger.io/v2/swagger.json` → **Import**
+3. Go to **Test Lab** → Select the spec → **Launch AI REST Assured**
+4. Watch the agent plan, write, execute, and self-heal in real-time
+5. Review generated tests → **Approve** → Push to GitHub
 
 ---
 
 ## Project Structure
 
-### Backend Structure
 ```
 swagger-ai-agent/
-├── src/
-│   ├── core/                   # App core (server, config, errors)
-│   ├── domain/                 # Business models and interfaces
-│   ├── application/            # Use cases (business logic)
-│   ├── infrastructure/         # External integrations
-│   └── api/                    # HTTP layer
-├── config/                     # Environment configs
-├── tests/                      # Unit and integration tests
-├── swagger_docs/               # Sample Swagger files
-├── swagger-tests/              # Generated test output
-├── logs/                       # Application logs
-├── package.json
-└── tsconfig.json
+├── src/                        # Backend (Node.js + Express + TypeScript)
+│   ├── api/                    # HTTP layer (routes, controllers, DTOs, validators)
+│   ├── application/            # Business logic (agents, use cases)
+│   ├── core/                   # App bootstrap, config, errors, middleware
+│   ├── domain/                 # Domain models and repository interfaces
+│   ├── infrastructure/         # External integrations (LLM, GitHub, persistence)
+│   ├── prompts/                # LLM prompt templates (separated files)
+│   └── utils/                  # Shared utilities
+├── web-app/                    # Frontend (React + Vite + TailwindCSS)
+│   └── src/
+│       ├── pages/              # UI pages (Dashboard, Specs, TestLab, Settings)
+│       ├── components/         # Reusable UI components
+│       ├── services/           # API client functions
+│       ├── stores/             # Zustand state management
+│       └── types/              # TypeScript interfaces
+├── config/                     # Environment-specific config (dev, prod, test)
+├── tests/                      # Unit tests (mirrors src/ structure)
+├── swagger_docs/               # Sample OpenAPI specs for testing
+├── swagger-tests/              # Generated test output (gitignored)
+└── logs/                       # Application log files
 ```
 
-### Frontend Structure
+### Backend (`src/`)
+
+#### `src/application/agents/` — The AI Agent System (Heart of the Project)
+
+This is where the autonomous pipeline lives. Each agent is independent and does one thing well.
+
+| File | Role |
+|------|------|
+| `AgentOrchestrator.ts` | Coordinates the full loop: Plan → Write → Persist → Execute → Reflect → Fix → Iterate. Stores run status in-memory for UI polling. Handles operation filtering on a copy to avoid mutating the stored spec |
+| `PlannerAgent.ts` | Reads the OpenAPI spec and asks the LLM to build a test strategy. Identifies operation dependencies (e.g., "POST must run before GET to have data"). Generates positive tests via LLM; generates negative/edge-case tests programmatically |
+| `TestWriterAgent.ts` | Takes the test plan and asks the LLM to write complete Java classes. Generates `pom.xml`, `BaseTest.java`, config files, and per-tag test classes. Handles token limits by splitting large groups |
+| `ExecutorAgent.ts` | Runs `mvn test` as a child process, parses Surefire XML reports for structured per-test results. Generates Allure reports. No LLM used |
+| `SelfHealAgent.ts` | Analyzes failures using a 3-layer defense: (1) Pre-LLM programmatic filter removes API bugs, (2) Prompt instructs LLM to never weaken negative tests, (3) Post-LLM scrub rejects fixes that change 4xx expectations to 2xx |
+| `types.ts` | All TypeScript interfaces: `AgentTestPlan`, `AgentRunStatus`, `AgentReflection`, `TestFix`, etc. |
+| `index.ts` | Central re-export of all agents |
+
+#### `src/prompts/` — LLM Prompt Templates
+
+Prompts are separated from agent logic for maintainability.
+
+| File | Agent | What it instructs the LLM to do |
+|------|-------|-------------------------------|
+| `planner.prompt.ts` | PlannerAgent | "Analyze this OpenAPI spec. Return a JSON test plan with operations, dependencies, assertions, and request bodies. Follow schema data types exactly." |
+| `test-writer.prompt.ts` | TestWriterAgent | "Write complete Java test classes using REST Assured + JUnit 5. Use Faker for dynamic data. Match Swagger schema types (integer for IDs, not UUIDs)." |
+| `self-heal.prompt.ts` | SelfHealAgent | "Diagnose these test failures. If a negative test expects 4xx but gets 2xx, that's an API bug — do NOT change the test. Only fix actual test code errors." |
+
+#### `src/api/` — REST API Layer
+
+Standard Express layered architecture. Each resource has 4 files:
+
+| Subfolder | Purpose |
+|-----------|---------|
+| `routes/` | URL → controller mapping |
+| `controllers/` | Parse request → call use case → send response |
+| `dto/` | Request/response data shapes |
+| `validators/` | Joi request validation schemas |
+
+Key resources:
+
+| Route Prefix | Purpose |
+|-------------|---------|
+| `/api/spec` | Import, list, get, delete OpenAPI specs |
+| `/api/testgen` | Start agent runs, poll status, get files, push to GitHub, submit feedback |
+| `/api/settings` | Read/write LLM & GitHub config (updates `.env` file) |
+
+#### `src/core/` — App Bootstrap & Cross-Cutting Concerns
+
+| File | Purpose |
+|------|---------|
+| `app.ts` | Creates the Express app, mounts middleware and routes |
+| `server.ts` | Starts the HTTP server, serves Allure reports as static files |
+| `env.ts` | Validates environment variables using Zod |
+| `config.ts` | Loads hierarchical config from `config/` folder |
+| `llm-factory.ts` | Creates the `LlmRouter` singleton based on `LLM_PROVIDER` |
+| `errors/` | Custom error classes: `NotFoundError`, `ValidationError`, `ConflictError`, etc. |
+| `middlewares/` | Error handler, request logger, rate limiter, auth, Joi validation |
+
+#### `src/domain/` — Domain Models & Repository Interfaces
+
+Pure business logic with no framework dependencies (Clean Architecture principle).
+
+| Folder | Content |
+|--------|---------|
+| `models/` | `NormalizedSpec` (parsed spec), `Operation` (single API endpoint), `EnvironmentConfig`, `RunPlan`, etc. |
+| `repositories/` | Interfaces only — `ISpecRepository`, `IEnvironmentRepository`, etc. Implementations live in `infrastructure/` |
+| `services/llm/` | `ILlmProvider` interface — the contract all LLM providers implement |
+
+#### `src/infrastructure/` — External Integrations
+
+| Folder | Purpose |
+|--------|---------|
+| `llm/` | LLM provider implementations and routing |
+| `github/` | `GitHubService.ts` — pushes test code to GitHub repos and creates PRs |
+| `persistence/` | In-memory repository implementations (specs, environments, run plans) |
+| `swagger/` | OpenAPI parsing: `SwaggerLoader` (fetch/read), `SwaggerParserAdapter` (parse), `OpenApiNormalizer` (normalize to internal model) |
+| `logging/` | Winston logger setup with structured log utilities |
+| `http/` | Axios HTTP client adapters |
+| `mcp/` | Model Context Protocol server (legacy, not actively used) |
+
+##### LLM Infrastructure Detail
+
+| File | Purpose |
+|------|---------|
+| `LlmRouter.ts` | Routes all LLM requests to the configured provider. Supports caching and structured logging |
+| `GroqProvider.ts` | Groq API integration (Llama models, free tier available) |
+| `OpenAiProvider.ts` | OpenAI API integration (GPT-4o-mini, etc.) |
+| `TestLeafProvider.ts` | Custom GPT-based API at `api.testleaf.com` |
+| `LlmCache.ts` | In-memory cache for LLM responses to avoid duplicate API calls |
+
+#### `src/utils/` — Shared Utilities
+
+| File | Purpose |
+|------|---------|
+| `idGenerator.ts` | UUID and prefixed ID generation |
+| `faker-schema.ts` | Schema-based fake data generation utilities |
+
+### Frontend (`web-app/`)
+
+A single-page application built with React + Vite + TailwindCSS.
+
+#### Pages
+
+| Page | Route | Purpose |
+|------|-------|---------|
+| **Dashboard** | `/` | Landing page with health status and quick-action cards |
+| **Specs** | `/specs` | Two tabs: **Import Spec** (URL/file/paste) + **Browse & Explore** (view operations) |
+| **Test Lab** | `/test-lab` | The main AI agent UI — a 6-step wizard (see [UI Workflow](#ui-workflow)) |
+| **Settings** | `/settings` | Configure LLM provider and API keys, GitHub token. Saves directly to `.env` |
+
+#### Key Frontend Folders
+
+| Folder | Purpose |
+|--------|---------|
+| `services/` | API client functions: `testgenService` (agent runs, polling, push), `specService` (import, list), `settingsService` (config) |
+| `stores/` | Zustand stores: `spec.store` (imported specs), `notification.store` (toasts), `settings.store` (LLM/GitHub config) |
+| `components/common/` | Reusable UI: `Button`, `Card`, `LoadingSpinner`, `Toast`, `StatusBadge`, `EmptyState` |
+| `components/layout/` | `Sidebar` (collapsible), `MainLayout`, `Header`, `PageContainer` |
+| `components/ui/` | Headless UI primitives (Tabs) |
+| `types/` | TypeScript interfaces matching backend API responses |
+
+### Other Folders
+
+| Folder | Purpose |
+|--------|---------|
+| `config/` | Hierarchical env configs: `default.ts`, `development.ts`, `production.ts`, `test.ts` |
+| `tests/` | Unit tests mirroring `src/` structure. Uses Jest + ts-jest |
+| `swagger_docs/` | Sample OpenAPI specs (`petstore_swagger.json`, `fakestore_swagger.json`) for quick testing |
+| `swagger-tests/` | Output folder for generated Maven test projects (gitignored) |
+| `logs/` | Winston log files (`app.log`, `combined.log`, `error.log`) |
+
+---
+
+## The Agent Pipeline in Detail
+
+When the user clicks **"Launch AI REST Assured"**, here is exactly what happens:
+
+### Phase 1 — Planning
+
 ```
-web-app/
-├── src/
-│   ├── pages/                  # Page components
-│   ├── components/             # Reusable UI components
-│   ├── services/               # API client
-│   ├── stores/                 # State management
-│   ├── types/                  # TypeScript types
-│   ├── config/                 # App config
-│   ├── utils/                  # Helpers
-│   ├── App.tsx                 # Root component
-│   └── main.tsx                # Entry point
-├── public/                     # Static assets
-├── package.json
-└── vite.config.ts
+AgentOrchestrator loads the spec from InMemorySpecRepository
+  → Applies operation filter (by tag or specific operations) on a COPY
+  → PlannerAgent.plan(spec) is called
+    → Builds a spec summary with schemas, parameters, and data types
+    → Sends to LLM with planner.prompt.ts instructions
+    → LLM returns: operations to test, dependencies, suggested request bodies, assertions
+    → Programmatically generates negative tests (invalid IDs, empty bodies, missing auth)
+    → Programmatically generates edge-case tests (boundary values, special characters)
+  → Result: AgentTestPlan with 50-90 test items
 ```
 
-### Generated Test Structure
+### Phase 2 — Writing Code
+
 ```
-swagger-tests/
-└── petstore-api/
-    ├── features/               # Gherkin feature files
-    │   ├── pet.feature
-    │   ├── store.feature
-    │   └── user.feature
-    ├── steps/                  # Step definitions
-    │   ├── common-steps.ts
-    │   ├── api-request-steps.ts
-    │   └── response-validation-steps.ts
-    ├── support/                # Support files
-    │   ├── world.ts
-    │   ├── hooks.ts
-    │   └── helpers.ts
-    ├── reports/                # Test reports
-    ├── cucumber.js             # Cucumber config
-    ├── package.json
-    ├── .env.example
-    └── README.md
+TestWriterAgent.write(plan) is called
+  → Sends plan + test-writer.prompt.ts to LLM
+  → LLM generates complete Java project:
+    ├── pom.xml (Maven config with REST Assured, JUnit 5, Faker, Allure dependencies)
+    ├── src/test/java/com/api/config/BaseTest.java
+    ├── src/test/java/com/api/config/TestConfig.java
+    └── src/test/java/com/api/tests/
+        ├── ProductsApiTest.java
+        ├── UsersApiTest.java
+        ├── CartsApiTest.java
+        └── AuthApiTest.java
+  → Files written to disk under swagger-tests/<spec-name>/
 ```
+
+### Phase 3 — Execution
+
+```
+ExecutorAgent.execute(suitePath) is called
+  → Runs: mvn test -f swagger-tests/<spec-name>/pom.xml
+  → Parses target/surefire-reports/*.xml for structured results
+  → Generates Allure report: mvn allure:report
+  → Result: AgentExecutionResult { passed: 38, failed: 12, total: 50 }
+```
+
+### Phase 4 — Self-Healing (iterates until success or max iterations)
+
+```
+SelfHealAgent.reflect(failures, testCode) is called
+  → Pre-LLM filter: removes negative test "failures" that are actually API bugs
+    (e.g., POST with empty body returning 201 instead of 400)
+  → Sends remaining failures to LLM with self-heal.prompt.ts
+  → LLM diagnoses root cause and returns complete fixed file contents
+  → Post-LLM scrub: rejects any fix that changes 4xx → 2xx for negative tests
+  → TestWriterAgent rewrites the fixed files
+  → Post-fix compilation check: runs mvn compile to verify fixes
+  → Back to Phase 3 (Execute again)
+
+Repeat up to maxIterations (default: 5)
+```
+
+### Phase 5 — Human Review & GitHub Push
+
+```
+UI shows all generated files for human review
+  → User can Approve or Reject
+  → If rejected with feedback: PlannerAgent re-generates with feedback
+  → If approved: GitHubService pushes code to specified repo and creates a PR
+```
+
+---
+
+## LLM Providers
+
+The system uses a single LLM provider at a time, configured via `LLM_PROVIDER` in `.env`.
+
+| Provider | Env Key | Endpoint | Models |
+|----------|---------|----------|--------|
+| **Groq** | `groq` | `api.groq.com` | `llama-3.3-70b-versatile` (free tier) |
+| **OpenAI** | `openai` | `api.openai.com` | `gpt-4o-mini`, `gpt-4o` |
+| **TestLeaf** | `testleaf` | `api.testleaf.com` | `gpt-4o-mini` (custom GPT wrapper) |
+
+All providers implement the same `ILlmProvider` interface. Switching providers requires only changing one env variable — no code changes needed.
+
+The `LlmRouter` handles:
+- Routing requests to the selected provider
+- Response caching to avoid duplicate API calls
+- Structured logging (which provider, response time, token usage)
+- Token limit handling (prompt truncation for large specs)
+
+---
+
+## UI Workflow
+
+The **Test Lab** page is a 6-step wizard:
+
+```
+┌──────────┐    ┌───────────┐    ┌──────────┐    ┌─────────┐    ┌────────┐    ┌──────┐
+│ 1.Select │───▶│2.Configure│───▶│3.Generate │───▶│4.Results │───▶│5.Review│───▶│6.Push│
+│   Spec   │    │  Options  │    │  (AI Run) │    │ (Allure) │    │  Code  │    │GitHub│
+└──────────┘    └───────────┘    └──────────┘    └─────────┘    └────────┘    └──────┘
+```
+
+| Step | What the User Does |
+|------|-------------------|
+| **1. Select** | Choose an imported spec. Optionally filter operations by tags or pick specific endpoints |
+| **2. Configure** | Set max iterations (1-10). Test type is "AI REST Assured" |
+| **3. Generate** | Click "Launch". Watch real-time logs as the agent plans, writes, executes, and self-heals. See pass/fail progress per iteration |
+| **4. Results** | View pass/fail summary. Embedded Allure report shows per-test request/response details |
+| **5. Review** | Browse all generated Java files in a code viewer. Approve or reject with feedback |
+| **6. Push** | Enter GitHub repo name and branch. Agent creates a PR with the generated tests |
+
+State is persisted in `sessionStorage` during a run, but automatically clears when the backend restarts.
+
+---
+
+## API Reference
+
+### Spec Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/spec/import` | Import an OpenAPI spec (URL, file, or inline) |
+| `GET` | `/api/spec` | List all imported specs |
+| `GET` | `/api/spec/:specId` | Get spec details with operations |
+| `DELETE` | `/api/spec/:specId` | Delete a spec |
+
+### AI Agent (Test Generation)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/testgen/agent/run` | Start a new agent run (returns `runId`) |
+| `GET` | `/api/testgen/agent/run/:runId/status` | Poll run status (phase, logs, results) |
+| `GET` | `/api/testgen/agent/run/:runId/files` | List generated test files |
+| `GET` | `/api/testgen/agent/run/:runId/files/:filePath` | Get a specific file's content |
+| `POST` | `/api/testgen/agent/run/:runId/push` | Push tests to GitHub and create PR |
+| `POST` | `/api/testgen/agent/run/:runId/feedback` | Submit human feedback for re-generation |
+| `GET` | `/api/testgen/agent/run/:runId/report` | Serve the Allure HTML report |
+
+### Settings
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/settings` | Get current LLM and GitHub config |
+| `PUT` | `/api/settings` | Update config (writes to `.env` file) |
+
+---
+
+## Configuration
+
+### Environment Variables (`.env`)
+
+```env
+# Server
+NODE_ENV=development          # development | production | test
+PORT=3001                     # Backend port
+LOG_LEVEL=info                # error | warn | info | debug
+
+# Swagger
+SWAGGER_UPLOAD_MAX_SIZE=10mb
+SWAGGER_CACHE_TTL=3600
+
+# LLM — choose one provider
+LLM_ENABLED=true
+LLM_PROVIDER=groq             # groq | openai | testleaf
+
+# Provider API keys (only the selected provider's key is required)
+GROQ_API_KEY=your_key
+GROQ_MODEL=llama-3.3-70b-versatile
+
+OPENAI_API_KEY=your_key
+OPENAI_MODEL=gpt-4o-mini
+
+TESTLEAF_API_KEY=your_key
+TESTLEAF_MODEL=gpt-4o-mini
+
+# GitHub
+GITHUB_TOKEN=your_github_pat
+```
+
+### Hierarchical Config (`config/`)
+
+Environment-specific overrides loaded at startup:
+
+| File | When |
+|------|------|
+| `config/default.ts` | Always loaded as base |
+| `config/development.ts` | `NODE_ENV=development` |
+| `config/production.ts` | `NODE_ENV=production` |
+| `config/test.ts` | `NODE_ENV=test` |
 
 ---
 
 ## Tech Stack
 
 ### Backend
-- **Runtime**: Node.js 18+
-- **Framework**: Express.js
-- **Language**: TypeScript
-- **Architecture**: Clean Architecture (Hexagonal)
-- **Validation**: Joi
-- **OpenAPI Parser**: @apidevtools/swagger-parser
-- **Logging**: Winston
-- **Testing**: Jest
+
+| Technology | Purpose |
+|-----------|---------|
+| **Node.js 18+** | Runtime |
+| **Express** | HTTP framework |
+| **TypeScript** | Type safety |
+| **Clean Architecture** | Layered separation (API → Application → Domain → Infrastructure) |
+| **Joi** | Request validation |
+| **Winston** | Structured logging |
+| **Zod** | Environment variable validation |
+| **Groq SDK / OpenAI SDK** | LLM provider clients |
+| **simple-git** | Git operations for GitHub push |
+| **Jest** | Unit testing |
 
 ### Frontend
-- **Framework**: React 18
-- **Language**: TypeScript
-- **Build Tool**: Vite
-- **Routing**: React Router v6
-- **State Management**: Zustand
-- **Styling**: Tailwind CSS
-- **UI Components**: Custom components with Lucide icons
-- **HTTP Client**: Axios
-- **Forms**: React Hook Form (if used)
 
-### Test Generation
-- **BDD Framework**: Cucumber.js
-- **Test Runner**: Jest / Cucumber
-- **HTTP Client**: Axios
-- **Assertion Library**: Chai (BDD) / Jest (Axios)
+| Technology | Purpose |
+|-----------|---------|
+| **React 19** | UI framework |
+| **Vite** | Build tool + dev server |
+| **TypeScript** | Type safety |
+| **TailwindCSS 4** | Styling |
+| **Zustand** | State management |
+| **React Router v7** | Client-side routing |
+| **Monaco Editor** | Code viewer for generated tests |
+| **Lucide React** | Icons |
+| **Axios** | HTTP client |
+
+### Generated Tests
+
+| Technology | Purpose |
+|-----------|---------|
+| **Java 11+** | Test language |
+| **Maven** | Build and dependency management |
+| **REST Assured** | HTTP request library for API testing |
+| **JUnit 5** | Test framework |
+| **JavaFaker** | Dynamic test data generation |
+| **Allure** | Test reporting with request/response details |
+| **Jackson Databind** | JSON serialization for request bodies |
 
 ---
 
 ## Troubleshooting
 
-### Backend Issues
+### Backend won't start
 
-**Issue**: Port 3001 already in use
 ```bash
-# Find and kill process
+# Port already in use
 lsof -ti:3001 | xargs kill -9
-# Or change port in .env
-PORT=3002 npm start
-```
 
-**Issue**: Cannot import spec
-- Check URL is accessible
-- Verify JSON/YAML is valid OpenAPI
-- Check network/firewall settings
-
-**Issue**: Tests fail to execute
-- Verify test suite path exists
-- Check package.json has test script
-- Run `npm install` in test directory first
-
-### Frontend Issues
-
-**Issue**: Cannot connect to backend
-- Verify backend is running on port 3001
-- Check `VITE_API_BASE_URL` in `.env`
-- Check CORS settings
-
-**Issue**: Build fails
-```bash
-cd web-app
-rm -rf node_modules package-lock.json
+# Missing dependencies
 npm install
-npm run build
+
+# Check env validation errors in console output
 ```
 
-### Test Execution Issues
+### Agent run fails immediately
 
-**Issue**: Can't proceed to Execute step after generating tests
-- Make sure "Save to Disk (Persist Tests)" is checked
-- Tests must be persisted to disk before execution
-- Check console for any errors during generation
+- Verify `LLM_PROVIDER` is set and the corresponding API key is valid
+- Check `LOG_LEVEL=debug` in `.env` for detailed LLM call logs
+- Groq free tier has token limits — switch to `openai` if hitting 429 errors
 
-**Issue**: Tests don't run
-- Ensure test suite has dependencies installed
-- Check test path is correct
-- Verify `.env` in test suite has API URL
-- Run `npm install` in the generated test directory
+### Tests show 0/0 passed
 
-**Issue**: All tests fail
-- Check API base URL in test `.env`
-- Verify API is accessible
-- Check authentication requirements
-- Ensure backend API is running
+- Ensure **Java 11+** and **Maven** are installed: `java -version && mvn -version`
+- Check `swagger-tests/<spec-name>/` exists with a `pom.xml`
+- Run manually: `cd swagger-tests/<spec-name> && mvn test`
+
+### Allure report not loading
+
+- The backend serves Allure reports as static files from `swagger-tests/<spec-name>/target/site/allure-maven-plugin/`
+- If empty, run: `cd swagger-tests/<spec-name> && mvn allure:report`
+
+### GitHub push fails
+
+- Verify `GITHUB_TOKEN` has `repo` scope permissions
+- Ensure the target repository exists on GitHub
+- Check the branch name doesn't contain invalid characters
+
+### Frontend can't connect to backend
+
+- Verify backend is running on port 3001
+- Check CORS — backend allows all origins in development
+- Frontend expects `http://localhost:3001` by default (configurable in `web-app/src/config/api.config.ts`)
 
 ---
 
 ## Development
-
-### Running in Development
 
 ```bash
 # Backend with hot reload
 npm run dev
 
 # Frontend with hot reload
-cd web-app
-npm run dev
+cd web-app && npm run dev
 
-# Run tests
+# Run unit tests
 npm test
 
-# Lint code
-npm run lint
+# Type check
+npx tsc --noEmit
+
+# Build for production
+npm run build:all
 ```
-
-### Building for Production
-
-```bash
-# Build backend
-npm run build
-
-# Build frontend
-cd web-app
-npm run build
-
-# Start production
-npm start
-```
-
-### Environment Variables
-
-**Backend (.env)**:
-```env
-PORT=3001
-NODE_ENV=development
-LOG_LEVEL=info
-```
-
-**Frontend (web-app/.env)**:
-```env
-VITE_API_BASE_URL=http://localhost:3001
-```
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
 
 ---
 
 ## License
 
-[Your License Here]
-
----
-
-## Support
-
-For issues, questions, or contributions:
-- **Issues**: [GitHub Issues](your-repo-url/issues)
-- **Discussions**: [GitHub Discussions](your-repo-url/discussions)
-- **Email**: your-email@example.com
-
----
-
-## Summary
-
-**What the Backend Does**:
-- Imports and parses OpenAPI specifications
-- Generates test code (BDD/Axios)
-- Persists tests to disk with proper structure
-- Executes tests and captures results
-- Provides REST API for all operations
-
-**What the UI Does**:
-- Modern web interface for all backend features
-- Unified workflow for spec management
-- Step-by-step test generation wizard
-- Real-time test execution and reporting
-- No command line needed
-
-**What You Should Do**:
-1. Start backend and frontend
-2. Import a Swagger spec (Specs page)
-3. Generate tests (Test Lab → Select spec → Configure → **Check "Save to Disk"** → Generate)
-4. Execute and view results (automatically advances to Execute step)
-5. Iterate and improve
-
-**Important**: For BDD tests, make sure "Save to Disk (Persist Tests)" is checked to enable test execution.
-
-**That's it!** Simple, powerful, and fully automated API testing from Swagger specs.
-
+ISC
