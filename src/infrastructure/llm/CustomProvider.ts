@@ -1,18 +1,18 @@
 /**
- * TestLeaf Provider
+ * Custom Provider
  * 
- * Custom LLM provider using TestLeaf's GPT-based API
+ * Custom LLM provider using an OpenAI-compatible GPT-based API
  * - OpenAI-compatible chat/completions endpoint
  * - Uses gpt-4o-mini model
- * - Base URL: https://api.testleaf.com/ai/v1
+ * - Base URL: https://api.<provider>.com/ai/v1
  */
 
 import axios, { AxiosInstance } from 'axios';
 import { ILlmProvider, LlmRequest, LlmResponse } from '../../domain/services/llm';
 import { ILogger } from '../logging';
 
-export class TestLeafProvider implements ILlmProvider {
-  public readonly name = 'testleaf';
+export class CustomProvider implements ILlmProvider {
+  public readonly name = 'custom';
   private client: AxiosInstance | null = null;
   private model: string;
   private apiKey: string | undefined;
@@ -20,9 +20,9 @@ export class TestLeafProvider implements ILlmProvider {
   private logger: ILogger | null;
 
   constructor(logger?: ILogger) {
-    this.apiKey = process.env.TESTLEAF_API_KEY;
-    this.model = process.env.TESTLEAF_MODEL || 'gpt-4o-mini';
-    this.baseUrl = process.env.TESTLEAF_BASE_URL || 'https://api.testleaf.com/ai/v1';
+    this.apiKey = process.env.CUSTOM_API_KEY;
+    this.model = process.env.CUSTOM_MODEL || 'gpt-4o-mini';
+    this.baseUrl = process.env.CUSTOM_BASE_URL || 'https://api.testleaf.com/ai/v1';
     this.logger = logger || null;
 
     if (this.apiKey) {
@@ -39,7 +39,7 @@ export class TestLeafProvider implements ILlmProvider {
 
   async isAvailable(): Promise<boolean> {
     const available = !!this.apiKey && !!this.client;
-    this.logger?.debug(`[TestLeaf] isAvailable: ${available}`, {
+    this.logger?.debug(`[Custom] isAvailable: ${available}`, {
       hasApiKey: !!this.apiKey,
       model: this.model,
       baseUrl: this.baseUrl,
@@ -49,7 +49,7 @@ export class TestLeafProvider implements ILlmProvider {
 
   async generate(request: LlmRequest): Promise<LlmResponse> {
     if (!this.client) {
-      throw new Error('TestLeaf client not initialized. Check TESTLEAF_API_KEY environment variable.');
+      throw new Error('Custom LLM client not initialized. Check CUSTOM_API_KEY environment variable.');
     }
 
     const messages: Array<{ role: 'system' | 'user'; content: string }> = [];
@@ -66,7 +66,7 @@ export class TestLeafProvider implements ILlmProvider {
       content: request.prompt,
     });
 
-    this.logger?.debug(`[TestLeaf] POST ${this.baseUrl}/chat/completions`, {
+    this.logger?.debug(`[Custom] POST ${this.baseUrl}/chat/completions`, {
       model: this.model,
       messageCount: messages.length,
       temperature: request.temperature ?? 0.3,
@@ -87,14 +87,14 @@ export class TestLeafProvider implements ILlmProvider {
       const latencyMs = Date.now() - startTime;
       const rawData = response.data;
 
-      // TestLeaf wraps the OpenAI response inside transaction.response
+      // The API may wrap the OpenAI response inside transaction.response
       // Shape: { message: "...", transaction: { response: { choices, usage, ... } } }
       const openAiResponse = rawData?.transaction?.response || rawData;
 
       const content = openAiResponse?.choices?.[0]?.message?.content || '';
       const tokensUsed = openAiResponse?.usage?.total_tokens || 0;
 
-      this.logger?.info(`[TestLeaf] ✅ Response received`, {
+      this.logger?.info(`[Custom] ✅ Response received`, {
         model: openAiResponse?.model || this.model,
         tokensUsed,
         promptTokens: openAiResponse?.usage?.prompt_tokens,
@@ -105,7 +105,7 @@ export class TestLeafProvider implements ILlmProvider {
       });
 
       if (!content) {
-        this.logger?.warn(`[TestLeaf] ⚠️ Empty content — unexpected response shape`, {
+        this.logger?.warn(`[Custom] ⚠️ Empty content — unexpected response shape`, {
           topLevelKeys: Object.keys(rawData || {}),
           hasTransaction: !!rawData?.transaction,
           hasResponse: !!rawData?.transaction?.response,
@@ -124,7 +124,7 @@ export class TestLeafProvider implements ILlmProvider {
       const errorData = error.response?.data;
       const errorMessage = errorData?.error?.message || error.message || String(error);
 
-      this.logger?.error(`[TestLeaf] ❌ Request failed`, {
+      this.logger?.error(`[Custom] ❌ Request failed`, {
         statusCode,
         errorMessage: errorMessage.substring(0, 200),
         latencyMs,
@@ -133,7 +133,7 @@ export class TestLeafProvider implements ILlmProvider {
         url: `${this.baseUrl}/chat/completions`,
       });
 
-      throw new Error(`TestLeaf API error: ${statusCode ? `${statusCode} ` : ''}${errorMessage}`);
+      throw new Error(`Custom LLM API error: ${statusCode ? `${statusCode} ` : ''}${errorMessage}`);
     }
   }
 }

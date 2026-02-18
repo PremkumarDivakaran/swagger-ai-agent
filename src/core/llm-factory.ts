@@ -5,7 +5,7 @@
  * No fallback cascade — one provider is selected and used for all calls.
  * 
  * Phase 1 supported providers:
- *   - testleaf  → TestLeaf GPT API (https://api.testleaf.com/ai/v1)
+ *   - custom    → Custom GPT API (https://api.<provider>.com/ai/v1)
  *   - groq      → Groq API (https://api.groq.com/openai/v1)
  *   - openai    → OpenAI API (https://api.openai.com/v1)
  */
@@ -14,7 +14,7 @@ import { ILlmProvider } from '../domain/services/llm';
 import {
   GroqProvider,
   OpenAiProvider,
-  TestLeafProvider,
+  CustomProvider,
   LlmRouter,
   LlmCache,
 } from '../infrastructure/llm';
@@ -23,14 +23,14 @@ import { ILogger } from '../infrastructure/logging';
 export interface LlmFactoryConfig {
   /** Whether LLM features are enabled */
   enabled: boolean;
-  /** The single provider to use (testleaf | groq | openai) */
+  /** The single provider to use (custom | groq | openai) */
   provider: string;
   /** Logger instance */
   logger?: ILogger;
 }
 
 /** Supported providers in Phase 1 */
-const SUPPORTED_PROVIDERS = ['testleaf', 'groq', 'openai'] as const;
+const SUPPORTED_PROVIDERS = ['custom', 'groq', 'openai'] as const;
 type SupportedProvider = typeof SUPPORTED_PROVIDERS[number];
 
 export class LlmFactory {
@@ -76,10 +76,10 @@ export class LlmFactory {
   private static createProvider(name: string, logger?: ILogger): ILlmProvider | null {
     try {
       switch (name) {
-        case 'testleaf':
-          // Endpoint: https://api.testleaf.com/ai/v1
-          // Key: TESTLEAF_API_KEY, Model: TESTLEAF_MODEL
-          return new TestLeafProvider(logger);
+        case 'custom':
+          // Endpoint: https://api.<provider>.com/ai/v1
+          // Key: CUSTOM_API_KEY, Model: CUSTOM_MODEL
+          return new CustomProvider(logger);
 
         case 'groq':
           // Endpoint: https://api.groq.com/openai/v1 (via groq-sdk)

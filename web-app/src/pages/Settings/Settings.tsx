@@ -40,8 +40,8 @@ const LLM_PROVIDERS = [
     badge: 'Fast',
   },
   {
-    value: 'testleaf',
-    label: 'TestLeaf',
+    value: 'custom',
+    label: 'Custom',
     description: 'Custom GPT-based API',
     icon: Sparkles,
     color: 'from-violet-500 to-purple-500',
@@ -70,8 +70,8 @@ export function Settings() {
   const [provider, setProvider] = useState('groq');
   const [groqApiKey, setGroqApiKey] = useState('');
   const [groqModel, setGroqModel] = useState('llama-3.3-70b-versatile');
-  const [testleafApiKey, setTestleafApiKey] = useState('');
-  const [testleafModel, setTestleafModel] = useState('gpt-4o-mini');
+  const [customApiKey, setCustomApiKey] = useState('');
+  const [customModel, setCustomModel] = useState('gpt-4o-mini');
   const [openaiApiKey, setOpenaiApiKey] = useState('');
   const [openaiModel, setOpenaiModel] = useState('gpt-4o-mini');
 
@@ -93,8 +93,8 @@ export function Settings() {
       setProvider(settings.llm.provider || 'groq');
       setGroqApiKey(settings.llm.groqApiKey || '');
       setGroqModel(settings.llm.groqModel || 'llama-3.3-70b-versatile');
-      setTestleafApiKey(settings.llm.testleafApiKey || '');
-      setTestleafModel(settings.llm.testleafModel || 'gpt-4o-mini');
+      setCustomApiKey(settings.llm.customApiKey || '');
+      setCustomModel(settings.llm.customModel || 'gpt-4o-mini');
       setOpenaiApiKey(settings.llm.openaiApiKey || '');
       setOpenaiModel(settings.llm.openaiModel || 'gpt-4o-mini');
       setGithubToken(settings.github.githubToken || '');
@@ -116,9 +116,9 @@ export function Settings() {
       if (provider === 'groq') {
         if (groqApiKey && !groqApiKey.includes('...')) request.llm!.groqApiKey = groqApiKey;
         request.llm!.groqModel = groqModel;
-      } else if (provider === 'testleaf') {
-        if (testleafApiKey && !testleafApiKey.includes('...')) request.llm!.testleafApiKey = testleafApiKey;
-        request.llm!.testleafModel = testleafModel;
+      } else if (provider === 'custom') {
+        if (customApiKey && !customApiKey.includes('...')) request.llm!.customApiKey = customApiKey;
+        request.llm!.customModel = customModel;
       } else if (provider === 'openai') {
         if (openaiApiKey && !openaiApiKey.includes('...')) request.llm!.openaiApiKey = openaiApiKey;
         request.llm!.openaiModel = openaiModel;
@@ -263,17 +263,17 @@ export function Settings() {
                       type={showApiKey ? 'text' : 'password'}
                       value={
                         provider === 'groq' ? groqApiKey :
-                        provider === 'testleaf' ? testleafApiKey :
+                        provider === 'custom' ? customApiKey :
                         openaiApiKey
                       }
                       onChange={(e) => {
                         if (provider === 'groq') setGroqApiKey(e.target.value);
-                        else if (provider === 'testleaf') setTestleafApiKey(e.target.value);
+                        else if (provider === 'custom') setCustomApiKey(e.target.value);
                         else setOpenaiApiKey(e.target.value);
                       }}
                       placeholder={
                         provider === 'groq' ? 'gsk_...' :
-                        provider === 'testleaf' ? 'Enter TestLeaf API key' :
+                        provider === 'custom' ? 'Enter Custom API key' :
                         'sk-...'
                       }
                       className="w-full px-4 py-2.5 border-2 rounded-lg bg-background pr-12 text-sm font-mono"
@@ -298,12 +298,12 @@ export function Settings() {
                     type="text"
                     value={
                       provider === 'groq' ? groqModel :
-                      provider === 'testleaf' ? testleafModel :
+                      provider === 'custom' ? customModel :
                       openaiModel
                     }
                     onChange={(e) => {
                       if (provider === 'groq') setGroqModel(e.target.value);
-                      else if (provider === 'testleaf') setTestleafModel(e.target.value);
+                      else if (provider === 'custom') setCustomModel(e.target.value);
                       else setOpenaiModel(e.target.value);
                     }}
                     className="w-full px-4 py-2.5 border-2 rounded-lg bg-background text-sm"

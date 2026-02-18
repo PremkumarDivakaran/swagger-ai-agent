@@ -25,7 +25,7 @@ function initializeDependencies(): AppDependencies {
 
   // Initialize LLM with selected provider
   const llmEnabled = process.env.LLM_ENABLED === 'true';
-  const llmProvider = process.env.LLM_PROVIDER || 'testleaf';
+  const llmProvider = process.env.LLM_PROVIDER || 'custom';
 
   const llmRouter = LlmFactory.createLlmRouter({
     enabled: llmEnabled,

@@ -1,7 +1,7 @@
 /**
  * LLM Provider Interface
  * 
- * Common interface for all LLM providers (Groq, OpenAI, TestLeaf)
+ * Common interface for all LLM providers (Groq, OpenAI, Custom)
  */
 
 /**
@@ -40,7 +40,7 @@ export interface LlmResponse {
  * All LLM providers must implement this interface
  */
 export interface ILlmProvider {
-  /** Provider name (e.g., 'groq', 'openai', 'testleaf') */
+  /** Provider name (e.g., 'groq', 'openai', 'custom') */
   name: string;
   
   /**

@@ -97,8 +97,8 @@ export class SettingsController {
             provider: env.get('LLM_PROVIDER') || 'groq',
             groqApiKey: maskKey(env.get('GROQ_API_KEY')),
             groqModel: env.get('GROQ_MODEL') || 'llama-3.3-70b-versatile',
-            testleafApiKey: maskKey(env.get('TESTLEAF_API_KEY')),
-            testleafModel: env.get('TESTLEAF_MODEL') || 'gpt-4o-mini',
+            customApiKey: maskKey(env.get('CUSTOM_API_KEY')),
+            customModel: env.get('CUSTOM_MODEL') || 'gpt-4o-mini',
             openaiApiKey: maskKey(env.get('OPENAI_API_KEY')),
             openaiModel: env.get('OPENAI_MODEL') || 'gpt-4o-mini',
           },
@@ -132,8 +132,8 @@ export class SettingsController {
         if (llm.provider) updates['LLM_PROVIDER'] = llm.provider;
         if (llm.groqApiKey) updates['GROQ_API_KEY'] = llm.groqApiKey;
         if (llm.groqModel) updates['GROQ_MODEL'] = llm.groqModel;
-        if (llm.testleafApiKey) updates['TESTLEAF_API_KEY'] = llm.testleafApiKey;
-        if (llm.testleafModel) updates['TESTLEAF_MODEL'] = llm.testleafModel;
+        if (llm.customApiKey) updates['CUSTOM_API_KEY'] = llm.customApiKey;
+        if (llm.customModel) updates['CUSTOM_MODEL'] = llm.customModel;
         if (llm.openaiApiKey) updates['OPENAI_API_KEY'] = llm.openaiApiKey;
         if (llm.openaiModel) updates['OPENAI_MODEL'] = llm.openaiModel;
       }

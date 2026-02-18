@@ -86,7 +86,7 @@ User clicks "Launch AI REST Assured"
 - **Node.js** 18+
 - **Java** 11+ and **Maven** (for executing generated REST Assured tests)
 - **Git**
-- An LLM API key (Groq or OpenAI)
+- An LLM API key (Groq, OpenAI, or Custom)
 
 ### Installation
 
@@ -110,7 +110,7 @@ NODE_ENV=development
 PORT=3001
 LOG_LEVEL=info
 
-# LLM — pick one provider: groq | openai
+# LLM — pick one provider: groq | openai | custom
 LLM_ENABLED=true
 LLM_PROVIDER=groq
 
@@ -122,6 +122,9 @@ GROQ_MODEL=llama-3.3-70b-versatile
 OPENAI_API_KEY=your_openai_api_key
 OPENAI_MODEL=gpt-4o-mini
 
+# Custom (OpenAI-compatible GPT-based API)
+CUSTOM_API_KEY=your_custom_api_key
+CUSTOM_MODEL=gpt-4o-mini
 
 # GitHub (for Push to GitHub / PR creation)
 GITHUB_TOKEN=your_github_personal_access_token
@@ -265,6 +268,7 @@ Pure business logic with no framework dependencies (Clean Architecture principle
 | `LlmRouter.ts` | Routes all LLM requests to the configured provider. Supports caching and structured logging |
 | `GroqProvider.ts` | Groq API integration (Llama models, free tier available) |
 | `OpenAiProvider.ts` | OpenAI API integration (GPT-4o-mini, etc.) |
+| `CustomProvider.ts` | Custom OpenAI-compatible API at `api.<provider>.com` |
 | `LlmCache.ts` | In-memory cache for LLM responses to avoid duplicate API calls |
 
 #### `src/utils/` — Shared Utilities
@@ -392,6 +396,7 @@ The system uses a single LLM provider at a time, configured via `LLM_PROVIDER` i
 | **OpenAI** | `openai` | `api.openai.com` | `gpt-4o-mini`, `gpt-4o` |
 
 
+
 All providers implement the same `ILlmProvider` interface. Switching providers requires only changing one env variable — no code changes needed.
 
 The `LlmRouter` handles:
@@ -474,7 +479,7 @@ SWAGGER_CACHE_TTL=3600
 
 # LLM — choose one provider
 LLM_ENABLED=true
-LLM_PROVIDER=groq             # groq | openai
+LLM_PROVIDER=groq             # groq | openai | custom
 
 # Provider API keys (only the selected provider's key is required)
 GROQ_API_KEY=your_key
@@ -483,6 +488,8 @@ GROQ_MODEL=llama-3.3-70b-versatile
 OPENAI_API_KEY=your_key
 OPENAI_MODEL=gpt-4o-mini
 
+CUSTOM_API_KEY=your_key
+CUSTOM_MODEL=gpt-4o-mini
 
 # GitHub
 GITHUB_TOKEN=your_github_pat

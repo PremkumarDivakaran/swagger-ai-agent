@@ -10,8 +10,8 @@ export interface LlmSettings {
   provider: string;
   groqApiKey?: string;
   groqModel?: string;
-  testleafApiKey?: string;
-  testleafModel?: string;
+  customApiKey?: string;
+  customModel?: string;
   openaiApiKey?: string;
   openaiModel?: string;
 }

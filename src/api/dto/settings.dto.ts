@@ -4,11 +4,11 @@
  */
 
 export interface LlmSettingsDto {
-  provider: 'groq' | 'testleaf' | 'openai';
+  provider: 'groq' | 'custom' | 'openai';
   groqApiKey?: string;
   groqModel?: string;
-  testleafApiKey?: string;
-  testleafModel?: string;
+  customApiKey?: string;
+  customModel?: string;
   openaiApiKey?: string;
   openaiModel?: string;
 }
@@ -22,8 +22,8 @@ export interface GetSettingsResponseDto {
     provider: string;
     groqApiKey?: string;
     groqModel?: string;
-    testleafApiKey?: string;
-    testleafModel?: string;
+    customApiKey?: string;
+    customModel?: string;
     openaiApiKey?: string;
     openaiModel?: string;
   };
